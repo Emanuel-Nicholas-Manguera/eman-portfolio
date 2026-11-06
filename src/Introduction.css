@@ -99,7 +99,7 @@
   width: 100%;
   padding: 0;
   border: 0;
-  border-radius: 16px;
+  border-radius: 50%;
   color: inherit;
   background: transparent;
   cursor: pointer;
@@ -111,18 +111,16 @@
   position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: 20 / 23;
+  aspect-ratio: 1;
   overflow: hidden;
-  /* A soft edge blends the cropped torso into either wallpaper. */
-  -webkit-mask-image: linear-gradient(#000 0%, #000 80%, transparent 99%);
-  mask-image: linear-gradient(#000 0%, #000 80%, transparent 99%);
+  border-radius: 50%;
 }
 
 .portrait-layer {
   position: absolute;
   display: block;
   transform: translateX(-50%);
-  transition: opacity 750ms ease-in-out;
+  transition: opacity 350ms ease-in-out;
 }
 
 .portrait-layer img {
@@ -135,14 +133,14 @@
 
 /* Match the eye line and head size across the two original poses. */
 .portrait-layer--suit {
-  top: 8.3%;
+  top: 10%;
   left: 52%;
   width: 100%;
   opacity: 1;
 }
 
 .portrait-layer--graduation {
-  top: -1.8%;
+  top: -1.6%;
   left: 50%;
   width: 134%;
   opacity: 0;
@@ -154,24 +152,6 @@
 
 .portrait-toggle[data-revealed='true'] .portrait-layer--graduation {
   opacity: 1;
-}
-
-.portrait-hint {
-  color: var(--muted-text);
-  font-size: 11px;
-}
-
-.portrait-hint {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  margin: 12px 0 0;
-  line-height: 1.5;
-}
-
-.portrait-hint--touch {
-  display: none;
 }
 
 .intro-scroll {
@@ -294,7 +274,6 @@
 .section-eyebrow,
 .intro-description,
 .intro-location,
-.portrait-hint,
 .intro-scroll,
 .work-number,
 .work-status,
@@ -367,16 +346,6 @@
   .work-link {
     grid-column: 2;
     justify-self: start;
-  }
-}
-
-@media (hover: none), (pointer: coarse) {
-  .portrait-hint--mouse {
-    display: none;
-  }
-
-  .portrait-hint--touch {
-    display: inline;
   }
 }
 

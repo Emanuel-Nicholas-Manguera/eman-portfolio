@@ -41,7 +41,6 @@ function Portrait() {
         className="portrait-toggle"
         type="button"
         aria-label={isPinned ? 'Show suit portrait' : 'Show graduation portrait'}
-        aria-describedby="portrait-hint"
         aria-pressed={isPinned}
         data-revealed={isRevealed}
         onPointerEnter={(event) => {
@@ -86,10 +85,6 @@ function Portrait() {
           </span>
         </span>
       </button>
-      <figcaption className="portrait-hint" id="portrait-hint">
-        <span className="portrait-hint--mouse">Hover or click to switch portraits</span>
-        <span className="portrait-hint--touch">Tap to switch portraits</span>
-      </figcaption>
     </figure>
   )
 }
