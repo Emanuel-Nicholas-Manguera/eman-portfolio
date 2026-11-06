@@ -6,14 +6,16 @@
   --header-shadow: #1435501c;
   --control-hover: #d7e7f5;
   --focus-color: #1559b7;
+  --accent: #2466a6;
+  --action-background: #173f66;
+  --action-text: #f4f9ff;
   --theme-duration: 350ms;
   --icon-duration: 300ms;
   --theme-easing: cubic-bezier(.25, .1, .25, 1);
 
   position: relative;
   isolation: isolate;
-  /* Leave room to try scrolling until the portfolio sections are added. */
-  min-height: calc(100svh + 240px);
+  min-height: 100svh;
   overflow: clip;
   color: var(--text);
   color-scheme: light;
@@ -48,6 +50,9 @@
   --header-shadow: #020b1e40;
   --control-hover: #25465f;
   --focus-color: #8dc5ff;
+  --accent: #a6d3ff;
+  --action-background: #c6e4ff;
+  --action-text: #12334f;
 
   color-scheme: dark;
   background: #06111e;
@@ -157,6 +162,11 @@
 .site-nav a[aria-disabled='true'],
 .mobile-nav a[aria-disabled='true'] {
   cursor: default;
+}
+
+.site-nav a[href]:hover,
+.mobile-nav a[href]:hover {
+  color: var(--accent);
 }
 
 .theme-toggle,
