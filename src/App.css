@@ -11,7 +11,7 @@
   min-height: 100svh;
   overflow: hidden;
   color-scheme: light;
-  background: linear-gradient(135deg, #d8edf7, #bad5f0 52%, #7da6d6);
+  background: #dce9f7;
 }
 
 .wallpaper {
@@ -20,41 +20,15 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-}
-
-.wallpaper::before,
-.wallpaper::after {
-  content: '';
-  position: absolute;
-}
-
-.wallpaper::before {
-  width: 135%;
-  height: 115%;
-  top: 36%;
-  left: 14%;
-  border-radius: 50%;
-  transform: rotate(-25deg);
-  background: linear-gradient(
-    155deg,
-    #eaf4fc 5%,
-    #a8ccec 23%,
-    #659bd8 43%,
-    #2861ae 67%,
-    #123f82 85%
-  );
-  box-shadow: 0 -24px 70px #f3eee6a6;
-}
-
-.wallpaper::after {
-  width: 110%;
-  height: 85%;
-  top: 70%;
-  left: -43%;
-  border-radius: 50%;
-  transform: rotate(21deg);
-  background: linear-gradient(150deg, #e0edf9, #a7c6e7 52%, #477ebc 88%);
-  box-shadow: 0 -12px 35px #dcebf650;
+  background:
+    radial-gradient(
+      ellipse at 72% 85%,
+      #4f97da 0,
+      #8ebbe6 24%,
+      transparent 62%
+    ),
+    radial-gradient(ellipse at 14% 14%, #f1f8fc 0, transparent 68%),
+    linear-gradient(140deg, #dce9f7, #a7cbe7);
 }
 
 .desktop-background[data-theme='windows'] {
@@ -66,44 +40,19 @@
   --focus-color: #8dc5ff;
 
   color-scheme: dark;
-  background: radial-gradient(ellipse at 59% 64%, #17477d, #0c203b 52%, #071322);
+  background: #06111e;
 }
 
-[data-theme='windows'] .wallpaper::before {
-  width: 78%;
-  height: 115%;
-  top: 18%;
-  left: 26%;
-  border-radius: 38% 65% 35% 62%;
-  transform: rotate(-37deg);
-  background: linear-gradient(
-    125deg,
-    #123563 8%,
-    #2b7bd1 23%,
-    #103d81 34%,
-    #52a7ed 45%,
-    #194d8d 57%,
-    #10294e 76%
-  );
-  box-shadow: -24px -14px 90px #3c91e52e;
-}
-
-[data-theme='windows'] .wallpaper::after {
-  width: 49%;
-  height: 85%;
-  top: 39%;
-  left: 45%;
-  border-radius: 58% 30% 66% 32%;
-  transform: rotate(-29deg);
-  background: linear-gradient(
-    130deg,
-    #0c264c 8%,
-    #195aaf 42%,
-    #4e9be7 51%,
-    #174375 64%,
-    #0b2241 85%
-  );
-  box-shadow: -12px -6px 28px #7bb8ef16;
+[data-theme='windows'] .wallpaper {
+  background:
+    radial-gradient(
+      ellipse at 72% 85%,
+      #145c9c 0,
+      #103b66 25%,
+      transparent 64%
+    ),
+    radial-gradient(ellipse at 12% 12%, #132838 0, transparent 65%),
+    #06111e;
 }
 
 .theme-switch {
@@ -143,32 +92,4 @@
 .theme-switch button:focus-visible {
   outline: 3px solid var(--focus-color);
   outline-offset: 3px;
-}
-
-@media (max-width: 600px) {
-  .wallpaper::before {
-    top: 40%;
-    left: -10%;
-    width: 200%;
-  }
-
-  .wallpaper::after {
-    top: 75%;
-    left: -105%;
-    width: 210%;
-  }
-
-  [data-theme='windows'] .wallpaper::before {
-    top: 22%;
-    left: -15%;
-    width: 140%;
-    height: 100%;
-  }
-
-  [data-theme='windows'] .wallpaper::after {
-    top: 42%;
-    left: 18%;
-    width: 95%;
-    height: 80%;
-  }
 }
