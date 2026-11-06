@@ -60,28 +60,30 @@ function Portrait() {
         }}
       >
         <span className="portrait-cutout">
-          <span className="portrait-layer portrait-layer--suit">
-            <img
-              src={suitPortrait}
-              width="833"
-              height="1000"
-              alt=""
-              aria-hidden="true"
-              fetchPriority="high"
-              draggable="false"
-            />
-          </span>
-          <span className="portrait-layer portrait-layer--graduation">
-            <img
-              ref={graduationRef}
-              src={graduationPortrait}
-              width="1000"
-              height="979"
-              alt=""
-              aria-hidden="true"
-              onLoad={() => setIsGraduationLoaded(true)}
-              draggable="false"
-            />
+          <span className="portrait-edges">
+            <span className="portrait-layer portrait-layer--suit">
+              <img
+                src={suitPortrait}
+                width="833"
+                height="1000"
+                alt=""
+                aria-hidden="true"
+                fetchPriority="high"
+                draggable="false"
+              />
+            </span>
+            <span className="portrait-layer portrait-layer--graduation">
+              <img
+                ref={graduationRef}
+                src={graduationPortrait}
+                width="1000"
+                height="979"
+                alt=""
+                aria-hidden="true"
+                onLoad={() => setIsGraduationLoaded(true)}
+                draggable="false"
+              />
+            </span>
           </span>
         </span>
       </button>

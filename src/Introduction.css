@@ -87,6 +87,7 @@
 }
 
 .portrait {
+  container-type: inline-size;
   width: 100%;
   max-width: 450px;
   margin: 0;
@@ -96,7 +97,9 @@
 
 .portrait-toggle {
   display: block;
-  width: 100%;
+  width: 150%;
+  height: 125cqw;
+  margin-left: -42%;
   padding: 0;
   border: 0;
   border-radius: 16px;
@@ -111,7 +114,7 @@
   position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  height: 100%;
   overflow: hidden;
   /* Keep the upper body clear, then feather the lower torso into the page. */
   -webkit-mask-image: linear-gradient(
@@ -134,6 +137,15 @@
   );
 }
 
+.portrait-edges {
+  position: absolute;
+  inset: 0;
+  display: block;
+  /* Feather the outermost edges when a narrow screen limits the gown's width. */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
 .portrait-layer {
   position: absolute;
   display: block;
@@ -149,18 +161,18 @@
   user-select: none;
 }
 
-/* Match the eye line and head size across the two original poses. */
+/* Preserve the original portrait scale within the wider visible area. */
 .portrait-layer--suit {
   top: 7.6%;
-  left: 52%;
-  width: 100%;
+  left: calc(50% + 2cqw);
+  width: 100cqw;
   opacity: 1;
 }
 
 .portrait-layer--graduation {
   top: -1.6%;
   left: 50%;
-  width: 134%;
+  width: 134cqw;
   opacity: 0;
 }
 
@@ -298,6 +310,22 @@
 .work-details p,
 .work-link {
   transition: color var(--theme-duration) var(--theme-easing);
+}
+
+@media (max-width: 1180px) {
+  .introduction {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .portrait {
+    justify-self: center;
+  }
+
+  .portrait-toggle {
+    width: min(150cqw, calc(100vw - 32px));
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
 @media (max-width: 760px) {
