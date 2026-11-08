@@ -125,8 +125,8 @@ export function Introduction() {
         </a>
       </div>
       <Portrait />
-      <a className="intro-scroll" href="#projects">
-        <span>A little about me. Then, what I’m building.</span>
+      <a className="intro-scroll" href="#experience">
+        <span>A little about me. Then, where I’ve contributed.</span>
         <ArrowIcon direction="down" />
       </a>
     </section>

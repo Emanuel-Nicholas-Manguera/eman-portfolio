@@ -1,22 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { Introduction, SelectedWork } from './Introduction'
+import { Experience } from './Experience'
 import './App.css'
 
 type Theme = 'light' | 'dark'
 
-const navigationItems = ['Projects', 'Experience', 'Contact']
+const navigationItems = ['Experience', 'Projects', 'Contact']
 
 function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
   // Add section links as each part of the portfolio is built.
   return navigationItems.map((label) => (
     <a
       key={label}
-      href={label === 'Projects' ? '#projects' : undefined}
+      href={label !== 'Contact' ? `#${label.toLowerCase()}` : undefined}
       role="link"
-      aria-disabled={label === 'Projects' ? undefined : true}
-      aria-label={label === 'Projects' ? undefined : `${label}, coming soon`}
-      title={label === 'Projects' ? undefined : `${label} section coming soon`}
-      onClick={label === 'Projects' ? onNavigate : undefined}
+      aria-disabled={label !== 'Contact' ? undefined : true}
+      aria-label={label !== 'Contact' ? undefined : `${label}, coming soon`}
+      title={label !== 'Contact' ? undefined : `${label} section coming soon`}
+      onClick={label !== 'Contact' ? onNavigate : undefined}
     >
       {label}
     </a>
@@ -176,6 +177,7 @@ function App() {
 
       <main className="main-content">
         <Introduction />
+        <Experience />
         <SelectedWork />
       </main>
     </div>
