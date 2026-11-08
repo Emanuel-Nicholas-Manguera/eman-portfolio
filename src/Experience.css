@@ -6,6 +6,8 @@
   max-width: 1040px;
   margin-inline: auto;
   padding: 60px 0 44px;
+  /* Account for section padding when navigating below the fixed header. */
+  scroll-margin-top: -60px;
 }
 
 .portfolio[data-theme='dark'] .experience {
@@ -38,7 +40,7 @@
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
   align-items: start;
-  gap: 40px;
+  gap: 48px;
 }
 
 .experience-companies {
@@ -140,7 +142,7 @@
 .experience-panel {
   position: absolute;
   inset: 0 0 auto;
-  padding: 4px 4px 8px;
+  padding: 4px 2px 8px;
   opacity: 0;
   visibility: hidden;
   transform: translateY(7px);
@@ -173,7 +175,7 @@
 
 .experience-panel h3 {
   margin: 13px 0 8px;
-  font-size: clamp(23px, 2.4vw, 29px);
+  font-size: clamp(24px, 2.6vw, 32px);
   font-weight: 500;
   line-height: 1.25;
   letter-spacing: -.035em;
@@ -199,19 +201,39 @@
   font-variant-numeric: tabular-nums;
 }
 
-.experience-contributions {
-  display: grid;
-  gap: 12px;
-  margin: 22px 0 0;
-  padding-left: 18px;
-  color: var(--muted-text);
+.experience-summary {
+  margin: 20px 0 0;
+  color: var(--text);
   font-size: 15px;
   line-height: 1.75;
 }
 
-.experience-contributions li { padding-left: 4px; }
-.experience-contributions li::marker { color: var(--accent); }
-.experience-contributions strong { color: var(--text); font-weight: 500; }
+.experience-contributions {
+  display: grid;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted-text);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.experience-contributions li {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 18px;
+  padding: 15px 0;
+  border-top: 1px solid var(--header-border);
+}
+
+.experience-contributions li:last-child { padding-bottom: 0; }
+.experience-contributions strong {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.7;
+}
+.experience-contributions p { margin: 0; }
 
 .experience-details {
   display: flex;
@@ -273,6 +295,7 @@
 }
 
 .experience-kind,
+.experience-summary,
 .experience-contributions strong,
 .experience-detail-label,
 .experience-employer,
@@ -286,16 +309,18 @@
 }
 
 @media (max-width: 900px) {
-  .experience-layout { grid-template-columns: 230px minmax(0, 1fr); gap: 28px; }
+  .experience-layout { grid-template-columns: 210px minmax(0, 1fr); gap: 24px; }
+  .experience-contributions li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 }
 
 @media (max-width: 760px) {
-  .experience { padding: 40px 0 32px; }
+  .experience { padding: 40px 0 32px; scroll-margin-top: -40px; }
   .experience-heading h2 { margin-bottom: 24px; }
-  .experience-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .experience-layout { grid-template-columns: minmax(0, 1fr); gap: 32px; }
   .experience-tab { min-height: 70px; padding: 12px 16px; }
   .experience-tab-copy { gap: 4px; }
-  .experience-contributions { font-size: 14px; line-height: 1.8; }
+  .experience-summary { font-size: 14px; }
+  .experience-contributions { font-size: 14px; line-height: 1.75; }
   .experience-employer { font-size: 15px; }
 }
 

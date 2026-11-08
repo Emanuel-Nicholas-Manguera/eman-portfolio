@@ -11,11 +11,12 @@ const experiences = [
     location: 'Manila City',
     dates: { start: '2026-02', end: '2026-10', label: 'Feb 2026 — Oct 2026' },
     kind: 'Professional experience',
-    projects: ['BeBeLive', 'GolfMatch'],
+    projects: [],
+    summary: 'Developed and maintained software solutions as part of the company’s development team.',
     contributions: [
-      { title: 'Software development', detail: 'Developed and maintained software solutions with the company’s development team.' },
-      { title: 'Team collaboration', detail: 'Worked with technical leads and operations stakeholders on features, documentation, and internal systems.' },
-      { title: 'Troubleshooting & support', detail: 'Helped resolve system issues and provided technical support during downtime.' },
+      { title: 'Team collaboration', detail: 'Collaborated with technical leads and operations stakeholders to deliver reliable software solutions.' },
+      { title: 'Project development', detail: 'Participated in project development activities involving source code, technical documentation, and internal systems.' },
+      { title: 'Troubleshooting & support', detail: 'Assisted in troubleshooting system issues and providing technical support during system downtime when needed.' },
     ],
     languages: ['TypeScript', 'JavaScript', 'SQL', 'Git'],
   },
@@ -28,10 +29,11 @@ const experiences = [
     dates: { start: '2025-09', end: '2025-12', label: 'Sep 2025 — Dec 2025' },
     kind: 'Internship',
     projects: [],
+    summary: 'Developed the backend and data architecture for a mobile performance reporting app used by Global Servicing directors and vice presidents.',
     contributions: [
-      { title: 'Reporting infrastructure', detail: 'Developed backend and data architecture for a mobile performance reporting app used by Global Servicing directors and vice presidents.' },
-      { title: '12 business metrics', detail: 'Built Power BI data models, Power Query workflows, and DAX measures using Excel and reporting data.' },
-      { title: 'Validation & presentation', detail: 'Validated the solution with business analysts and presented it to senior leadership, receiving a vice president’s endorsement to present it globally.' },
+      { title: '12 key business metrics', detail: 'Built Power BI data models, Power Query (M) ETL workflows, and DAX measures to support performance reporting.' },
+      { title: 'Data quality & testing', detail: 'Worked with business analysts to validate data, test and optimize the backend, and align reporting with business requirements.' },
+      { title: 'Leadership presentation', detail: 'Presented the solution to senior leadership and received a vice president’s endorsement to present it globally.' },
     ],
     languages: ['Power Query M', 'DAX'],
   },
@@ -45,13 +47,14 @@ const experiences = [
     // Omit the dates until the duplicate range in the résumé is confirmed.
     dates: null,
     kind: 'Internship',
-    projects: ['DOST INSPIRE'],
+    projects: [],
+    summary: 'Contributed to DOST INSPIRE, developing web modules and dashboards for executive insights and data analytics.',
     contributions: [
-      { title: 'Web development', detail: 'Enhanced web modules and built reusable interface templates from system specifications.' },
-      { title: 'Analytics dashboards', detail: 'Contributed dashboards for executive insights and data analytics to the DOST INSPIRE system.' },
-      { title: 'Account features', detail: 'Implemented authentication, user management, and account modules, collaborating with the team through Git.' },
+      { title: 'Web modules & interfaces', detail: 'Enhanced modules from system specifications using PHP and JavaScript, and built reusable interface templates.' },
+      { title: 'Authentication & accounts', detail: 'Implemented authentication, user management, and account modules for the system.' },
+      { title: 'Team integration', detail: 'Used Git to collaborate with the development team, keeping changes integrated and the code maintainable.' },
     ],
-    languages: ['PHP', 'JavaScript', 'CSS', 'Git'],
+    languages: ['PHP', 'JavaScript', 'CSS', 'Laravel', 'Vue.js', 'Git'],
   },
 ]
 
@@ -190,10 +193,12 @@ export function Experience() {
                 <h3>{experience.role}</h3>
                 <p className="experience-employer">{experience.company}</p>
                 {experience.department && <p className="experience-department">{experience.department}</p>}
+                <p className="experience-summary">{experience.summary}</p>
                 <ul className="experience-contributions">
                   {experience.contributions.map((contribution) => (
                     <li key={contribution.title}>
-                      <strong>{contribution.title}.</strong> {contribution.detail}
+                      <strong>{contribution.title}</strong>
+                      <p>{contribution.detail}</p>
                     </li>
                   ))}
                 </ul>
