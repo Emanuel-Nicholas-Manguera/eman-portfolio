@@ -79,9 +79,12 @@
   background: var(--accent);
   mask: var(--social-logo) center / contain no-repeat;
   -webkit-mask: var(--social-logo) center / contain no-repeat;
-  opacity: .09;
+  opacity: 0;
+  transition: opacity var(--theme-duration) var(--theme-easing);
   pointer-events: none;
 }
+
+.social-watermark[data-visible='true'] { opacity: .09; }
 
 .social-portal {
   position: fixed;

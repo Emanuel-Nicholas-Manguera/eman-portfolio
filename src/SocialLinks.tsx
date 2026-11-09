@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties, type MouseEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
 import { socials, type SocialId } from './socialData'
 import './SocialLinks.css'
@@ -13,19 +13,51 @@ export function SocialLinks({ selected, onSelect }: Props) {
   const watermarkRef = useRef<HTMLSpanElement>(null)
   const captionRef = useRef<HTMLParagraphElement>(null)
   const animations = useRef<Animation[]>([])
+  const navigationTimer = useRef<number | undefined>(undefined)
+  const [blockedHref, setBlockedHref] = useState<string | null>(null)
+  // Keep the mask mounted during reset so opacity can fade to zero.
+  const [watermarkSocial, setWatermarkSocial] = useState<SocialId | null>(selected)
   const active = socials.find((social) => social.id === selected)
+  const watermarkSocialData = socials.find((social) => social.id === watermarkSocial)
 
-  useEffect(() => () => animations.current.forEach((animation) => animation.cancel()), [])
+  useEffect(() => () => {
+    animations.current.forEach((animation) => animation.cancel())
+    window.clearTimeout(navigationTimer.current)
+  }, [])
   useEffect(() => {
-    if (selected === null) animations.current.forEach((animation) => animation.cancel())
+    if (selected === null) {
+      animations.current.forEach((animation) => animation.cancel())
+      window.clearTimeout(navigationTimer.current)
+    }
   }, [selected])
 
   function activate(event: MouseEvent<HTMLAnchorElement>, id: SocialId) {
-    // Preserve normal links, including browser shortcuts and new-tab behavior.
+    // Modified clicks retain the browser's normal link behavior.
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
+    const href = event.currentTarget.href
+    window.clearTimeout(navigationTimer.current)
+    setBlockedHref(null)
+    // Let the 600ms portal finish before opening the destination.
+    navigationTimer.current = window.setTimeout(() => {
+      const destination = window.open('about:blank', '_blank')
+      if (!destination) {
+        setBlockedHref(href)
+        return
+      }
+      destination.opener = null
+      const referrer = destination.document.createElement('meta')
+      referrer.name = 'referrer'
+      referrer.content = 'no-referrer'
+      destination.document.head.append(referrer)
+      destination.location.replace(href)
+    }, 700)
     animations.current.forEach((animation) => animation.cancel())
     animations.current = []
-    flushSync(() => onSelect(id))
+    flushSync(() => {
+      setWatermarkSocial(id)
+      onSelect(id)
+    })
 
     const portal = portalRef.current
     const watermark = watermarkRef.current
@@ -66,9 +98,10 @@ export function SocialLinks({ selected, onSelect }: Props) {
       <span
         ref={watermarkRef}
         className="social-watermark"
-        hidden={!active}
+        hidden={!watermarkSocialData}
+        data-visible={selected !== null}
         aria-hidden="true"
-        style={{ '--social-logo': active ? `url("${active.logo}")` : 'none' } as CSSProperties}
+        style={{ '--social-logo': watermarkSocialData ? `url("${watermarkSocialData.logo}")` : 'none' } as CSSProperties}
       />
       <nav className="intro-socials" aria-label="Social profiles and email">
         {socials.map((social) => (
@@ -90,6 +123,9 @@ export function SocialLinks({ selected, onSelect }: Props) {
       </nav>
       <p ref={captionRef} className="social-caption" aria-live="polite" aria-atomic="true">
         {active?.caption ?? '\u00a0'}
+        {active && blockedHref && (
+          <> <a href={blockedHref} target="_blank" rel="noopener noreferrer">Open {active.label} ↗</a></>
+        )}
       </p>
     </>
   )
