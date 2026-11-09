@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Introduction, SelectedWork } from './Introduction'
+import { Introduction } from './Introduction'
+import { Projects } from './Projects'
 import { Experience } from './Experience'
 import './App.css'
 
@@ -178,7 +179,7 @@ function App() {
       <main className="main-content">
         <Introduction />
         <Experience />
-        <SelectedWork />
+        <Projects />
       </main>
     </div>
   )
