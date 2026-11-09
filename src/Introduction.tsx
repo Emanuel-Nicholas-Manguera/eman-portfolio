@@ -5,6 +5,39 @@ import './Introduction.css'
 import { SocialLinks } from './SocialLinks'
 import type { SocialId } from './socialData'
 
+function DotConnections() {
+  const fieldRef = useRef<HTMLDivElement>(null)
+  const [running, setRunning] = useState(false)
+
+  useEffect(() => {
+    const field = fieldRef.current
+    if (!field) return
+    let inView = false
+    const update = () => setRunning(inView && !document.hidden)
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting
+      update()
+    })
+    observer.observe(field)
+    document.addEventListener('visibilitychange', update)
+    return () => {
+      observer.disconnect()
+      document.removeEventListener('visibilitychange', update)
+    }
+  }, [])
+
+  return (
+    <div ref={fieldRef} className="intro-dot-connections" data-running={running} aria-hidden="true">
+      <svg width="100%" height="100%" focusable="false">
+        {/* Match the existing 16px dot grid without stretching on resize. */}
+        <path pathLength="1" d="M40 168H104L136 200H184" />
+        <path pathLength="1" d="M168 104H232V152L264 184" />
+        <path pathLength="1" d="M24 280H72L104 312H152V344" />
+      </svg>
+    </div>
+  )
+}
+
 function ArrowIcon({ direction = 'diagonal' }: { direction?: 'diagonal' | 'down' }) {
   return (
     <svg
@@ -99,6 +132,7 @@ export function Introduction({ social, onSocialSelect }: {
 }) {
   return (
     <section className="introduction" aria-labelledby="intro-title">
+      <DotConnections />
       <div className="intro-copy">
         <p className="intro-location">
           <svg

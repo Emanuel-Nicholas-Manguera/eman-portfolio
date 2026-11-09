@@ -20,7 +20,8 @@
 }
 
 /* Start at the top-left and fade down into the existing blue glow. */
-.introduction::before {
+.introduction::before,
+.intro-dot-connections {
   content: '';
   position: absolute;
   z-index: -1;
@@ -30,12 +31,40 @@
   right: 24%;
   pointer-events: none;
   color: var(--accent);
-  background-image: radial-gradient(circle, currentColor .85px, transparent 1.25px);
-  background-size: 16px 16px;
   -webkit-mask-image: radial-gradient(ellipse at 0% 0%, #000, transparent 85%);
   mask-image: radial-gradient(ellipse at 0% 0%, #000, transparent 85%);
   opacity: .38;
   transition: color var(--theme-duration) var(--theme-easing);
+}
+
+.introduction::before {
+  background-image: radial-gradient(circle, currentColor .85px, transparent 1.25px);
+  background-size: 16px 16px;
+}
+
+.intro-dot-connections { overflow: hidden; }
+.intro-dot-connections svg { display: block; }
+.intro-dot-connections path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  animation: intro-connection-trace 8s ease-in-out infinite;
+  animation-play-state: paused;
+}
+.intro-dot-connections[data-running='true'] path { animation-play-state: running; }
+.intro-dot-connections path:nth-child(2) { animation-delay: -2.7s; }
+.intro-dot-connections path:nth-child(3) { animation-delay: -5.4s; }
+
+@keyframes intro-connection-trace {
+  0%, 6% { stroke-dashoffset: 1; opacity: 0; }
+  12% { opacity: .8; }
+  35% { stroke-dashoffset: 0; opacity: .8; }
+  50%, 100% { stroke-dashoffset: 0; opacity: 0; }
 }
 
 .section-eyebrow {
@@ -242,7 +271,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .introduction::before {
+  .introduction::before,
+  .intro-dot-connections {
     height: 600px;
     right: 0;
   }
@@ -274,7 +304,8 @@
     padding: 0;
   }
 
-  .introduction::before {
+  .introduction::before,
+  .intro-dot-connections {
     left: -24px;
   }
 
@@ -306,6 +337,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .intro-dot-connections path { animation: none; opacity: 0; }
   .portrait-layer,
   .intro-action {
     transition: none;
