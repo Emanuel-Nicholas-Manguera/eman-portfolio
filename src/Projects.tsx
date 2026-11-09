@@ -55,7 +55,7 @@ export function Projects() {
     <div className="projects-heading">
       <div><p className="section-eyebrow">Selected work</p><h2 id="projects-title">Ideas brought to life.</h2></div>
       <div className="projects-navigation" role="group" aria-label="Browse projects">
-        <div className="projects-arrows"><button type="button" className="project-arrow" aria-label="Previous project" onClick={() => setSelected(wrap(selected - 1, projects.length))}><Arrow previous /></button><span>Project {selected + 1} of {projects.length}</span><button type="button" className="project-arrow" aria-label="Next project" onClick={() => setSelected(wrap(selected + 1, projects.length))}><Arrow /></button></div>
+        <div className="projects-arrows"><button type="button" className="project-arrow" aria-label="Previous project" onClick={() => setSelected(wrap(selected - 1, projects.length))}><Arrow previous /></button><span aria-label={`Project ${selected + 1} of ${projects.length}`}>{String(selected + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}</span><button type="button" className="project-arrow" aria-label="Next project" onClick={() => setSelected(wrap(selected + 1, projects.length))}><Arrow /></button></div>
       </div>
     </div>
     <h3 className="project-gallery-title" aria-live="polite">{project.name}</h3>
@@ -79,7 +79,7 @@ export function Projects() {
           if (index === selected) setViewerOpen(true)
           else setSelected(index)
         }}>
-          <span className="project-image-frame">{item.photos.map((itemPhoto, imageIndex) => <span className="project-photo-layer" data-active={photoIndexes[index] === imageIndex} aria-hidden={photoIndexes[index] !== imageIndex} key={itemPhoto.label}><Photo photo={itemPhoto} /></span>)}<span className="project-enlarge" aria-hidden="true">Enlarge ↗</span></span>
+          <span className="project-image-frame">{item.photos.map((itemPhoto, imageIndex) => <span className="project-photo-layer" data-active={photoIndexes[index] === imageIndex} aria-hidden={photoIndexes[index] !== imageIndex} key={itemPhoto.label}><Photo photo={itemPhoto} /></span>)}<span className="project-enlarge" aria-hidden="true">View ↗</span></span>
         </button>
       })}
     </div>

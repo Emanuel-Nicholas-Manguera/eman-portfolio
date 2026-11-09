@@ -24,6 +24,7 @@ const experiences = [
     id: 'amex',
     name: 'American Express',
     company: 'American Express International Inc.',
+    department: 'Country Manager Office',
     role: 'Global Services – Data Analytics Intern',
     location: 'Taguig City',
     dates: { start: '2025-09', end: '2025-12', label: 'Sep 2025 — Dec 2025' },
@@ -191,8 +192,10 @@ export function Experience() {
                   )}
                 </div>
                 <h3>{experience.role}</h3>
-                <p className="experience-employer">{experience.company}</p>
-                {experience.department && <p className="experience-department">{experience.department}</p>}
+                <p className="experience-employer">
+                  <span>{experience.company}</span>
+                  {experience.department && <span className="experience-department"><span aria-hidden="true"> · </span>{experience.department}</span>}
+                </p>
                 <p className="experience-summary">{experience.summary}</p>
                 <ul className="experience-contributions">
                   {experience.contributions.map((contribution) => (
