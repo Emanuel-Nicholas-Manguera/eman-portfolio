@@ -3,6 +3,7 @@ import { Introduction } from './Introduction'
 import { Projects } from './Projects'
 import { Experience } from './Experience'
 import './App.css'
+import type { SocialId } from './socialData'
 
 type Theme = 'light' | 'dark'
 
@@ -27,6 +28,7 @@ function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 function App() {
   const [theme, setTheme] = useState<Theme>('light')
+  const [social, setSocial] = useState<SocialId | null>(null)
   const [isFloating, setIsFloating] = useState(() => window.scrollY >= 80)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
@@ -80,8 +82,12 @@ function App() {
   }, [isMenuOpen])
 
   return (
-    <div className="portfolio" data-theme={theme} id="top">
-      <div className="wallpaper" aria-hidden="true" />
+    <div className="portfolio" data-theme={theme} data-social={social ?? undefined} id="top">
+      <div className="wallpaper" aria-hidden="true">
+        {(['github', 'linkedin', 'gmail'] as const).map((id) => (
+          <div key={id} className={`social-wallpaper social-wallpaper--${id}`} />
+        ))}
+      </div>
 
       <header ref={headerRef} className="site-header" data-floating={isFloating}>
         <div className="header-content">
@@ -104,9 +110,10 @@ function App() {
               type="button"
               aria-label={themeAction}
               title={themeAction}
-              onClick={() =>
+              onClick={() => {
                 setTheme((current) => current === 'light' ? 'dark' : 'light')
-              }
+                setSocial(null)
+              }}
             >
               <svg
                 className="theme-icon theme-icon--moon"
@@ -177,7 +184,7 @@ function App() {
       </header>
 
       <main className="main-content">
-        <Introduction />
+        <Introduction social={social} onSocialSelect={setSocial} />
         <Experience />
         <Projects />
       </main>

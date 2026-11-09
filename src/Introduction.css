@@ -4,6 +4,8 @@
 }
 
 .introduction {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
   align-items: center;
@@ -14,27 +16,25 @@
 }
 
 .intro-copy {
-  position: relative;
-  isolation: isolate;
   padding-block: 20px;
 }
 
-/* Add texture to the empty left side without covering links or the portrait. */
-.intro-copy::before {
+/* Start at the top-left and fade down into the existing blue glow. */
+.introduction::before {
   content: '';
   position: absolute;
   z-index: -1;
-  top: -80px;
-  bottom: -75px;
+  top: 0;
+  height: min(100%, 780px);
   left: calc(-1 * max(40px, (100vw - 1120px) / 2));
-  right: -110px;
+  right: 24%;
   pointer-events: none;
   color: var(--accent);
   background-image: radial-gradient(circle, currentColor .85px, transparent 1.25px);
   background-size: 16px 16px;
-  -webkit-mask-image: radial-gradient(ellipse at 0% 50%, #000, transparent 76%);
-  mask-image: radial-gradient(ellipse at 0% 50%, #000, transparent 76%);
-  opacity: .28;
+  -webkit-mask-image: radial-gradient(ellipse at 0% 0%, #000, transparent 85%);
+  mask-image: radial-gradient(ellipse at 0% 0%, #000, transparent 85%);
+  opacity: .38;
   transition: color var(--theme-duration) var(--theme-easing);
 }
 
@@ -242,9 +242,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .intro-copy::before {
-    top: -35px;
-    bottom: -40px;
+  .introduction::before {
+    height: 600px;
     right: 0;
   }
 
@@ -275,10 +274,8 @@
     padding: 0;
   }
 
-  .intro-copy::before {
+  .introduction::before {
     left: -24px;
-    top: -30px;
-    bottom: -30px;
   }
 
   .intro-copy h1 {

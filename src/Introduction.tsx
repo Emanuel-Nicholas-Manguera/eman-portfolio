@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import suitPortrait from './assets/portraits/emanuel-suit.png'
 import graduationPortrait from './assets/portraits/emanuel-graduation.png'
 import './Introduction.css'
+import { SocialLinks } from './SocialLinks'
+import type { SocialId } from './socialData'
 
 function ArrowIcon({ direction = 'diagonal' }: { direction?: 'diagonal' | 'down' }) {
   return (
@@ -91,7 +93,10 @@ function Portrait() {
   )
 }
 
-export function Introduction() {
+export function Introduction({ social, onSocialSelect }: {
+  social: SocialId | null
+  onSocialSelect: (social: SocialId) => void
+}) {
   return (
     <section className="introduction" aria-labelledby="intro-title">
       <div className="intro-copy">
@@ -123,6 +128,7 @@ export function Introduction() {
         <a className="intro-action" href="#projects">
           View projects <ArrowIcon />
         </a>
+        <SocialLinks selected={social} onSelect={onSocialSelect} />
       </div>
       <Portrait />
       <a className="intro-scroll" href="#experience">

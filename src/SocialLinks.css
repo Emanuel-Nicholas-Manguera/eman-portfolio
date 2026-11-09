@@ -1,0 +1,193 @@
+.intro-copy {
+  position: relative;
+  isolation: isolate;
+}
+
+.intro-socials {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.social-link {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: var(--muted-text);
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: transform 200ms ease, color 350ms ease, background-color 350ms ease;
+}
+
+.social-link:hover {
+  transform: translateY(-3px);
+  background: var(--control-hover);
+}
+
+.social-link:active { transform: scale(.92); }
+.social-link[data-selected='true'] { color: var(--action-text); background: var(--action-background); }
+
+.social-logo {
+  width: 22px;
+  height: 22px;
+  background: currentColor;
+  mask: var(--social-logo) center / contain no-repeat;
+  -webkit-mask: var(--social-logo) center / contain no-repeat;
+}
+
+.social-tooltip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translate(-50%, 4px);
+  padding: 5px 9px;
+  border: 1px solid var(--header-border);
+  border-radius: 7px;
+  background: var(--header-background);
+  color: var(--text);
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.social-link:hover .social-tooltip,
+.social-link:focus-visible .social-tooltip { opacity: 1; transform: translate(-50%, 0); }
+
+.social-caption {
+  min-height: 42px;
+  max-width: 340px;
+  margin: 10px 0 0;
+  color: var(--muted-text);
+  font-size: 12px;
+  line-height: 1.7;
+  transition: color var(--theme-duration) var(--theme-easing);
+}
+
+.social-watermark {
+  position: absolute;
+  z-index: -1;
+  top: 8%;
+  left: 7%;
+  width: min(80%, 340px);
+  aspect-ratio: 1;
+  background: var(--accent);
+  mask: var(--social-logo) center / contain no-repeat;
+  -webkit-mask: var(--social-logo) center / contain no-repeat;
+  opacity: .09;
+  pointer-events: none;
+}
+
+.social-portal {
+  position: fixed;
+  z-index: -2;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: var(--accent);
+}
+
+/* Theme changes are shared by the header and all portfolio sections. */
+.portfolio[data-theme][data-social='github'] {
+  --text: #24292f;
+  --muted-text: #4c5764;
+  --accent: #475569;
+  --header-background: #f1f3f5;
+  --header-border: #52617040;
+  --control-hover: #dce3ea;
+  --action-background: #303c4c;
+  --action-text: #fafcff;
+  --focus-color: #455e78;
+}
+.portfolio[data-theme='dark'][data-social='github'] {
+  --text: #f0f3f6;
+  --muted-text: #b7c1cb;
+  --accent: #c4d1df;
+  --header-background: #202934;
+  --header-border: #bbc9d438;
+  --control-hover: #344456;
+  --action-background: #d6e0eb;
+  --action-text: #19222b;
+  --focus-color: #c4d1df;
+}
+.portfolio[data-theme][data-social='linkedin'] {
+  --text: #103451;
+  --muted-text: #345977;
+  --accent: #0866b0;
+  --header-background: #eaf4fd;
+  --header-border: #0a66c240;
+  --control-hover: #cce4fa;
+  --action-background: #0a66c2;
+  --action-text: #fff;
+  --focus-color: #0a66c2;
+}
+.portfolio[data-theme='dark'][data-social='linkedin'] {
+  --text: #ecf6ff;
+  --muted-text: #b6d2e9;
+  --accent: #8ecbff;
+  --header-background: #123756;
+  --header-border: #8fc9f43d;
+  --control-hover: #214e72;
+  --action-background: #afd9ff;
+  --action-text: #10334e;
+  --focus-color: #8ecbff;
+}
+.portfolio[data-theme][data-social='gmail'] {
+  --text: #4b2529;
+  --muted-text: #735158;
+  --accent: #b83c36;
+  --header-background: #fff1ef;
+  --header-border: #ad555540;
+  --control-hover: #f1d8d5;
+  --action-background: #b83c36;
+  --action-text: #fff8f7;
+  --focus-color: #a92f30;
+}
+.portfolio[data-theme='dark'][data-social='gmail'] {
+  --text: #fff0f0;
+  --muted-text: #e3bfc4;
+  --accent: #ffaaa4;
+  --header-background: #402328;
+  --header-border: #eeb6b640;
+  --control-hover: #60363c;
+  --action-background: #ffc4bf;
+  --action-text: #481b20;
+  --focus-color: #ffaaa4;
+}
+
+.social-wallpaper,
+.social-wallpaper::after {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 600ms var(--theme-easing);
+}
+.social-wallpaper { z-index: 1; }
+.social-wallpaper::after { content: ''; }
+.social-wallpaper--github { background: radial-gradient(ellipse at 72% 85%, #abbccc, transparent 72%), #e9edf1; }
+.social-wallpaper--github::after { background: radial-gradient(ellipse at 72% 85%, #364c62, transparent 72%), #10161e; }
+.social-wallpaper--linkedin { background: radial-gradient(ellipse at 72% 85%, #68afea, transparent 72%), #deefff; }
+.social-wallpaper--linkedin::after { background: radial-gradient(ellipse at 72% 85%, #085e9d, transparent 72%), #071c30; }
+.social-wallpaper--gmail { background: radial-gradient(ellipse at 72% 85%, #e4a5a1, transparent 72%), #f9e9e8; }
+.social-wallpaper--gmail::after { background: radial-gradient(ellipse at 72% 85%, #873d45, transparent 72%), #25171c; }
+[data-social='github'] .social-wallpaper--github,
+[data-social='linkedin'] .social-wallpaper--linkedin,
+[data-social='gmail'] .social-wallpaper--gmail,
+[data-theme='dark'] .social-wallpaper::after { opacity: 1; }
+
+.portfolio[data-social] .experience {
+  --experience-selected-background: color-mix(in srgb, var(--header-background) 82%, var(--accent));
+  --experience-selected-text: var(--text);
+  --experience-selected-border: color-mix(in srgb, var(--header-background) 55%, var(--accent));
+  --experience-hover-background: var(--header-background);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-link, .social-tooltip, .social-caption, .social-wallpaper, .social-wallpaper::after { transition: none; }
+  .social-link:hover, .social-link:active { transform: none; }
+}
