@@ -55,7 +55,6 @@ export function Projects() {
     <div className="projects-heading">
       <div><p className="section-eyebrow">Selected work</p><h2 id="projects-title">Ideas brought to life.</h2></div>
       <div className="projects-navigation" role="group" aria-label="Browse projects">
-        <label className="projects-picker"><span className="projects-sr-only">Browse projects</span><select value={selected} onChange={event => setSelected(Number(event.target.value))}>{projects.map((item, index) => <option key={item.id} value={index}>{item.name}</option>)}</select></label>
         <div className="projects-arrows"><button type="button" className="project-arrow" aria-label="Previous project" onClick={() => setSelected(wrap(selected - 1, projects.length))}><Arrow previous /></button><span>Project {selected + 1} of {projects.length}</span><button type="button" className="project-arrow" aria-label="Next project" onClick={() => setSelected(wrap(selected + 1, projects.length))}><Arrow /></button></div>
       </div>
     </div>
