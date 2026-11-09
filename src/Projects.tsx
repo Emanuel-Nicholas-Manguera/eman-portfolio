@@ -111,14 +111,25 @@ export function Projects() {
       <div className="project-viewer-dock" role="group" aria-label="Browse project photos">
         <button type="button" className="project-arrow project-viewer-previous" aria-label="Previous photo" onClick={() => changePhoto(photoIndex - 1)}><Arrow previous /></button>
         <div className="project-viewer-thumbnails">
-          {project.photos.map((itemPhoto, index) => <button type="button" key={itemPhoto.label} className="project-viewer-thumbnail" aria-pressed={index === photoIndex} aria-label={`Show ${itemPhoto.label} photo`} onClick={() => changePhoto(index)}>
+          {project.photos.map((itemPhoto, index) => <button type="button" key={itemPhoto.label} className="project-viewer-thumbnail" aria-pressed={index === photoIndex} aria-label={`Show ${itemPhoto.label} photo`} onClick={() => changePhoto(index)} onKeyDown={event => {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+              event.preventDefault()
+              event.stopPropagation()
+              const next = wrap(index + (event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1), project.photos.length)
+              changePhoto(next)
+              ;(event.currentTarget.parentElement?.children[next] as HTMLButtonElement)?.focus()
+            }
+          }}>
             <span className="project-thumbnail-image" aria-hidden="true"><Photo photo={itemPhoto} /></span>
+            <span className="project-viewer-thumbnail-label">{itemPhoto.label}</span>
           </button>)}
         </div>
         <button type="button" className="project-arrow project-viewer-next" aria-label="Next photo" onClick={() => changePhoto(photoIndex + 1)}><Arrow /></button>
-        <p className="project-viewer-caption" aria-live="polite">{photo.label} · {photoIndex + 1} of {project.photos.length}</p>
       </div>
-      <p className="project-viewer-note">{photo.note}</p>
+      <div className="project-viewer-footer">
+        <p className="project-viewer-caption" aria-live="polite">{photo.label} · {photoIndex + 1} of {project.photos.length}</p>
+        <p className="project-viewer-note">{photo.note}</p>
+      </div>
     </div></dialog>
   </section>
 }
