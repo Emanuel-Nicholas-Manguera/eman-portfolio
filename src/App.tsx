@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Introduction } from './Introduction'
 import { Projects } from './Projects'
 import { Experience } from './Experience'
+import { Contact } from './Contact'
 import { HeaderNavigation } from './HeaderNavigation'
 import './App.css'
 import type { SocialId } from './socialData'
@@ -22,9 +23,13 @@ function App() {
     const updateHeader = () => {
       const threshold = Math.max(120, window.innerHeight * .3)
       let current: string | null = null
-      for (const id of ['experience', 'projects']) {
+      for (const id of ['experience', 'projects', 'contact']) {
         const section = document.getElementById(id)
         if (section && section.getBoundingClientRect().top <= threshold) current = id
+      }
+      // The final section may be too short to reach the normal threshold.
+      if (window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+        current = 'contact'
       }
       setActiveSection(current)
       if (window.scrollY >= 80) {
@@ -182,6 +187,7 @@ function App() {
         <Introduction social={social} onSocialSelect={setSocial} />
         <Experience />
         <Projects />
+        <Contact />
       </main>
     </div>
   )

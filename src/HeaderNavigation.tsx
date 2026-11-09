@@ -57,19 +57,14 @@ export function HeaderNavigation({ activeSection, onNavigate }: Props) {
       />
       {items.map((label) => {
         const id = label.toLowerCase()
-        const enabled = label !== 'Contact'
         return (
           <a
             key={id}
-            href={enabled ? `#${id}` : undefined}
-            role="link"
-            aria-disabled={enabled ? undefined : true}
-            aria-current={enabled && activeSection === id ? 'location' : undefined}
-            aria-label={enabled ? undefined : `${label}, coming soon`}
-            title={enabled ? undefined : `${label} section coming soon`}
-            onPointerEnter={(event) => setHovered(enabled && event.pointerType === 'mouse' ? id : null)}
-            onFocus={(event) => setFocused(enabled && event.currentTarget.matches(':focus-visible') ? id : null)}
-            onClick={enabled ? onNavigate : undefined}
+            href={`#${id}`}
+            aria-current={activeSection === id ? 'location' : undefined}
+            onPointerEnter={(event) => setHovered(event.pointerType === 'mouse' ? id : null)}
+            onFocus={(event) => setFocused(event.currentTarget.matches(':focus-visible') ? id : null)}
+            onClick={onNavigate}
           >
             <span>{label}</span>
           </a>
