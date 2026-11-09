@@ -100,6 +100,25 @@ export function Projects() {
     </article>)}</div>
     <dialog ref={dialogRef} className="project-viewer" aria-label={`${project.name} image viewer`} onClose={() => setViewerOpen(false)} onClick={event => { if (event.target === event.currentTarget) setViewerOpen(false) }} onKeyDown={event => {
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); changePhoto(photoIndex + (event.key === 'ArrowRight' ? 1 : -1)) }
-    }}><div className="project-viewer-content"><div className="project-viewer-heading"><strong>{project.name}</strong><button autoFocus type="button" className="project-arrow" aria-label="Close image viewer" onClick={() => setViewerOpen(false)}>✕</button></div><div className="project-viewer-image"><Photo photo={photo} /></div><div className="project-viewer-controls"><button type="button" className="project-arrow" aria-label="Previous photo" onClick={() => changePhoto(photoIndex - 1)}><Arrow previous /></button><p>{photo.label} · {photoIndex + 1} of {project.photos.length}<small>{photo.note}</small></p><button type="button" className="project-arrow" aria-label="Next photo" onClick={() => changePhoto(photoIndex + 1)}><Arrow /></button></div></div></dialog>
+    }}><div className="project-viewer-content">
+      <div className="project-viewer-heading">
+        <strong>{project.name}</strong>
+        <button autoFocus type="button" className="project-arrow" aria-label="Close image viewer" onClick={() => setViewerOpen(false)}>✕</button>
+      </div>
+      <div className="project-viewer-image">
+        {project.photos.map((itemPhoto, index) => <div className="project-photo-layer" data-active={index === photoIndex} aria-hidden={index !== photoIndex} key={`${project.id}-${itemPhoto.label}`}><Photo photo={itemPhoto} /></div>)}
+      </div>
+      <div className="project-viewer-dock" role="group" aria-label="Browse project photos">
+        <button type="button" className="project-arrow project-viewer-previous" aria-label="Previous photo" onClick={() => changePhoto(photoIndex - 1)}><Arrow previous /></button>
+        <div className="project-viewer-thumbnails">
+          {project.photos.map((itemPhoto, index) => <button type="button" key={itemPhoto.label} className="project-viewer-thumbnail" aria-pressed={index === photoIndex} aria-label={`Show ${itemPhoto.label} photo`} onClick={() => changePhoto(index)}>
+            <span className="project-thumbnail-image" aria-hidden="true"><Photo photo={itemPhoto} /></span>
+          </button>)}
+        </div>
+        <button type="button" className="project-arrow project-viewer-next" aria-label="Next photo" onClick={() => changePhoto(photoIndex + 1)}><Arrow /></button>
+        <p className="project-viewer-caption" aria-live="polite">{photo.label} · {photoIndex + 1} of {project.photos.length}</p>
+      </div>
+      <p className="project-viewer-note">{photo.note}</p>
+    </div></dialog>
   </section>
 }
