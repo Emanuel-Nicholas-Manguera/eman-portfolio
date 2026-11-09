@@ -127,7 +127,7 @@ export function Projects() {
         <button type="button" className="project-arrow project-viewer-next" aria-label="Next photo" onClick={() => changePhoto(photoIndex + 1)}><Arrow /></button>
       </div>
       <div className="project-viewer-footer">
-        <p className="project-viewer-caption" aria-live="polite">{photo.label} · {photoIndex + 1} of {project.photos.length}</p>
+        <p className="project-viewer-caption" aria-live="polite"><strong>{photo.label}</strong><span>{photoIndex + 1} of {project.photos.length}</span></p>
         <p className="project-viewer-note">{photo.note}</p>
       </div>
     </div></dialog>
