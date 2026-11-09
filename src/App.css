@@ -146,6 +146,31 @@
   gap: 21px;
 }
 
+.navigation-links {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 21px;
+}
+
+.navigation-underline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 280ms cubic-bezier(.22, .7, .25, 1),
+    width 280ms cubic-bezier(.22, .7, .25, 1),
+    opacity 160ms ease,
+    background-color var(--theme-duration) var(--theme-easing);
+}
+
+.navigation-underline[data-visible='true'] { opacity: 1; }
+
 .site-nav a,
 .mobile-nav a {
   display: inline-flex;
@@ -165,7 +190,9 @@
 }
 
 .site-nav a[href]:hover,
-.mobile-nav a[href]:hover {
+.mobile-nav a[href]:hover,
+.navigation-links a[aria-current='location'],
+.navigation-links a[href]:focus-visible {
   color: var(--accent);
 }
 
@@ -297,6 +324,12 @@
     padding: 8px 12px;
     font-size: 14px;
   }
+
+  .mobile-nav .navigation-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -308,4 +341,6 @@
   .site-header {
     transition: none;
   }
+
+  .navigation-underline { transition: none; }
 }

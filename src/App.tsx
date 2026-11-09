@@ -2,41 +2,31 @@ import { useEffect, useRef, useState } from 'react'
 import { Introduction } from './Introduction'
 import { Projects } from './Projects'
 import { Experience } from './Experience'
+import { HeaderNavigation } from './HeaderNavigation'
 import './App.css'
 import type { SocialId } from './socialData'
 
 type Theme = 'light' | 'dark'
-
-const navigationItems = ['Experience', 'Projects', 'Contact']
-
-function NavigationLinks({ onNavigate }: { onNavigate?: () => void }) {
-  // Add section links as each part of the portfolio is built.
-  return navigationItems.map((label) => (
-    <a
-      key={label}
-      href={label !== 'Contact' ? `#${label.toLowerCase()}` : undefined}
-      role="link"
-      aria-disabled={label !== 'Contact' ? undefined : true}
-      aria-label={label !== 'Contact' ? undefined : `${label}, coming soon`}
-      title={label !== 'Contact' ? undefined : `${label} section coming soon`}
-      onClick={label !== 'Contact' ? onNavigate : undefined}
-    >
-      {label}
-    </a>
-  ))
-}
 
 function App() {
   const [theme, setTheme] = useState<Theme>('light')
   const [social, setSocial] = useState<SocialId | null>(null)
   const [isFloating, setIsFloating] = useState(() => window.scrollY >= 80)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
   const headerRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const themeAction = `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`
 
   useEffect(() => {
     const updateHeader = () => {
+      const threshold = Math.max(120, window.innerHeight * .3)
+      let current: string | null = null
+      for (const id of ['experience', 'projects']) {
+        const section = document.getElementById(id)
+        if (section && section.getBoundingClientRect().top <= threshold) current = id
+      }
+      setActiveSection(current)
       if (window.scrollY >= 80) {
         setIsFloating(true)
       } else if (window.scrollY <= 8) {
@@ -45,8 +35,13 @@ function App() {
       }
     }
 
+    updateHeader()
     window.addEventListener('scroll', updateHeader, { passive: true })
-    return () => window.removeEventListener('scroll', updateHeader)
+    window.addEventListener('resize', updateHeader)
+    return () => {
+      window.removeEventListener('scroll', updateHeader)
+      window.removeEventListener('resize', updateHeader)
+    }
   }, [])
 
   useEffect(() => {
@@ -101,7 +96,7 @@ function App() {
           </a>
 
           <nav className="site-nav" aria-label="Main navigation">
-            <NavigationLinks />
+            <HeaderNavigation activeSection={activeSection} />
           </nav>
 
           <div className="header-actions">
@@ -179,7 +174,7 @@ function App() {
           aria-label="Main navigation"
           hidden={!isMenuOpen}
         >
-          <NavigationLinks onNavigate={() => setIsMenuOpen(false)} />
+          <HeaderNavigation activeSection={activeSection} onNavigate={() => setIsMenuOpen(false)} />
         </nav>
       </header>
 
