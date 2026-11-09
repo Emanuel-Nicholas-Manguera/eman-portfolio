@@ -14,7 +14,28 @@
 }
 
 .intro-copy {
+  position: relative;
+  isolation: isolate;
   padding-block: 20px;
+}
+
+/* Add texture to the empty left side without covering links or the portrait. */
+.intro-copy::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -80px;
+  bottom: -75px;
+  left: calc(-1 * max(40px, (100vw - 1120px) / 2));
+  right: -110px;
+  pointer-events: none;
+  color: var(--accent);
+  background-image: radial-gradient(circle, currentColor .85px, transparent 1.25px);
+  background-size: 16px 16px;
+  -webkit-mask-image: radial-gradient(ellipse at 0% 50%, #000, transparent 76%);
+  mask-image: radial-gradient(ellipse at 0% 50%, #000, transparent 76%);
+  opacity: .28;
+  transition: color var(--theme-duration) var(--theme-easing);
 }
 
 .section-eyebrow {
@@ -221,6 +242,12 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .intro-copy::before {
+    top: -35px;
+    bottom: -40px;
+    right: 0;
+  }
+
   .portrait {
     justify-self: center;
   }
@@ -246,6 +273,12 @@
 
   .intro-copy {
     padding: 0;
+  }
+
+  .intro-copy::before {
+    left: -24px;
+    top: -30px;
+    bottom: -30px;
   }
 
   .intro-copy h1 {
