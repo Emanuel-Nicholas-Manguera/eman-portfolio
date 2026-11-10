@@ -1,7 +1,6 @@
 import { Introduction } from './Introduction'
 import { Experience } from './Experience'
 import { Projects } from './Projects'
-import { About } from './About'
 import { Contact } from './Contact'
 import type { PortfolioData } from './cms/portfolio'
 import type { SocialId } from './socialData'
@@ -19,6 +18,7 @@ export function PortfolioBody({
       {data.introduction && (
         <Introduction
           content={data.introduction}
+          background={data.about}
           contact={data.contact}
           social={social}
           onSocialSelect={onSocialSelect}
@@ -36,7 +36,6 @@ export function PortfolioBody({
           projects={data.projects}
         />
       )}
-      {data.about && <About content={data.about} />}
       {data.contact && <Contact content={data.contact} />}
     </>
   )

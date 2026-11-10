@@ -9,7 +9,7 @@ type Theme = 'light' | 'dark'
 
 function App() {
   const {data,failed} = usePortfolio()
-  const navigation = [ ...(data?.experiences.length ? ['Experience'] : []), ...(data?.projects.length ? ['Projects'] : []), ...(data?.about ? ['About'] : []), ...(data?.contact ? ['Contact'] : []) ]
+  const navigation = [ ...(data?.experiences.length ? ['Experience'] : []), ...(data?.projects.length ? ['Projects'] : []), ...(data?.contact ? ['Contact'] : []) ]
   const [theme, setTheme] = useState<Theme>('light')
   const [social, setSocial] = useState<SocialId | null>(null)
   const [isFloating, setIsFloating] = useState(() => window.scrollY >= 80)
@@ -23,7 +23,7 @@ function App() {
     const updateHeader = () => {
       const threshold = Math.max(120, window.innerHeight * .3)
       let current: string | null = null
-      for (const id of ['experience', 'projects', 'about', 'contact']) {
+      for (const id of ['experience', 'projects', 'contact']) {
         const section = document.getElementById(id)
         if (section && section.getBoundingClientRect().top <= threshold) current = id
       }

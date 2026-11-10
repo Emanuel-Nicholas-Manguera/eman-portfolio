@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import type { IntroductionContent, ContactContent } from './cms/content'
+import type { IntroductionContent, ContactContent, AboutContent } from './cms/content'
 import { profileSocials } from './socialData'
 import './Introduction.css'
+import { IntroductionDetails } from './IntroductionDetails'
 import { SocialLinks } from './SocialLinks'
 import type { SocialId } from './socialData'
 
@@ -280,8 +281,9 @@ function TypingName({ name }: { name: string }) {
   )
 }
 
-export function Introduction({ content, contact, social, onSocialSelect }: {
+export function Introduction({ content, background, contact, social, onSocialSelect }: {
   content: IntroductionContent & { suitSrc?: string; graduationSrc?: string }
+  background?: AboutContent | null
   contact: ContactContent | null
   social: SocialId | null
   onSocialSelect: (social: SocialId) => void
@@ -370,6 +372,7 @@ export function Introduction({ content, contact, social, onSocialSelect }: {
           setIsHovered(false)
         }}
       />}
+      {background && <IntroductionDetails content={background} />}
       <a className="intro-scroll" href="#experience">
         <span>{content.scrollLabel}</span>
         <ArrowIcon direction="down" />

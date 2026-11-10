@@ -1,15 +1,16 @@
 import type { AboutContent } from './cms/content'
 import { safeLink } from './cms/content'
-import './About.css'
-export function About({ content }: { content: AboutContent }) {
+import './IntroductionDetails.css'
+export function IntroductionDetails({ content }: { content: AboutContent }) {
+  if (!content.description.trim() && !content.education.length && !content.recognitions.length && !content.certificates.length) return null
   return (
-    <section className="about-section" id="about" aria-labelledby="about-title">
-      <p className="section-eyebrow">About</p>
-      <h2 id="about-title">{content.heading}</h2>
+    <details className="intro-background">
+      <summary>{content.heading || 'More about me'}<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></summary>
+      <div className="intro-background-content">
       {content.description && (
-        <p className="about-summary">{content.description}</p>
+        <p className="intro-background-summary">{content.description}</p>
       )}
-      <div className="about-columns">
+      <div className="intro-background-columns">
         {(
           [
             ['Education', content.education],
@@ -39,6 +40,7 @@ export function About({ content }: { content: AboutContent }) {
             </div>
           ))}
       </div>
-    </section>
+      </div>
+    </details>
   )
 }

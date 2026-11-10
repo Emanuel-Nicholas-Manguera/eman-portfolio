@@ -1,0 +1,60 @@
+.intro-background {
+  grid-column: 1 / -1;
+  width: 100%;
+  border-top: 1px solid var(--header-border);
+}
+.intro-background > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  padding-block: 16px;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+}
+.intro-background > summary::-webkit-details-marker { display: none; }
+.intro-background > summary svg { transition: transform 200ms ease; }
+.intro-background[open] > summary svg { transform: rotate(180deg); }
+.intro-background > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.intro-background-content { padding-bottom: 16px; }
+@media (prefers-reduced-motion: reduce) {
+  .intro-background > summary svg { transition: none; }
+}
+.intro-background-summary {
+  max-width: 70ch;
+  line-height: 1.8;
+  color: var(--muted-text);
+  white-space: pre-line;
+}
+.intro-background-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 40px;
+  margin-top: 16px;
+}
+.intro-background-columns h3 {
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted-text);
+  font-weight: 500;
+}
+.intro-background-columns article {
+  border-top: 1px solid var(--header-border);
+  padding: 20px 0;
+}
+.intro-background-columns h4 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+.intro-background-columns p {
+  color: var(--muted-text);
+  white-space: pre-line;
+  line-height: 1.7;
+}
+.intro-background-columns a {
+  color: var(--accent);
+}
