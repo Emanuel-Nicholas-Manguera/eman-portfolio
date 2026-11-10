@@ -4,6 +4,10 @@
 }
 
 .introduction {
+  --intro-secondary-text: var(--muted-text);
+  --dot-color: var(--accent);
+  --dot-opacity: .38;
+  --dot-hover-opacity: .85;
   position: relative;
   isolation: isolate;
   display: grid;
@@ -15,13 +19,20 @@
   padding-bottom: 32px;
 }
 
+.portfolio[data-theme='light'] .introduction {
+  --intro-secondary-text: color-mix(in srgb, var(--muted-text) 55%, var(--text));
+  --dot-color: color-mix(in srgb, var(--accent) 85%, var(--text));
+  --dot-opacity: .49;
+  --dot-hover-opacity: .9;
+}
+
 .intro-copy {
   padding-block: 20px;
 }
 
 /* Start at the top-left and fade down into the existing blue glow. */
 .introduction::before,
-.intro-dot-connections {
+.intro-interactive-dots {
   content: '';
   position: absolute;
   z-index: -1;
@@ -30,11 +41,11 @@
   left: calc(-1 * max(40px, (100vw - 1120px) / 2));
   right: 24%;
   pointer-events: none;
-  color: var(--accent);
+  color: var(--dot-color);
   -webkit-mask-image: radial-gradient(ellipse at 0% 0%, #000, transparent 85%);
   mask-image: radial-gradient(ellipse at 0% 0%, #000, transparent 85%);
-  opacity: .38;
-  transition: color var(--theme-duration) var(--theme-easing);
+  opacity: var(--dot-opacity);
+  transition: color var(--theme-duration) var(--theme-easing), opacity var(--theme-duration) var(--theme-easing);
 }
 
 .introduction::before {
@@ -42,29 +53,37 @@
   background-size: 16px 16px;
 }
 
-.intro-dot-connections { overflow: hidden; }
-.intro-dot-connections svg { display: block; }
-.intro-dot-connections path {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.25px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  opacity: 0;
-  animation: intro-connection-trace 8s ease-in-out infinite;
-  animation-play-state: paused;
+@property --dot-ripple-radius {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
 }
-.intro-dot-connections[data-running='true'] path { animation-play-state: running; }
-.intro-dot-connections path:nth-child(2) { animation-delay: -2.7s; }
-.intro-dot-connections path:nth-child(3) { animation-delay: -5.4s; }
 
-@keyframes intro-connection-trace {
-  0%, 6% { stroke-dashoffset: 1; opacity: 0; }
-  12% { opacity: .8; }
-  35% { stroke-dashoffset: 0; opacity: .8; }
-  50%, 100% { stroke-dashoffset: 0; opacity: 0; }
+.intro-interactive-dots { opacity: 1; }
+.intro-interactive-dots span {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, currentColor 1.5px, transparent 2px);
+  background-size: 16px 16px;
+}
+.intro-dot-hover {
+  opacity: 0;
+  transition: opacity 240ms ease;
+  -webkit-mask-image: radial-gradient(circle 110px at var(--dot-x, -200px) var(--dot-y, -200px), #000 10%, transparent 100%);
+  mask-image: radial-gradient(circle 110px at var(--dot-x, -200px) var(--dot-y, -200px), #000 10%, transparent 100%);
+}
+.intro-interactive-dots[data-active='true'] .intro-dot-hover { opacity: var(--dot-hover-opacity); }
+.intro-interactive-dots .intro-dot-ripple {
+  opacity: 0;
+  background-image: radial-gradient(circle, currentColor 2.25px, transparent 2.75px);
+  -webkit-mask-image: radial-gradient(circle at var(--ripple-x) var(--ripple-y), transparent max(0px, calc(var(--dot-ripple-radius) - 28px)), #000 var(--dot-ripple-radius), transparent calc(var(--dot-ripple-radius) + 28px));
+  mask-image: radial-gradient(circle at var(--ripple-x) var(--ripple-y), transparent max(0px, calc(var(--dot-ripple-radius) - 28px)), #000 var(--dot-ripple-radius), transparent calc(var(--dot-ripple-radius) + 28px));
+  animation: intro-dot-ripple 850ms ease-out both;
+}
+@keyframes intro-dot-ripple {
+  0% { --dot-ripple-radius: 0px; opacity: 0; }
+  15%, 55% { opacity: 1; }
+  100% { --dot-ripple-radius: 180px; opacity: 0; }
 }
 
 .section-eyebrow {
@@ -97,7 +116,7 @@
 .intro-description {
   max-width: 450px;
   margin: 0;
-  color: var(--muted-text);
+  color: var(--intro-secondary-text);
   font-size: 16px;
   line-height: 1.85;
 }
@@ -131,7 +150,7 @@
   align-items: center;
   gap: 7px;
   margin: 0;
-  color: var(--muted-text);
+  color: var(--intro-secondary-text);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -272,7 +291,7 @@
   }
 
   .introduction::before,
-  .intro-dot-connections {
+  .intro-interactive-dots {
     height: 600px;
     right: 0;
   }
@@ -305,7 +324,7 @@
   }
 
   .introduction::before,
-  .intro-dot-connections {
+  .intro-interactive-dots {
     left: -24px;
   }
 
@@ -337,7 +356,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro-dot-connections path { animation: none; opacity: 0; }
+  .intro-dot-hover { transition: none; }
+  .intro-dot-ripple { display: none; animation: none; }
   .portrait-layer,
   .intro-action {
     transition: none;

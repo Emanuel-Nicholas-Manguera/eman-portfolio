@@ -1,39 +1,113 @@
 import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import suitPortrait from './assets/portraits/emanuel-suit.png'
 import graduationPortrait from './assets/portraits/emanuel-graduation.png'
 import './Introduction.css'
 import { SocialLinks } from './SocialLinks'
 import type { SocialId } from './socialData'
 
-function DotConnections() {
+function InteractiveDots() {
   const fieldRef = useRef<HTMLDivElement>(null)
-  const [running, setRunning] = useState(false)
+  const [ripple, setRipple] = useState<{ x: number; y: number; id: number } | null>(null)
 
   useEffect(() => {
     const field = fieldRef.current
     if (!field) return
-    let inView = false
-    const update = () => setRunning(inView && !document.hidden)
-    const observer = new IntersectionObserver(([entry]) => {
-      inView = entry.isIntersecting
-      update()
-    })
-    observer.observe(field)
-    document.addEventListener('visibilitychange', update)
+    let frame = 0
+    let pointerX = 0
+    let pointerY = 0
+    let rippleId = 0
+    const controlSelector = 'a, button, input, textarea, select, label, summary, header, [role="button"], [role="link"], [tabindex]:not([tabindex="-1"]), [contenteditable]:not([contenteditable="false"]), .portrait, .intro-socials'
+    const isControlEvent = (event: Event) => event.composedPath()
+      .some((target) => target instanceof Element && target.matches(controlSelector))
+    const hide = () => {
+      cancelAnimationFrame(frame)
+      frame = 0
+      field.dataset.active = 'false'
+    }
+    const yieldToControl = () => {
+      hide()
+      setRipple(null)
+    }
+    const prioritizeControl = (event: Event) => {
+      if (isControlEvent(event)) yieldToControl()
+    }
+    const paint = () => {
+      frame = 0
+      const bounds = field.getBoundingClientRect()
+      const x = pointerX - bounds.left
+      const y = pointerY - bounds.top
+      if (x < 0 || y < 0 || x > bounds.width || y > bounds.height) {
+        hide()
+        return
+      }
+      field.style.setProperty('--dot-x', `${x}px`)
+      field.style.setProperty('--dot-y', `${y}px`)
+      field.dataset.active = 'true'
+    }
+    const move = (event: PointerEvent) => {
+      if (isControlEvent(event)) {
+        yieldToControl()
+        return
+      }
+      if (event.pointerType !== 'mouse') {
+        hide()
+        return
+      }
+      pointerX = event.clientX
+      pointerY = event.clientY
+      if (!frame) frame = requestAnimationFrame(paint)
+    }
+    const leaveWindow = (event: PointerEvent) => {
+      if (!event.relatedTarget) hide()
+    }
+    const click = (event: MouseEvent) => {
+      if (isControlEvent(event)) {
+        yieldToControl()
+        return
+      }
+      if (event.defaultPrevented || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      const bounds = field.getBoundingClientRect()
+      const x = event.clientX - bounds.left
+      const y = event.clientY - bounds.top
+      if (x < 0 || y < 0 || x > bounds.width || y > bounds.height) return
+      setRipple({ x, y, id: ++rippleId })
+    }
+    window.addEventListener('pointermove', move, { passive: true })
+    // Observe controls without stopping their events or changing their behavior.
+    window.addEventListener('pointerdown', prioritizeControl, true)
+    window.addEventListener('pointerover', prioritizeControl, true)
+    window.addEventListener('focusin', prioritizeControl)
+    window.addEventListener('pointerout', leaveWindow)
+    window.addEventListener('click', click)
+    window.addEventListener('blur', hide)
+    window.addEventListener('scroll', hide, { passive: true })
+    window.addEventListener('resize', hide)
     return () => {
-      observer.disconnect()
-      document.removeEventListener('visibilitychange', update)
+      hide()
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerdown', prioritizeControl, true)
+      window.removeEventListener('pointerover', prioritizeControl, true)
+      window.removeEventListener('focusin', prioritizeControl)
+      window.removeEventListener('pointerout', leaveWindow)
+      window.removeEventListener('click', click)
+      window.removeEventListener('blur', hide)
+      window.removeEventListener('scroll', hide)
+      window.removeEventListener('resize', hide)
     }
   }, [])
 
   return (
-    <div ref={fieldRef} className="intro-dot-connections" data-running={running} aria-hidden="true">
-      <svg width="100%" height="100%" focusable="false">
-        {/* Match the existing 16px dot grid without stretching on resize. */}
-        <path pathLength="1" d="M40 168H104L136 200H184" />
-        <path pathLength="1" d="M168 104H232V152L264 184" />
-        <path pathLength="1" d="M24 280H72L104 312H152V344" />
-      </svg>
+    <div ref={fieldRef} className="intro-interactive-dots" aria-hidden="true">
+      <span className="intro-dot-hover" />
+      {ripple && (
+        <span
+          key={ripple.id}
+          className="intro-dot-ripple"
+          style={{ '--ripple-x': `${ripple.x}px`, '--ripple-y': `${ripple.y}px` } as CSSProperties}
+          onAnimationEnd={() => setRipple((current) => current?.id === ripple.id ? null : current)}
+        />
+      )}
     </div>
   )
 }
@@ -132,7 +206,7 @@ export function Introduction({ social, onSocialSelect }: {
 }) {
   return (
     <section className="introduction" aria-labelledby="intro-title">
-      <DotConnections />
+      <InteractiveDots />
       <div className="intro-copy">
         <p className="intro-location">
           <svg
