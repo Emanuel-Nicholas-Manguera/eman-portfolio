@@ -1,0 +1,84 @@
+.admin-sign-in {
+  display: flex;
+  flex-direction: column;
+  --admin-field: #f3f8fc;
+  --admin-dot: #3778aa;
+}
+
+.admin-sign-in[data-theme='dark'] {
+  --admin-field: #0d263b;
+  --admin-dot: #9ccfff;
+}
+
+.admin-sign-in__dots {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .32;
+  background-image: radial-gradient(circle, var(--admin-dot) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(115deg, #000, transparent 57%);
+  transition: background-color var(--theme-duration) ease;
+}
+
+.admin-sign-in__header,
+.admin-sign-in__footer {
+  width: min(100%, 1440px);
+  margin-inline: auto;
+  padding-inline: clamp(24px, 5vw, 72px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.admin-sign-in__header { min-height: 104px; }
+.admin-sign-in__header .wordmark { font-size: 29px; letter-spacing: -1.8px; }
+.admin-sign-in__main { flex: 1; display: grid; place-items: center; padding: 42px 24px 56px; }
+.admin-sign-in__content { width: 100%; max-width: 380px; }
+.admin-sign-in__eyebrow { margin: 0; color: var(--muted-text); font-size: 11px; font-weight: 500; letter-spacing: 2.2px; text-transform: uppercase; }
+.admin-sign-in h1 { margin: 16px 0 12px; font-size: clamp(34px, 5vw, 44px); font-weight: 500; letter-spacing: -1.9px; line-height: 1.15; }
+.admin-sign-in__intro { margin: 0 0 32px; color: var(--muted-text); font-size: 15px; line-height: 1.6; }
+.admin-sign-in__form { display: flex; flex-direction: column; }
+.admin-sign-in__form label { margin-bottom: 9px; font-size: 13px; font-weight: 500; }
+.admin-sign-in__form > input { margin-bottom: 22px; }
+.admin-sign-in__form input {
+  width: 100%; min-width: 0; height: 50px; border: 1px solid var(--header-border);
+  border-radius: 10px; padding: 0 15px; color: var(--text); background: var(--admin-field);
+  font: inherit; font-size: 16px;
+  transition: color var(--theme-duration) ease, background-color var(--theme-duration) ease, border-color var(--theme-duration) ease;
+}
+.admin-sign-in__form input::placeholder { color: var(--muted-text); opacity: .8; }
+.admin-sign-in__password { position: relative; }
+.admin-sign-in__password input { padding-right: 54px; }
+.admin-sign-in__password button {
+  position: absolute; top: 3px; right: 3px; width: 44px; height: 44px; display: grid; place-items: center;
+  border: 0; border-radius: 8px; background: transparent; color: var(--muted-text); cursor: pointer;
+  transition: background-color 200ms ease;
+}
+.admin-sign-in__password button:hover { background: var(--control-hover); }
+.admin-sign-in__forgot { align-self: flex-end; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--muted-text); font-size: 12px; }
+.admin-sign-in__submit {
+  display: flex; align-items: center; justify-content: space-between; min-height: 50px; margin-top: 8px;
+  padding: 0 18px; border: 0; border-radius: 10px; background: var(--action-background); color: var(--action-text); font-size: 14px;
+  transition: background-color var(--theme-duration) ease, color var(--theme-duration) ease;
+}
+.admin-sign-in__form button:disabled { cursor: not-allowed; }
+.admin-sign-in__notice { margin: 12px 0 0; color: var(--muted-text); font-size: 12px; line-height: 1.6; }
+.admin-sign-in__back { width: fit-content; min-height: 44px; margin: 16px auto 0; display: flex; align-items: center; gap: 9px; color: var(--muted-text); font-size: 13px; text-decoration: none; transition: color 200ms ease; }
+.admin-sign-in__back:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.admin-sign-in__footer { padding-block: 22px 28px; color: var(--muted-text); font-size: 12px; }
+.admin-sign-in a:focus-visible,
+.admin-sign-in input:focus-visible,
+.admin-sign-in button:focus-visible { outline: 3px solid var(--focus-color); outline-offset: 3px; }
+
+@media (max-width: 580px) {
+  .admin-sign-in__header { min-height: 88px; }
+  .admin-sign-in__main { padding-block: 28px 40px; }
+  .admin-sign-in__footer { flex-wrap: wrap; gap: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sign-in *, .admin-sign-in *::after { transition: none !important; }
+}

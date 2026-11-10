@@ -1,8 +1,13 @@
 # Portfolio CMS: database foundation
 
-This milestone creates the database and access rules only. The public portfolio
-still uses its existing content. Admin sign-in, sign-out, MFA enrollment, the
-`/admin/myself` landing page, and editing forms are separate future steps.
+The database and access rules are in place. The public portfolio still uses its
+existing content. An Open canvas sign-in page is now available at `/admin/myself`,
+with responsive layout, light/dark themes, and password visibility controls.
+Sign-in and password recovery are visibly unavailable until Auth is connected.
+Sign-out, MFA enrollment, the admin landing page, and editing forms remain future steps.
+
+During development, open `http://localhost:5173/admin/myself` after `npm run dev`.
+The production host will need an SPA fallback to `index.html` for this direct URL.
 
 ## Hosted project
 
