@@ -15,7 +15,6 @@ type Section =
   | 'Introduction'
   | 'Experience'
   | 'Projects'
-  | 'About'
   | 'Contact'
   | 'Media'
 type Contents = {
@@ -32,7 +31,7 @@ const sections: {
   {
     name: 'Introduction',
     kind: 'introduction',
-    detail: 'Your first impression',
+    detail: 'Profile, education, and recognition',
     icon: 'user',
   },
   {
@@ -48,12 +47,6 @@ const sections: {
     icon: 'layers',
   },
   {
-    name: 'About',
-    kind: 'about',
-    detail: 'Education and recognition',
-    icon: 'education',
-  },
-  {
     name: 'Contact',
     kind: 'contact',
     detail: 'Ways to reach you',
@@ -63,7 +56,6 @@ const sections: {
 
 export function AdminDashboard({
   client,
-  email,
   theme,
   onToggleTheme,
   onSignOut,
@@ -71,7 +63,6 @@ export function AdminDashboard({
   onStaySignedIn,
 }: {
   client: SupabaseClient
-  email: string
   theme: 'light' | 'dark'
   onToggleTheme: () => void
   onSignOut: () => void
@@ -134,7 +125,8 @@ export function AdminDashboard({
   function go(next: Section) {
     if (busy || !leave()) return
     setDirty(false)
-    setEditor(null)
+    const kind = next === 'Introduction' ? 'introduction' : next === 'Contact' ? 'contact' : null
+    setEditor(kind ? singleton(kind) : null)
     setAsset(null)
     setSection(next)
     setMenuOpen(false)
@@ -142,11 +134,27 @@ export function AdminDashboard({
     setError('')
     setMessage('')
   }
+  function singleton(kind: 'introduction' | 'about' | 'contact') {
+    if (!contents) return null
+    const existing = contents.documents.find((d) => d.kind === kind && !d.deleted_at)
+    if (existing) return existing
+    const created = newDocument(kind, 0)
+    created.content = blankContent(kind)
+    created.title = kind === 'about' ? 'Background' : kind === 'contact' ? 'Contact' : 'Introduction'
+    return created
+  }
+  function switchIntroduction(kind: 'introduction' | 'about') {
+    if (busy || !leave()) return
+    setDirty(false)
+    setEditor(singleton(kind))
+    setError('')
+    setMessage('')
+  }
   function open(doc: CmsDocument) {
     if (!leave()) return
     setDirty(false)
     setEditor(doc)
-    setSection(sections.find((s) => s.kind === doc.kind)!.name)
+    setSection(doc.kind === 'about' ? 'Introduction' : sections.find((s) => s.kind === doc.kind)!.name)
     setError('')
     setMessage('')
   }
@@ -260,7 +268,6 @@ export function AdminDashboard({
     contents?.documents.filter(
       (d) => d.kind === current?.kind && !!d.deleted_at === showArchived,
     ) ?? []
-  const projects = activeDocs.filter((d) => d.kind === 'project')
   const media =
     contents?.assets.filter(
       (a) =>
@@ -402,9 +409,17 @@ export function AdminDashboard({
               </p>
             )}
             {editor && contents ? (
+              <>
+              {section === 'Introduction' && (
+                <nav className="ss-editor-tabs" aria-label="Introduction editor">
+                  <button aria-current={editor.kind === 'introduction' ? 'page' : undefined} disabled={busy} onClick={() => switchIntroduction('introduction')}>Profile & portraits</button>
+                  <button aria-current={editor.kind === 'about' ? 'page' : undefined} disabled={busy} onClick={() => switchIntroduction('about')}>Education & recognition</button>
+                </nav>
+              )}
               <CmsEditor
                 key={editor.id}
                 initial={editor}
+                sectionTitle={section === 'Introduction' ? 'Introduction' : undefined}
                 assets={contents.assets}
                 publications={contents.publications}
                 client={client}
@@ -415,12 +430,14 @@ export function AdminDashboard({
                 onClose={() => {
                   setDirty(false)
                   setEditor(null)
+                  if (section === 'Introduction' || section === 'Contact') setSection('Overview')
                 }}
                 onSaved={async () => {
                   await reload()
                 }}
                 onUpload={(files) => void upload(files)}
               />
+              </>
             ) : (
               <>
                 <div className="ss-heading">
@@ -441,25 +458,14 @@ export function AdminDashboard({
                     </h1>
                     <p className="ss-lead">
                       {section === 'Overview'
-                        ? 'A space to shape your work and your story.'
+                        ? 'Choose a section to update.'
                         : section === 'Media'
                           ? 'Images for your introduction and project albums.'
                           : current?.detail}
                     </p>
                   </div>
                   {contents &&
-                    (section === 'Overview' ? (
-                      <button
-                        className="ss-primary"
-                        disabled={busy}
-                        onClick={() => {
-                          setSection('Projects')
-                          add('project')
-                        }}
-                      >
-                        <Icon name="plus" /> New project
-                      </button>
-                    ) : section === 'Media' ? (
+                    (section === 'Media' ? (
                       <label
                         className={`ss-upload-button ${busy ? 'is-disabled' : ''}`}
                       >
@@ -521,106 +527,22 @@ export function AdminDashboard({
                               </button>
                             </div>
                           )}
-                          <section>
-                            <div className="ss-section-heading">
-                              <h2>
-                                Your projects <small>{projects.length}</small>
-                              </h2>
-                              <button onClick={() => go('Projects')}>
-                                View all
-                                <Icon name="right" />
-                              </button>
-                            </div>
-                            {projects.length ? (
-                              <div className="ss-project-grid">
-                                {projects.slice(0, 3).map(record)}
-                              </div>
-                            ) : (
-                              empty(
-                                'Your next chapter starts here.',
-                                'Add a project with a description, images, and a link.',
-                              )
-                            )}
-                          </section>
-                          <div className="ss-bottom-grid">
-                            <section>
-                              <div className="ss-section-heading">
-                                <h2>Portfolio sections</h2>
-                              </div>
-                              <div className="ss-section-list">
-                                {sections
-                                  .filter((s) => s.name !== 'Projects')
-                                  .map((s) => (
-                                    <button
-                                      key={s.name}
-                                      className="ss-content-row"
-                                      onClick={() => go(s.name)}
-                                    >
-                                      <Icon name={s.icon} />
-                                      <span>
-                                        <strong>{s.name}</strong>
-                                        <small>{s.detail}</small>
-                                      </span>
-                                      <Icon name="chevron" />
-                                    </button>
-                                  ))}
-                              </div>
-                            </section>
-                            <section>
-                              <div className="ss-section-heading">
-                                <h2>A place for your photos</h2>
-                              </div>
-                              <div className="ss-upload-tile">
-                                <span className="ss-upload-icon">
-                                  <Icon name="media" />
-                                </span>
-                                <div className="ss-upload-copy">
-                                  <strong>Bring your work to life.</strong>
-                                  <p>
-                                    {
-                                      contents.assets.filter(
-                                        (a) =>
-                                          a.bucket_id === 'portfolio-media' &&
-                                          !a.archived_at,
-                                      ).length
-                                    }{' '}
-                                    images ready for your portfolio.
-                                  </p>
-                                </div>
-                                <button
-                                  className="ss-primary"
-                                  onClick={() => go('Media')}
-                                >
-                                  Open library
-                                  <Icon name="right" />
-                                </button>
-                              </div>
-                            </section>
-                          </div>
                           {!!contents.documents.length && (
-                            <details className="ss-import-details">
-                              <summary>
-                                Import missing content from the original
-                                portfolio
-                              </summary>
-                              <p>
-                                This fills missing entries and leaves existing
-                                CMS edits in place.
-                              </p>
-                              <button
-                                className="ss-secondary"
-                                disabled={busy}
-                                onClick={() =>
-                                  void run(async () => {
-                                    await importPortfolio(client, setMessage)
-                                    await reload()
-                                    setMessage('Import complete.')
-                                  })
-                                }
-                              >
-                                Import missing content
-                              </button>
-                            </details>
+                            <section className="ss-overview" aria-label="Portfolio sections">
+                              {sections.map((s) => {
+                                const entries = activeDocs.filter((d) => d.kind === s.kind || (s.kind === 'introduction' && d.kind === 'about'))
+                                const pending = entries.filter((d) => {
+                                  const live = contents.publications.find((p) => p.document_id === d.id)
+                                  return !live || live.title !== d.title || live.sort_order !== d.sort_order || JSON.stringify(live.content) !== JSON.stringify(d.content)
+                                }).length
+                                return <button key={s.name} className="ss-overview-row" disabled={busy} onClick={() => go(s.name)}>
+                                  <span className="ss-overview-icon"><Icon name={s.icon} /></span>
+                                  <span className="ss-overview-copy"><strong>{s.name}</strong><small>{s.detail}</small></span>
+                                  <span className="ss-overview-state">{pending ? 'Draft changes' : entries.length ? 'Published' : 'Not added'}</span>
+                                  <Icon name="chevron" />
+                                </button>
+                              })}
+                            </section>
                           )}
                         </>
                       ) : (
@@ -818,10 +740,7 @@ export function AdminDashboard({
               </>
             )}
           </main>
-          <footer className="ss-footer">
-            <span>Emanuel Nicholas · Portfolio studio</span>
-            <span title={email}>Owner workspace</span>
-          </footer>
+
         </div>
       </div>
     </div>

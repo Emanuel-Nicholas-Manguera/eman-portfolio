@@ -24,7 +24,7 @@ export function AdminSignIn() {
   }, [auth.view.stage])
 
   if (auth.view.stage === 'ready' && auth.client) {
-    return <AdminDashboard client={auth.client} email={auth.view.email} theme={theme}
+    return <AdminDashboard client={auth.client} theme={theme}
       idleWarning={auth.idleWarning} onStaySignedIn={auth.staySignedIn}
       onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')} onSignOut={auth.signOut} />
   }

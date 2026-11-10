@@ -228,10 +228,16 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
               'text',
               true,
             )}
-            {text(c, 'graduateRole', 'Graduate role')}
-            {text(c, 'graduateDescription', 'Education introduction', true)}
-            {text(c, 'actionLabel', 'Projects button label')}
-            {text(c, 'scrollLabel', 'Scroll invitation')}
+            <details className="ss-editor-disclosure">
+              <summary>Graduation introduction</summary>
+              {text(c, 'graduateRole', 'Graduate role')}
+              {text(c, 'graduateDescription', 'Education introduction', true)}
+            </details>
+            <details className="ss-editor-disclosure">
+              <summary>Button labels</summary>
+              {text(c, 'actionLabel', 'Projects button label')}
+              {text(c, 'scrollLabel', 'Scroll invitation')}
+            </details>
           </div>
           <section>
             <h2>Portraits</h2>
@@ -427,25 +433,34 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
       return (
         <>
           <div className="ss-editor-fields">
-            {text(c, 'heading', 'Heading', false, 'text', true)}
-            {text(c, 'description', 'About you', true)}
+            {text(c, 'heading', 'Expand button label', false, 'text', true)}
+            {text(c, 'description', 'Background summary (optional)', true)}
           </div>
+          <details className="ss-editor-disclosure">
+            <summary>Education <span>{c.education.length}</span></summary>
           <Repeater
             label="Education"
             rows={c.education}
             onChange={(education) => onChange({ ...c, education })}
           />
+          </details>
+          <details className="ss-editor-disclosure">
+            <summary>Recognitions <span>{c.recognitions.length}</span></summary>
           <Repeater
             label="Recognitions"
             rows={c.recognitions}
             onChange={(recognitions) => onChange({ ...c, recognitions })}
           />
+          </details>
+          <details className="ss-editor-disclosure">
+            <summary>Certificates <span>{c.certificates.length}</span></summary>
           <Repeater
             label="Certificates"
             rows={c.certificates}
             links
             onChange={(certificates) => onChange({ ...c, certificates })}
           />
+          </details>
         </>
       )
     }

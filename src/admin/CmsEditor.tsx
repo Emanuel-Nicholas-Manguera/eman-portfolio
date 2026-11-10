@@ -18,6 +18,7 @@ import { saveDocument, publishDocument, archiveDocument } from './cms'
 
 export function CmsEditor({
   initial,
+  sectionTitle,
   assets,
   publications,
   onSaved,
@@ -30,6 +31,7 @@ export function CmsEditor({
   theme,
 }: {
   initial: CmsDocument
+  sectionTitle?: string
   assets: CmsAsset[]
   publications: Publication[]
   onSaved: (doc: CmsDocument) => Promise<void>
@@ -176,12 +178,12 @@ export function CmsEditor({
   return (
     <>
       <button className="ss-editor-back" onClick={close}>
-        <Icon name="left" /> Back to {doc.kind === 'project' ? 'projects' : doc.kind}
+        <Icon name="left" /> Back to {['introduction', 'about', 'contact'].includes(doc.kind) ? 'overview' : doc.kind === 'project' ? 'projects' : 'experience'}
       </button>
       <div className="ss-heading">
         <div>
-          <div className="ss-eyebrow">{doc.kind.toUpperCase()} EDITOR</div>
-          <h1>{doc.title || 'Untitled content'}</h1>
+          <div className="ss-eyebrow">{doc.kind === 'about' ? 'EDUCATION & RECOGNITION' : doc.kind.toUpperCase() + ' EDITOR'}</div>
+          <h1>{sectionTitle || doc.title || 'Untitled content'}</h1>
           <p className="ss-lead">
             {published
               ? 'A published version is live.'
@@ -204,7 +206,7 @@ export function CmsEditor({
           disabled={busy || externalBusy}
           className="ss-editor-fieldset"
         >
-          <div className="ss-document-meta">
+          {['experience', 'project'].includes(doc.kind) && <div className="ss-document-meta">
             <label className="ss-field">
               Title in CMS
               <input
@@ -225,7 +227,7 @@ export function CmsEditor({
                 }
               />
             </label>
-          </div>
+          </div>}
           <DocumentFields
             value={doc}
             assets={assets}

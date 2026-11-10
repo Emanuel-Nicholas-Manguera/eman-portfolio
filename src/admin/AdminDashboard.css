@@ -355,91 +355,6 @@
 .admin-dashboard .ss-section-heading button:hover {
   background: none;
 }
-.admin-dashboard .ss-bottom-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
-  gap: 29px;
-  margin-top: 29px;
-}
-.admin-dashboard .ss-section-list {
-  border-top: 1px solid var(--ss-edge);
-}
-.admin-dashboard .ss-content-row {
-  width: 100%;
-  border-radius: 0;
-  border-bottom: 1px solid var(--ss-edge);
-  justify-content: flex-start;
-  padding: 13px 2px;
-  gap: 12px;
-}
-.admin-dashboard .ss-content-row > svg:first-child {
-  color: var(--ss-muted);
-  width: 16px;
-  height: 16px;
-}
-.admin-dashboard .ss-content-row > span {
-  flex: 1;
-  min-width: 0;
-}
-.admin-dashboard .ss-content-row strong {
-  display: block;
-  font-size: 12px;
-}
-.admin-dashboard .ss-content-row small {
-  display: block;
-  color: var(--ss-muted);
-  font-size: 10px;
-  margin-top: 2px;
-}
-.admin-dashboard .ss-content-row > svg:last-child {
-  width: 13px;
-  height: 13px;
-  color: var(--ss-muted);
-}
-.admin-dashboard .ss-upload-tile {
-  border: 1px dashed var(--ss-art-dark);
-  border-radius: var(--ss-radius);
-  background: var(--ss-panel);
-  padding: 24px 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 15px;
-  min-height: 182px;
-}
-.admin-dashboard .ss-upload-icon {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--ss-hover);
-  color: var(--ss-accent);
-}
-.admin-dashboard .ss-upload-copy strong {
-  display: block;
-  font-size: 13px;
-}
-.admin-dashboard .ss-upload-copy p {
-  margin-top: 6px;
-  font-size: 11px;
-  line-height: 1.7;
-  color: var(--ss-muted);
-}
-.admin-dashboard .ss-footer {
-  border-top: 1px solid var(--ss-faint);
-  margin: 0 28px;
-  padding: 17px 0;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-size: 10px;
-  color: var(--ss-muted);
-}
-.admin-dashboard .ss-footer span span {
-  margin: 0 5px;
-}
 @media (max-width: 900px) {
   .admin-dashboard .ss-app {
     grid-template-columns: 176px minmax(0, 1fr);
@@ -460,12 +375,6 @@
   }
   .admin-dashboard h1 {
     font-size: 27px;
-  }
-  .admin-dashboard .ss-bottom-grid {
-    gap: 20px;
-  }
-  .admin-dashboard .ss-footer {
-    margin-inline: 21px;
   }
 }
 @media (max-width: 700px) {
@@ -532,21 +441,6 @@
     gap: 18px;
     margin-bottom: 25px;
   }
-  .admin-dashboard .ss-bottom-grid {
-    grid-template-columns: 1fr;
-    gap: 26px;
-  }
-  .admin-dashboard .ss-upload-tile {
-    min-height: 0;
-    padding: 20px;
-  }
-  .admin-dashboard .ss-upload-tile .ss-primary {
-    width: auto;
-  }
-  .admin-dashboard .ss-footer {
-    margin-inline: 18px;
-    font-size: 9px;
-  }
 }
 @media (pointer: coarse) {
   .admin-dashboard button {
@@ -596,15 +490,8 @@
 .admin-dashboard .ss-secondary {
   font-size: 13px;
 }
-.admin-dashboard .ss-content-row strong {
-  font-size: 14px;
-}
-.admin-dashboard .ss-content-row small,
-.admin-dashboard .ss-footer,
 .admin-dashboard .ss-nav-label,
-.admin-dashboard .ss-owner-person div > span {
-  font-size: 11px;
-}
+.admin-dashboard .ss-owner-person div > span { font-size: 11px; }
 .admin-dashboard .ss-owner-person strong {
   font-size: 12px;
 }
@@ -699,7 +586,6 @@
     .ss-workspace,
     .ss-record,
     .ss-empty,
-    .ss-upload-tile,
     .ss-toolbar
   ) {
   transition:
@@ -976,22 +862,11 @@
   border-radius: var(--ss-radius);
   margin-bottom: 30px;
 }
-.admin-dashboard .ss-import p,
-.admin-dashboard .ss-import-details p {
+.admin-dashboard .ss-import p {
   color: var(--ss-muted);
   line-height: 1.7;
   font-size: 14px;
   margin: 10px 0 20px;
-}
-.admin-dashboard .ss-import-details {
-  margin-top: 35px;
-  font-size: 12px;
-  color: var(--ss-muted);
-}
-.admin-dashboard .ss-import-details summary {
-  cursor: pointer;
-  min-height: 44px;
-  padding-block: 12px;
 }
 .admin-dashboard .ss-draft-dialog {
   width: 96vw;
@@ -1076,4 +951,58 @@
   .admin-dashboard .ss-editor-actions > div button {
     flex: 1;
   }
+}
+
+/* A small directory replaces the repeated project and media previews. */
+.admin-dashboard .ss-overview {
+  max-width: 1000px;
+  border: 1px solid var(--ss-edge);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--ss-panel);
+}
+.admin-dashboard .ss-overview-row {
+  width: 100%;
+  min-height: 96px;
+  padding: 22px 24px;
+  gap: 18px;
+  border-radius: 0;
+  justify-content: flex-start;
+}
+.admin-dashboard .ss-overview-row + .ss-overview-row { border-top: 1px solid var(--ss-faint); }
+.admin-dashboard .ss-overview-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border: 1px solid var(--ss-edge);
+  border-radius: 12px;
+  background: var(--ss-rail);
+  color: var(--ss-accent);
+}
+.admin-dashboard .ss-overview-copy { flex: 1; min-width: 0; }
+.admin-dashboard .ss-overview-copy strong { display: block; font-size: 16px; }
+.admin-dashboard .ss-overview-copy small { display: block; color: var(--ss-muted); font-size: 13px; margin-top: 4px; }
+.admin-dashboard .ss-overview-state { color: var(--ss-muted); font-size: 12px; }
+.admin-dashboard .ss-editor-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--ss-edge);
+}
+.admin-dashboard .ss-editor-tabs button { min-height: 44px; color: var(--ss-muted); }
+.admin-dashboard .ss-editor-tabs [aria-current='page'] { color: var(--ss-ink); background: var(--ss-active); box-shadow: inset 0 -2px var(--ss-accent); }
+.admin-dashboard .ss-editor-disclosure { margin-top: 18px; border: 1px solid var(--ss-edge); border-radius: 12px; padding: 0 18px; background: var(--ss-panel); }
+.admin-dashboard .ss-editor-disclosure > summary { padding: 18px 0; min-height: 52px; cursor: pointer; color: var(--ss-ink); font-weight: 500; }
+.admin-dashboard .ss-editor-disclosure > summary span { margin-left: 8px; color: var(--ss-muted); font-size: 12px; }
+.admin-dashboard .ss-editor-disclosure > summary:focus-visible { outline: 2px solid var(--ss-accent); outline-offset: 3px; }
+.admin-dashboard .ss-editor-disclosure > .ss-repeater { margin-top: 0; }
+@media (max-width: 580px) {
+  .admin-dashboard .ss-overview-row { padding: 18px 14px; gap: 12px; flex-wrap: wrap; }
+  .admin-dashboard .ss-overview-state { margin-left: 54px; width: calc(100% - 84px); }
+  .admin-dashboard .ss-overview-copy { flex-basis: calc(100% - 54px); }
+  .admin-dashboard .ss-editor-tabs button { flex: 1; font-size: 12px; }
 }
