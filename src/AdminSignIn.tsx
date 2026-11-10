@@ -53,14 +53,6 @@ export function AdminSignIn() {
         <section className={`admin-sign-in__content${auth.view.stage === 'checking' ? ' admin-sign-in__content--checking' : ''}`} aria-labelledby="sign-in-heading">
           <p className="admin-sign-in__eyebrow">{auth.view.stage === 'checking' ? 'Portfolio studio' : 'Portfolio admin'}</p>
           <AdminAuthPanel auth={auth} />
-
-          <a className="admin-sign-in__back" href="/">
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
-              strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="m12 5-7 7 7 7M5 12h14" />
-            </svg>
-            Back to portfolio
-          </a>
         </section>
       </main>
 

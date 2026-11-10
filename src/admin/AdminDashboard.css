@@ -98,11 +98,11 @@
 .admin-dashboard .ss-app {
   display: grid;
   grid-template-columns: 194px minmax(0, 1fr);
-  border: 1px solid var(--ss-edge);
-  border-radius: 19px;
+  border: 0;
+  border-radius: 0;
   background: var(--ss-base);
   overflow: clip;
-  min-height: 800px;
+  min-height: 100svh;
 }
 .admin-dashboard .ss-sidebar {
   padding: 27px 14px 20px;
@@ -570,13 +570,13 @@
 }
 
 .admin-dashboard {
-  padding: 24px;
+  padding: 0;
   min-height: 100svh;
 }
 .admin-dashboard .ss-app {
-  max-width: 1560px;
-  margin: auto;
-  min-height: calc(100svh - 48px);
+  max-width: none;
+  margin: 0;
+  min-height: 100svh;
 }
 .admin-dashboard .ss-content {
   padding: clamp(28px, 3vw, 48px);

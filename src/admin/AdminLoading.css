@@ -63,10 +63,6 @@
   line-height: 1.7;
 }
 
-.admin-sign-in__content--checking .admin-sign-in__back {
-  margin-top: 30px;
-}
-
 .admin-sign-in__content:not(.admin-sign-in__content--checking) {
   animation: admin-loading-arrive 240ms ease-out both;
 }

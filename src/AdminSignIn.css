@@ -79,8 +79,6 @@
 .admin-sign-in__sign-out:hover { text-decoration: underline; text-underline-offset: 4px; }
 .admin-sign-in__form button:disabled { cursor: not-allowed; }
 .admin-sign-in__notice { margin: 12px 0 0; color: var(--muted-text); font-size: 12px; line-height: 1.6; }
-.admin-sign-in__back { width: fit-content; min-height: 44px; margin: 16px auto 0; display: flex; align-items: center; gap: 9px; color: var(--muted-text); font-size: 13px; text-decoration: none; transition: color 200ms ease; }
-.admin-sign-in__back:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
 .admin-sign-in__footer { padding-block: 22px 28px; color: var(--muted-text); font-size: 12px; }
 .admin-sign-in a:focus-visible,
 .admin-sign-in input:focus-visible,

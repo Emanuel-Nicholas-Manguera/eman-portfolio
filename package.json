@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:cms": "node --test supabase/tests/cms-permissions.test.mjs",
-    "test:auth": "node --test src/admin/auth.test.mjs",
+    "test:auth": "node --test src/admin/auth.test.mjs src/admin/authController.test.mjs",
     "test:content": "node --test src/cms/content.test.mjs"
   },
   "dependencies": {
