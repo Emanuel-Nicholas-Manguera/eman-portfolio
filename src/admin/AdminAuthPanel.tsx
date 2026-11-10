@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { enrollAdminAuthenticator, signInAdmin, verifyAdminAuthenticator } from './auth'
-import { useAdminAuth } from './useAdminAuth'
+import type { useAdminAuth } from './useAdminAuth'
 
-export function AdminAuthPanel() {
-  const auth = useAdminAuth()
+export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth> }) {
   const { view, busy, error, client, run } = auth
   const [showPassword, setShowPassword] = useState(false)
   const signedIn = !['signedOut', 'checking', 'unconfigured'].includes(view.stage)

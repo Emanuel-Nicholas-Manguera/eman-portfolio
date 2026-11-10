@@ -2,14 +2,17 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import './AdminSignIn.css'
 import { AdminAuthPanel } from './admin/AdminAuthPanel'
+import { useAdminAuth } from './admin/useAdminAuth'
+import { AdminDashboard } from './admin/AdminDashboard'
 
 export function AdminSignIn() {
+  const auth = useAdminAuth()
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const themeAction = `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`
 
   useEffect(() => {
     const previousTitle = document.title
-    document.title = 'Sign in · Emanuel Nicholas'
+    document.title = auth.view.stage === 'ready' ? 'Studio · Emanuel Nicholas' : 'Sign in · Emanuel Nicholas'
     const robots = document.createElement('meta')
     robots.name = 'robots'
     robots.content = 'noindex, nofollow'
@@ -18,7 +21,12 @@ export function AdminSignIn() {
       document.title = previousTitle
       robots.remove()
     }
-  }, [])
+  }, [auth.view.stage])
+
+  if (auth.view.stage === 'ready' && auth.client) {
+    return <AdminDashboard client={auth.client} email={auth.view.email} theme={theme}
+      onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')} onSignOut={auth.signOut} />
+  }
 
   return (
     <div className="portfolio admin-sign-in" data-theme={theme}>
@@ -44,7 +52,7 @@ export function AdminSignIn() {
       <main className="admin-sign-in__main">
         <section className="admin-sign-in__content" aria-labelledby="sign-in-heading">
           <p className="admin-sign-in__eyebrow">Portfolio admin</p>
-          <AdminAuthPanel />
+          <AdminAuthPanel auth={auth} />
 
           <a className="admin-sign-in__back" href="/">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
