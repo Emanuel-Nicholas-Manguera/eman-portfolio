@@ -3,8 +3,6 @@ import type { KeyboardEvent } from 'react'
 import './Experience.css'
 import type { ExperienceContent } from './cms/content'
 
-
-
 export function Experience({ experiences }: { experiences: ExperienceContent[] }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
@@ -152,18 +150,10 @@ export function Experience({ experiences }: { experiences: ExperienceContent[] }
                   ))}
                 </ul>
                 <div className="experience-details">
-                  {experience.projects.length > 0 && (
-                    <div>
-                      <p className="experience-detail-label">Project work</p>
-                      <p className="experience-projects">{experience.projects.join(' · ')}</p>
-                    </div>
-                  )}
-                  <div>
-                    <p className="experience-detail-label">Languages & tools</p>
-                    <ul className="experience-languages" aria-label="Languages and tools used">
-                      {experience.languages.map((language) => <li key={language}>{language}</li>)}
-                    </ul>
-                  </div>
+                  <p className="experience-detail-label">Languages & tools</p>
+                  <ul className="experience-languages" aria-label="Languages and tools used">
+                    {experience.languages.map((language) => <li key={language}>{language}</li>)}
+                  </ul>
                 </div>
               </article>
             )

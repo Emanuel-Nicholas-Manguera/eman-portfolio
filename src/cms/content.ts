@@ -34,7 +34,6 @@ export type ExperienceContent = {
   summary: string
   contributions: { title: string; detail: string }[]
   languages: string[]
-  projects: string[]
 }
 export type ProjectContent = {
   name: string
@@ -224,7 +223,6 @@ export function blankContent(kind: Kind): Content {
         summary: '',
         contributions: [],
         languages: [],
-        projects: [],
       }
     case 'project':
       return {

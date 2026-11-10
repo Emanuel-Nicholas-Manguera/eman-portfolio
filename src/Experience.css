@@ -238,9 +238,6 @@
 .experience-contributions p { margin: 0; }
 
 .experience-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 22px 32px;
   margin-top: 24px;
   padding-top: 18px;
   border-top: 1px solid var(--header-border);
@@ -254,13 +251,6 @@
   line-height: 1.5;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-}
-
-.experience-projects {
-  margin: 0;
-  color: var(--text);
-  font-size: 13px;
-  line-height: 2.15;
 }
 
 .experience-languages {
@@ -304,7 +294,6 @@
 .experience-department,
 .experience-period,
 .experience-contributions,
-.experience-projects,
 .experience-languages li {
   transition: color var(--theme-duration) var(--theme-easing),
     background-color var(--theme-duration) var(--theme-easing);

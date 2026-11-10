@@ -7,7 +7,6 @@ export const experiences = [
     location: 'Manila City',
     dates: { start: '2026-02', end: '2026-10', label: 'Feb 2026 — Oct 2026' },
     kind: 'Professional experience',
-    projects: [],
     summary: 'Developed and maintained software solutions as part of the company’s development team.',
     contributions: [
       { title: 'Team collaboration', detail: 'Collaborated with technical leads and operations stakeholders to deliver reliable software solutions.' },
@@ -25,7 +24,6 @@ export const experiences = [
     location: 'Taguig City',
     dates: { start: '2025-09', end: '2025-12', label: 'Sep 2025 — Dec 2025' },
     kind: 'Internship',
-    projects: [],
     summary: 'Developed the backend and data architecture for a mobile performance reporting app used by Global Servicing directors and vice presidents.',
     contributions: [
       { title: '12 key business metrics', detail: 'Built Power BI data models, Power Query (M) ETL workflows, and DAX measures to support performance reporting.' },
@@ -44,7 +42,6 @@ export const experiences = [
     // Omit the dates until the duplicate range in the résumé is confirmed.
     dates: null,
     kind: 'Internship',
-    projects: [],
     summary: 'Contributed to DOST INSPIRE, developing web modules and dashboards for executive insights and data analytics.',
     contributions: [
       { title: 'Web modules & interfaces', detail: 'Enhanced modules from system specifications using PHP and JavaScript, and built reusable interface templates.' },

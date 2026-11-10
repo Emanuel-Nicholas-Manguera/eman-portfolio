@@ -305,11 +305,6 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
               value={c.languages}
               onChange={(languages) => onChange({ ...c, languages })}
             />
-            <List
-              label="Project work"
-              value={c.projects}
-              onChange={(projects) => onChange({ ...c, projects })}
-            />
           </div>
           <Repeater
             label="Contributions"

@@ -98,7 +98,6 @@ export function CmsEditor({
       if (next.kind === 'experience') {
         const c = next.content as ExperienceContent
         c.languages = c.languages.map((x) => x.trim()).filter(Boolean)
-        c.projects = c.projects.map((x) => x.trim()).filter(Boolean)
         if (c.dates) {
           const format = (value: string) =>
             new Intl.DateTimeFormat('en', {
