@@ -25,7 +25,7 @@ export function AdminLoading() {
 // Use the same loading treatment while the admin bundle itself is arriving.
 export function AdminLoadingScreen() {
   return (
-    <div className="portfolio admin-sign-in" data-theme="light">
+    <div className="portfolio admin-sign-in" data-theme="dark">
       <div className="wallpaper" aria-hidden="true" />
       <div className="admin-sign-in__dots" aria-hidden="true" />
       <header className="admin-sign-in__header">

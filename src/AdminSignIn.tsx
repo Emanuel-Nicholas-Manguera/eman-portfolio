@@ -7,7 +7,7 @@ import { AdminDashboard } from './admin/AdminDashboard'
 
 export function AdminSignIn() {
   const auth = useAdminAuth()
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
   const themeAction = `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`
 
   useEffect(() => {
