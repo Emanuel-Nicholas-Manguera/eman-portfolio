@@ -112,49 +112,34 @@
 }
 
 .intro-name-word {
+  position: relative;
+  display: inline-block;
   white-space: nowrap;
 }
 
-/* Every letter occupies its final space throughout the one-time reveal. */
-.intro-name-letter {
-  position: relative;
-  opacity: 0;
-  animation: intro-name-type 1ms step-end forwards;
-  animation-delay: calc(80ms + var(--letter-index) * 80ms);
+/* The final words reserve their space, including when the first name is erased. */
+.intro-name-reserve { visibility: hidden; }
+.intro-name-typed {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-.intro-name-letter::after {
+.intro-name-typed[data-cursor='true']::after {
   content: '';
   position: absolute;
   top: .12em;
-  right: -.06em;
+  right: -.07em;
   width: 2px;
   height: .8em;
   background: var(--accent);
-  opacity: 0;
   pointer-events: none;
-  animation: intro-name-cursor 80ms step-end;
-  animation-delay: calc(80ms + var(--letter-index) * 80ms);
-}
-
-.intro-copy h1 > span:last-child .intro-name-letter:last-child::after {
-  animation-name: intro-name-cursor-fade;
-  animation-duration: 400ms;
-  animation-timing-function: ease-out;
-}
-
-@keyframes intro-name-type {
-  to { opacity: 1; }
+  animation: intro-name-cursor 1s step-end infinite;
 }
 
 @keyframes intro-name-cursor {
-  0%, 99% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-@keyframes intro-name-cursor-fade {
-  0%, 35% { opacity: 1; }
-  100% { opacity: 0; }
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
 .intro-bio {
@@ -429,8 +414,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro-name-letter { animation: none; opacity: 1; }
-  .intro-name-letter::after { display: none; animation: none; }
+  .intro-name-reserve { visibility: visible; }
+  .intro-name-typed { display: none; }
   .intro-copy::after,
   .intro-bio,
   .intro-bio-panel,

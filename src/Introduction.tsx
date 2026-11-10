@@ -199,6 +199,76 @@ function Portrait({ isPinned, isRevealed, onHoverChange, onToggle, onReset, onGr
   )
 }
 
+const nameFrames = (() => {
+  const frames = [{ at: 0, first: '', second: '' }]
+  let at = 0
+  const add = (first: string, second: string, delay = 80) => {
+    at += delay
+    frames.push({ at, first, second })
+  }
+  for (let length = 1; length <= 8; length++) add('Emmanuel'.slice(0, length), '')
+  at += 500
+  for (let length = 7; length >= 2; length--) add('Emmanuel'.slice(0, length), '', 65)
+  at += 160
+  for (let length = 3; length <= 7; length++) add('Emanuel'.slice(0, length), '')
+  for (let length = 1; length <= 8; length++) add('Emanuel', 'Nicholas'.slice(0, length))
+  return frames
+})()
+
+function TypingName() {
+  const [frame, setFrame] = useState(nameFrames[0])
+
+  useEffect(() => {
+    const startedAt = performance.now()
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const finalFrame = nameFrames[nameFrames.length - 1]
+    let completed = false
+    const finish = () => {
+      completed = true
+      window.clearInterval(interval)
+      setFrame(finalFrame)
+    }
+    const tick = () => {
+      if (completed) return
+      const elapsed = performance.now() - startedAt
+      if (elapsed >= finalFrame.at) return finish()
+      for (let index = nameFrames.length - 1; index >= 0; index--) {
+        if (elapsed >= nameFrames[index].at) {
+          setFrame(nameFrames[index])
+          break
+        }
+      }
+    }
+    const interval = window.setInterval(tick, 30)
+    // A definite final state prevents the name from remaining partly hidden.
+    const deadline = window.setTimeout(finish, motion.matches ? 0 : finalFrame.at)
+    const onVisibility = () => {
+      if (!document.hidden) tick()
+    }
+    motion.addEventListener('change', finish, { once: true })
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.clearInterval(interval)
+      window.clearTimeout(deadline)
+      motion.removeEventListener('change', finish)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [])
+
+  return (
+    <h1 id="intro-title" aria-label="Emanuel Nicholas">
+      <span className="intro-name-word" aria-hidden="true">
+        <span className="intro-name-reserve">Emanuel</span>
+        <span className="intro-name-typed" data-cursor={!frame.second}>{frame.first}</span>
+      </span>{' '}
+      <span className="intro-name-word" aria-hidden="true">
+        <span className="intro-name-reserve">Nicholas</span>
+        <span className="intro-name-typed" data-cursor={!!frame.second}>{frame.second}</span>
+      </span>
+    </h1>
+  )
+}
+
 export function Introduction({ social, onSocialSelect }: {
   social: SocialId | null
   onSocialSelect: (social: SocialId) => void
@@ -251,22 +321,7 @@ export function Introduction({ social, onSocialSelect }: {
           </svg>
           Paranaque, Philippines
         </p>
-        <h1 id="intro-title" aria-label="Emanuel Nicholas">
-          {['Emanuel', 'Nicholas'].map((word, wordIndex) => (
-            <span key={word} aria-hidden="true">
-              {wordIndex > 0 && ' '}
-              <span className="intro-name-word">
-                {Array.from(word).map((letter, index) => (
-                  <span
-                    key={index}
-                    className="intro-name-letter"
-                    style={{ '--letter-index': index + (wordIndex === 0 ? 0 : 7) } as CSSProperties}
-                  >{letter}</span>
-                ))}
-              </span>
-            </span>
-          ))}
-        </h1>
+        <TypingName />
         <div ref={bioRef} className="intro-bio">
           <div className="intro-bio-panel" aria-hidden={isRevealed}>
             <p className="intro-role">Software Developer</p>
