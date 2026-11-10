@@ -1,0 +1,38 @@
+.admin-dashboard .ss-idle-warning {
+  position: sticky;
+  top: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 18px 20px;
+  border: 1px solid var(--ss-accent);
+  border-radius: 12px;
+  background: var(--ss-panel);
+  box-shadow: 0 8px 24px var(--ss-shadow);
+  animation: studio-enter 190ms ease-out;
+}
+.admin-dashboard .ss-idle-clock {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--ss-accent);
+  background: var(--ss-active);
+}
+.admin-dashboard .ss-idle-clock svg { width: 24px; height: 24px; }
+.admin-dashboard .ss-idle-copy { flex: 1; min-width: 200px; }
+.admin-dashboard .ss-idle-copy p + p { margin-top: 4px; color: var(--ss-muted); font-size: 13px; }
+.admin-dashboard .ss-idle-copy [role='timer'] { color: var(--ss-ink); font-variant-numeric: tabular-nums; }
+.admin-dashboard .ss-idle-warning button { min-height: 44px; }
+@media (max-width: 580px) {
+  .admin-dashboard .ss-idle-warning { gap: 12px; padding: 16px; }
+  .admin-dashboard .ss-idle-copy { min-width: 0; flex-basis: calc(100% - 56px); }
+  .admin-dashboard .ss-idle-warning button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-dashboard .ss-idle-warning { animation: none; }
+}

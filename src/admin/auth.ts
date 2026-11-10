@@ -1,9 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { sessionIdFromToken } from './idleSession.ts'
 
 export type AuthView =
   | { stage: 'signedOut' | 'checking' | 'unconfigured' | 'error' }
   | { stage: 'denied' | 'enroll' | 'pending'; email: string }
-  | { stage: 'ready'; email: string; userId: string }
+  | { stage: 'ready'; email: string; userId: string; sessionId: string }
   | { stage: 'verify'; email: string; factors: { id: string; name: string }[] }
   | { stage: 'enrolling'; email: string; factorId: string; qr: string; secret: string }
 
@@ -23,7 +24,10 @@ export async function inspectAdminSession(client: SupabaseClient): Promise<AuthV
     case 'denied': return { stage: 'denied', email }
     case 'enroll': return { stage: 'enroll', email }
     case 'pending': return { stage: 'pending', email }
-    case 'ready': return { stage: 'ready', email, userId: identity.user.id }
+    case 'ready': return {
+      stage: 'ready', email, userId: identity.user.id,
+      sessionId: sessionIdFromToken(session.session.access_token),
+    }
     case 'verify': {
       const { data, error: factorsError } = await client.auth.mfa.listFactors()
       if (factorsError) throw factorsError

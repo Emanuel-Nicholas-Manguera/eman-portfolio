@@ -4,12 +4,13 @@ import { authErrorMessage, enrollAdminAuthenticator, inspectAdminSession, signIn
 
 const ok = (data) => ({data, error:null})
 const fail = (message) => ({data:null,error:new Error(message)})
+const testToken = `test.${Buffer.from(JSON.stringify({session_id:'00000000-0000-4000-8000-000000000001'})).toString('base64url')}.unsigned`
 function fixture(status = 'ready') {
   const calls = []
   const client = {
     rpc: async (name) => {calls.push(['rpc',name]);return ok(status)},
     auth: {
-      getSession: async () => ok({session:{access_token:'test-token'}}),
+      getSession: async () => ok({session:{access_token:testToken}}),
       getUser: async () => ok({user:{id:'owner',email:'owner@example.test',user_metadata:{admin:true}}}),
       signInWithPassword: async (credentials) => {calls.push(['signIn',credentials]);return ok({})},
       signOut: async (options) => {calls.push(['signOut',options]);return ok({})},

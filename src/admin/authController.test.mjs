@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { createAuthController } from './authController.ts'
 const owner = { userId:'owner', accessToken:'test-token-a' }
-const ready = { stage:'ready', email:'owner@example.test', userId:'owner' }
+const ready = { stage:'ready', email:'owner@example.test', userId:'owner', sessionId:'00000000-0000-4000-8000-000000000001' }
 const tick = () => new Promise(resolve => setTimeout(resolve, 5))
 const deferred = () => { let resolve, reject; const promise = new Promise((yes,no)=>{resolve=yes;reject=no});return {promise,resolve,reject} }
 function fixture(inspect = async()=>ready) {

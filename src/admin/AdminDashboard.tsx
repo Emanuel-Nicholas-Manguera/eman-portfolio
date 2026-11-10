@@ -6,6 +6,7 @@ import { loadWorkspace, uploadImage, archiveDocument, newDocument } from './cms'
 import { importPortfolio } from './importPortfolio'
 import { CmsEditor } from './CmsEditor'
 import './AdminDashboard.css'
+import './AdminIdle.css'
 
 type Section =
   | 'Overview'
@@ -96,12 +97,16 @@ export function AdminDashboard({
   theme,
   onToggleTheme,
   onSignOut,
+  idleWarning,
+  onStaySignedIn,
 }: {
   client: SupabaseClient
   email: string
   theme: 'light' | 'dark'
   onToggleTheme: () => void
   onSignOut: () => void
+  idleWarning: number | null
+  onStaySignedIn: () => void
 }) {
   const [section, setSection] = useState<Section>('Overview'),
     [menuOpen, setMenuOpen] = useState(false)
@@ -403,6 +408,18 @@ export function AdminDashboard({
             </div>
           </header>
           <main className="ss-content" id="studio-content">
+            {idleWarning !== null && <section className="ss-idle-warning" aria-label="Inactivity warning">
+              <div className="ss-idle-clock" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+                </svg>
+              </div>
+              <div className="ss-idle-copy">
+                <p role="status"><strong>Still working?</strong> Your session is about to end.</p>
+                <p>Save any unsaved changes. Automatic sign-out in <span role="timer" aria-live="off">{Math.floor(idleWarning / 60)}:{String(idleWarning % 60).padStart(2, '0')}</span>.</p>
+              </div>
+              <button className="ss-primary" onClick={onStaySignedIn}>Stay signed in</button>
+            </section>}
             {error && (
               <div role="alert" className="ss-message ss-error">
                 {error}

@@ -6,6 +6,7 @@ type ObservedSession = { userId: string; accessToken: string } | null
 // Only inspectAdminSession's server-verified result may open the dashboard.
 export function createAuthController(options: {
   inspect: () => Promise<AuthView>
+  prepare?: (view: AuthView) => Promise<AuthView>
   onView: (view: AuthView) => void
   onBusy: (busy: boolean) => void
   onError: (message: string) => void
@@ -26,7 +27,8 @@ export function createAuthController(options: {
     options.onError('')
     if (hideCurrent) show({ stage: 'checking' })
     try {
-      const next = await action()
+      let next = await action()
+      if (operation === id && options.prepare) next = await options.prepare(next)
       if (operation === id) show(next)
     } catch (cause) {
       if (operation === id) {

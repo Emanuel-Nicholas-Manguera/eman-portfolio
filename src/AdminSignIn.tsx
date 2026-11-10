@@ -25,6 +25,7 @@ export function AdminSignIn() {
 
   if (auth.view.stage === 'ready' && auth.client) {
     return <AdminDashboard client={auth.client} email={auth.view.email} theme={theme}
+      idleWarning={auth.idleWarning} onStaySignedIn={auth.staySignedIn}
       onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')} onSignOut={auth.signOut} />
   }
 
@@ -52,6 +53,9 @@ export function AdminSignIn() {
       <main className="admin-sign-in__main">
         <section className={`admin-sign-in__content${auth.view.stage === 'checking' ? ' admin-sign-in__content--checking' : ''}`} aria-labelledby="sign-in-heading">
           <p className="admin-sign-in__eyebrow">{auth.view.stage === 'checking' ? 'Portfolio studio' : 'Portfolio admin'}</p>
+          {auth.idleTimedOut && auth.view.stage !== 'checking' && <p className="admin-sign-in__timeout" role="status">
+            You were signed out after 10 minutes of inactivity. Sign in again to continue.
+          </p>}
           <AdminAuthPanel auth={auth} />
         </section>
       </main>

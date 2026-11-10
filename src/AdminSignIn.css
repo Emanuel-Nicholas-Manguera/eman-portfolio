@@ -79,6 +79,7 @@
 .admin-sign-in__sign-out:hover { text-decoration: underline; text-underline-offset: 4px; }
 .admin-sign-in__form button:disabled { cursor: not-allowed; }
 .admin-sign-in__notice { margin: 12px 0 0; color: var(--muted-text); font-size: 12px; line-height: 1.6; }
+.admin-sign-in__timeout { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--header-border); border-radius: 10px; background: var(--admin-field); color: var(--text); font-size: 14px; line-height: 1.6; }
 .admin-sign-in__footer { padding-block: 22px 28px; color: var(--muted-text); font-size: 12px; }
 .admin-sign-in a:focus-visible,
 .admin-sign-in input:focus-visible,

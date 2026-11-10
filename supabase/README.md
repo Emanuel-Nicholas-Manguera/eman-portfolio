@@ -83,6 +83,22 @@ removes that tab's stored session. Passwords, TOTP setup secrets, and one-time
 codes are never stored by the application or logged. An enrollment QR/setup key
 exists only in the current screen state and disappears on sign-out or navigation.
 
+The admin signs out the current tab's session after **10 minutes of inactivity**.
+At nine minutes, an inline warning shows the remaining minute and a **Stay signed
+in** button. Trusted clicks, typing, and scrolling reset the timer; Auth/token
+refreshes and returning to the tab do not. The activity timestamp and a non-secret
+session identifier are kept in the same tab's `sessionStorage`, so reloads retain
+the deadline and a new login gets its own timer. Focus/visibility checks handle
+deadlines passed during background throttling or laptop sleep. An expired restored
+session is signed out before the workspace is mounted. Unsaved edits are not
+automatically saved or published; the warning reminds the owner to save them.
+
+This is a browser inactivity safeguard using `signOut({ scope: 'local' })`, not a
+new server-enforced session policy. A copied access JWT remains valid until its
+existing expiry; owner/MFA RLS stays unchanged. Supabase's managed session limits
+are a separate Pro-plan feature. See [sessions](https://supabase.com/docs/guides/auth/sessions)
+and [sign-out](https://supabase.com/docs/reference/javascript/auth-signout).
+
 Hosted configuration was set for the development phase: public signup OFF,
 anonymous sign-in OFF, email confirmation ON, TOTP ON, and site URL
 `http://localhost:5173/admin/myself`. Update the site/allowed redirect URLs when the
