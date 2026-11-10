@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { enrollAdminAuthenticator, signInAdmin, verifyAdminAuthenticator } from './auth'
 import type { useAdminAuth } from './useAdminAuth'
+import { AdminLoading } from './AdminLoading'
 
 export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth> }) {
   const { view, busy, error, client, run } = auth
@@ -33,6 +34,8 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
     const input = event.currentTarget.elements.namedItem('code') as HTMLInputElement
     input.value = ''
   }
+
+  if (view.stage === 'checking') return <AdminLoading />
 
   return (
     <>

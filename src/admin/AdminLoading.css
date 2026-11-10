@@ -1,0 +1,105 @@
+.admin-sign-in__content--checking {
+  max-width: 460px;
+  text-align: center;
+}
+
+.admin-loading {
+  padding-top: 26px;
+  animation: admin-loading-arrive 260ms ease-out both;
+}
+
+.admin-loading__illustration {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 144px;
+  height: 144px;
+  margin: 0 auto 26px;
+}
+
+.admin-loading__halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%);
+  animation: admin-loading-breathe 2.8s ease-in-out infinite;
+}
+
+.admin-loading__orbit {
+  position: absolute;
+  inset: 16px;
+  border: 2px solid var(--header-border);
+  border-top-color: var(--accent);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: admin-loading-orbit 1.6s linear infinite;
+}
+
+.admin-loading__tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border: 1px solid var(--header-border);
+  border-radius: 22px;
+  color: var(--accent);
+  background: linear-gradient(145deg, var(--header-background), var(--control-hover));
+  box-shadow: 0 12px 30px var(--header-shadow), inset 0 1px 0 color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+.admin-sign-in .admin-loading h1 {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 5vw, 36px);
+  letter-spacing: -1.4px;
+  line-height: 1.2;
+}
+
+.admin-loading__description {
+  max-width: 31ch;
+  margin: 0 auto;
+  color: var(--muted-text);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.admin-sign-in__content--checking .admin-sign-in__back {
+  margin-top: 30px;
+}
+
+.admin-sign-in__content:not(.admin-sign-in__content--checking) {
+  animation: admin-loading-arrive 240ms ease-out both;
+}
+
+.admin-dashboard {
+  animation: admin-studio-arrive 280ms ease-out both;
+}
+
+@keyframes admin-loading-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes admin-loading-breathe {
+  0%, 100% { opacity: .55; transform: scale(.92); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes admin-loading-arrive {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes admin-studio-arrive {
+  from { opacity: .5; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-loading,
+  .admin-loading__halo,
+  .admin-loading__orbit,
+  .admin-sign-in__content,
+  .admin-dashboard {
+    animation: none !important;
+  }
+}

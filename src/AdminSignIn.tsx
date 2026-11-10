@@ -50,8 +50,8 @@ export function AdminSignIn() {
       </header>
 
       <main className="admin-sign-in__main">
-        <section className="admin-sign-in__content" aria-labelledby="sign-in-heading">
-          <p className="admin-sign-in__eyebrow">Portfolio admin</p>
+        <section className={`admin-sign-in__content${auth.view.stage === 'checking' ? ' admin-sign-in__content--checking' : ''}`} aria-labelledby="sign-in-heading">
+          <p className="admin-sign-in__eyebrow">{auth.view.stage === 'checking' ? 'Portfolio studio' : 'Portfolio admin'}</p>
           <AdminAuthPanel auth={auth} />
 
           <a className="admin-sign-in__back" href="/">
