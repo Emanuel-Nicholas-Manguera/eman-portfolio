@@ -4,6 +4,7 @@
 }
 
 .introduction {
+  --intro-reveal-duration: 350ms;
   --intro-secondary-text: var(--muted-text);
   --dot-color: var(--accent);
   --dot-opacity: .38;
@@ -102,6 +103,20 @@
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: -.05em;
+}
+
+.intro-bio { display: grid; }
+.intro-bio-panel {
+  grid-area: 1 / 1;
+  align-self: start;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--intro-reveal-duration) ease-in-out, visibility 0s;
+}
+.intro-bio-panel[aria-hidden='true'] {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--intro-reveal-duration) ease-in-out, visibility 0s var(--intro-reveal-duration);
 }
 
 .intro-role {
@@ -219,7 +234,7 @@
   position: absolute;
   display: block;
   transform: translateX(-50%);
-  transition: opacity 350ms ease-in-out;
+  transition: opacity var(--intro-reveal-duration) ease-in-out;
 }
 
 .portrait-layer img {
@@ -356,6 +371,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .intro-bio-panel,
+  .intro-bio-panel[aria-hidden='true'] { transition: none; }
   .intro-dot-hover { transition: none; }
   .intro-dot-ripple { display: none; animation: none; }
   .portrait-layer,

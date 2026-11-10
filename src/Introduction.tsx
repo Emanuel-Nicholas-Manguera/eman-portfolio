@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import suitPortrait from './assets/portraits/emanuel-suit.png'
 import graduationPortrait from './assets/portraits/emanuel-graduation.png'
@@ -131,40 +131,39 @@ function ArrowIcon({ direction = 'diagonal' }: { direction?: 'diagonal' | 'down'
   )
 }
 
-function Portrait() {
-  const [isHovered, setIsHovered] = useState(false)
-  const [isPinned, setIsPinned] = useState(false)
-  const [isGraduationLoaded, setIsGraduationLoaded] = useState(false)
+function Portrait({ isPinned, isRevealed, onHoverChange, onToggle, onReset, onGraduationReady }: {
+  isPinned: boolean
+  isRevealed: boolean
+  onHoverChange: (hovered: boolean) => void
+  onToggle: () => void
+  onReset: () => void
+  onGraduationReady: () => void
+}) {
   const graduationRef = useRef<HTMLImageElement>(null)
-  const isRevealed = isGraduationLoaded && (isHovered || isPinned)
 
   useEffect(() => {
     if (graduationRef.current?.complete && graduationRef.current.naturalWidth > 0) {
-      setIsGraduationLoaded(true)
+      onGraduationReady()
     }
-  }, [])
+  }, [onGraduationReady])
 
   return (
     <figure className="portrait" aria-label="Portraits of Emanuel Nicholas">
       <button
         className="portrait-toggle"
         type="button"
-        aria-label={isPinned ? 'Show suit portrait' : 'Show graduation portrait'}
+        aria-label={isPinned ? 'Show software developer introduction' : 'Show Computer Science graduate introduction'}
         aria-pressed={isPinned}
         data-revealed={isRevealed}
         onPointerEnter={(event) => {
-          if (event.pointerType === 'mouse') setIsHovered(true)
+          if (event.pointerType === 'mouse') onHoverChange(true)
         }}
-        onPointerLeave={() => setIsHovered(false)}
-        onPointerCancel={() => setIsHovered(false)}
-        onClick={() => {
-          setIsPinned((current) => !current)
-          setIsHovered(false)
-        }}
+        onPointerLeave={() => onHoverChange(false)}
+        onPointerCancel={() => onHoverChange(false)}
+        onClick={onToggle}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
-            setIsPinned(false)
-            setIsHovered(false)
+            onReset()
           }
         }}
       >
@@ -189,7 +188,7 @@ function Portrait() {
                 height="979"
                 alt=""
                 aria-hidden="true"
-                onLoad={() => setIsGraduationLoaded(true)}
+                onLoad={onGraduationReady}
                 draggable="false"
               />
             </span>
@@ -204,6 +203,12 @@ export function Introduction({ social, onSocialSelect }: {
   social: SocialId | null
   onSocialSelect: (social: SocialId) => void
 }) {
+  const [isHovered, setIsHovered] = useState(false)
+  const [isPinned, setIsPinned] = useState(false)
+  const [isGraduationLoaded, setIsGraduationLoaded] = useState(false)
+  const isRevealed = isGraduationLoaded && (isHovered || isPinned)
+  const graduationReady = useCallback(() => setIsGraduationLoaded(true), [])
+
   return (
     <section className="introduction" aria-labelledby="intro-title">
       <InteractiveDots />
@@ -227,18 +232,41 @@ export function Introduction({ social, onSocialSelect }: {
           Paranaque, Philippines
         </p>
         <h1 id="intro-title">Emanuel Nicholas</h1>
-        <p className="intro-role">Software Developer</p>
-        <p className="intro-description">
-          I’m a Computer Science graduate with experience in full-stack
-          development. I enjoy building web applications and improving how
-          they work.
-        </p>
+        <div className="intro-bio">
+          <div className="intro-bio-panel" aria-hidden={isRevealed}>
+            <p className="intro-role">Software Developer</p>
+            <p className="intro-description">
+              I develop web applications and improve existing systems, with experience
+              in full-stack development, team collaboration, and troubleshooting.
+            </p>
+          </div>
+          <div className="intro-bio-panel" aria-hidden={!isRevealed}>
+            <p className="intro-role">BS Computer Science Graduate</p>
+            <p className="intro-description">
+              My Computer Science studies built my foundation in programming and
+              problem-solving, which I applied through academic projects and internships.
+            </p>
+          </div>
+        </div>
         <a className="intro-action" href="#projects">
           View projects <ArrowIcon />
         </a>
         <SocialLinks selected={social} onSelect={onSocialSelect} />
       </div>
-      <Portrait />
+      <Portrait
+        isPinned={isPinned}
+        isRevealed={isRevealed}
+        onHoverChange={setIsHovered}
+        onGraduationReady={graduationReady}
+        onToggle={() => {
+          setIsPinned((current) => !current)
+          setIsHovered(false)
+        }}
+        onReset={() => {
+          setIsPinned(false)
+          setIsHovered(false)
+        }}
+      />
       <a className="intro-scroll" href="#experience">
         <span>A little about me. Then, where I’ve contributed.</span>
         <ArrowIcon direction="down" />
