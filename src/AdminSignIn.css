@@ -85,8 +85,6 @@
 .admin-sign-in__error { font-size: 14px; color: var(--text); border-left: 3px solid var(--accent); padding-left: 12px; line-height: 1.6; }
 .admin-sign-in__identity { color: var(--muted-text); font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
 .admin-sign-in__identity strong { display: block; font-weight: 500; color: var(--text); }
-.admin-sign-in__sign-out { display: block; min-height: 44px; padding: 10px 0; margin-top: 16px; border: 0; background: transparent; font: inherit; font-size: 14px; color: var(--accent); cursor: pointer; }
-.admin-sign-in__sign-out:hover { text-decoration: underline; text-underline-offset: 4px; }
 .admin-sign-in__form button:disabled { cursor: not-allowed; }
 .admin-sign-in__notice { margin: 12px 0 0; color: var(--muted-text); font-size: 12px; line-height: 1.6; }
 .admin-sign-in__timeout { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--header-border); border-radius: 10px; background: var(--admin-field); color: var(--text); font-size: 14px; line-height: 1.6; }

@@ -7,7 +7,6 @@ import { AdminLoading } from './AdminLoading'
 export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth> }) {
   const { view, busy, error, client, run } = auth
   const [showPassword, setShowPassword] = useState(false)
-  const signedIn = !['signedOut', 'checking', 'unconfigured'].includes(view.stage)
   const titles = {
     signedOut: 'Welcome back.', checking: 'Checking sign-in…', unconfigured: 'Sign-in unavailable.',
     error: 'Connection interrupted.', denied: 'Access unavailable.', enroll: 'Secure your account.',
@@ -106,7 +105,6 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
 
       {view.stage === 'ready' && <p className="admin-sign-in__identity">Signed in as <strong>{view.email}</strong></p>}
       {error && <p className="admin-sign-in__error" role="alert">{error}</p>}
-      {signedIn && <button className="admin-sign-in__sign-out" type="button" disabled={busy} onClick={auth.signOut}>Sign out</button>}
     </>
   )
 }
