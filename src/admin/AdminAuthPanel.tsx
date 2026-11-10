@@ -1,3 +1,4 @@
+import { AdminIcon } from './AdminIcon'
 import { useState } from 'react'
 import { enrollAdminAuthenticator, signInAdmin, verifyAdminAuthenticator } from './auth'
 import type { useAdminAuth } from './useAdminAuth'
@@ -71,14 +72,14 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
             </button>
           </div>
           <button className="admin-sign-in__submit" type="submit" disabled={busy}>
-            {busy ? 'Signing in…' : 'Sign in'}<span aria-hidden="true">↗</span>
+            {busy ? 'Signing in…' : 'Sign in'}<AdminIcon name="right" />
           </button>
         </form>
       )}
 
       {view.stage === 'enroll' && <button className="admin-sign-in__submit" type="button" disabled={busy}
         onClick={() => { if (client) void run(() => enrollAdminAuthenticator(client), 'Unable to start authenticator setup. Please try again.') }}>
-        {busy ? 'Preparing setup…' : 'Set up authenticator'}<span aria-hidden="true">↗</span>
+        {busy ? 'Preparing setup…' : 'Set up authenticator'}<AdminIcon name="right" />
       </button>}
 
       {view.stage === 'enrolling' && <div className="admin-sign-in__enrollment">
@@ -96,7 +97,7 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
           <input id="admin-code" name="code" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6}
             autoComplete="one-time-code" placeholder="000000" required disabled={busy} aria-describedby="code-help" />
           <p id="code-help" className="admin-sign-in__notice">Use the current code from your authenticator app.</p>
-          <button className="admin-sign-in__submit" type="submit" disabled={busy}>{busy ? 'Verifying…' : 'Verify code'}<span aria-hidden="true">↗</span></button>
+          <button className="admin-sign-in__submit" type="submit" disabled={busy}>{busy ? 'Verifying…' : 'Verify code'}<AdminIcon name="right" /></button>
         </form>
       )}
 

@@ -1,0 +1,85 @@
+/* Shared action styling, kept separate from navigation and portfolio previews. */
+.admin-dashboard :is(.ss-primary, .ss-secondary, .ss-upload-button, .ss-quiet, .ss-editor-back, .ss-row-actions > :where(button), .ss-section-heading > :where(button)) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 11px 16px;
+  border: 1px solid var(--ss-edge);
+  border-radius: 12px;
+  background: var(--ss-panel);
+  color: var(--ss-ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-decoration: none;
+  box-shadow: inset 0 1px 0 light-dark(#fff, #ffffff08), 0 2px 4px var(--ss-shadow);
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.admin-dashboard :is(.ss-primary, .ss-upload-button) {
+  color: var(--ss-action-ink);
+  border-color: light-dark(#315c84, #b9ddff);
+  background: linear-gradient(165deg, light-dark(#295780, #d4ebff), var(--ss-action));
+  box-shadow: inset 0 1px 0 #ffffff24, 0 4px 12px var(--ss-shadow);
+}
+
+.admin-dashboard :is(.ss-quiet, .ss-editor-back, .ss-section-heading > :where(button)) {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--ss-accent);
+  padding-inline: 12px;
+}
+
+.admin-dashboard .ss-editor-back { margin-left: -12px; }
+.admin-dashboard .ss-row-actions { gap: 8px; }
+.admin-dashboard .ss-row-actions > :where(button) { padding-inline: 13px; }
+.admin-dashboard .ss-icon-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 light-dark(#fff, #ffffff08);
+}
+
+.admin-dashboard :is(.ss-primary, .ss-secondary, .ss-upload-button, .ss-quiet, .ss-editor-back, .ss-row-actions > :where(button), .ss-section-heading > :where(button)) > svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) {
+  .admin-dashboard :is(.ss-secondary, .ss-row-actions > :where(button:not(.ss-primary))):hover:not(:disabled),
+  .admin-dashboard .ss-icon-button:hover:not(:disabled) {
+    background: var(--ss-hover);
+    border-color: var(--ss-art-dark);
+    box-shadow: 0 4px 12px var(--ss-shadow);
+    transform: translateY(-1px);
+  }
+  .admin-dashboard :is(.ss-primary, .ss-upload-button):hover:not(:disabled, .is-disabled) {
+    background: linear-gradient(165deg, light-dark(#32658f, #e5f3ff), var(--ss-action));
+    box-shadow: inset 0 1px 0 #ffffff30, 0 6px 18px var(--ss-shadow);
+    transform: translateY(-1px);
+  }
+  .admin-dashboard :is(.ss-quiet, .ss-editor-back, .ss-section-heading > :where(button)):hover:not(:disabled) {
+    background: var(--ss-hover);
+  }
+  .admin-dashboard .ss-quiet:hover > svg { transform: translate(1px, -1px); }
+}
+
+.admin-dashboard :is(.ss-primary, .ss-secondary, .ss-editor-back, .ss-row-actions > :where(button), .ss-section-heading > :where(button)):active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+.admin-dashboard button:disabled,
+.admin-dashboard .ss-upload-button.is-disabled {
+  opacity: .4;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-dashboard :is(button, a, .ss-upload-button),
+  .admin-dashboard :is(button, a, .ss-upload-button) > svg { transition: none; }
+}

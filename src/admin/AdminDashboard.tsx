@@ -1,3 +1,4 @@
+import { AdminIcon as Icon } from './AdminIcon'
 import { useCallback, useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CmsDocument, CmsAsset, Publication, Kind } from '../cms/content'
@@ -7,6 +8,7 @@ import { importPortfolio } from './importPortfolio'
 import { CmsEditor } from './CmsEditor'
 import './AdminDashboard.css'
 import './AdminIdle.css'
+import './AdminButtons.css'
 
 type Section =
   | 'Overview'
@@ -58,38 +60,6 @@ const sections: {
     icon: 'mail',
   },
 ]
-const paths: Record<string, string> = {
-  overview: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
-  user: 'M20 21v-2a8 8 0 0 0-16 0v2M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
-  work: 'M8 6V3h8v3M3 6h18v14H3zM3 11l9 4 9-4',
-  layers: 'm12 3 10 5-10 5L2 8zm-10 10 10 5 10-5M2 18l10 5 10-5',
-  education: 'm2 8 10-5 10 5-10 5zm4 3v6q6 5 12 0v-6M22 8v9',
-  mail: 'M3 5h18v14H3zM3 5l9 8 9-8',
-  media: 'M3 3h18v18H3zM3 17l6-6 5 5 3-3 4 4M8 7h.01',
-  arrow: 'M7 17 17 7M7 7h10v10',
-  right: 'M5 12h14m-6-6 6 6-6 6',
-  chevron: 'm9 5 7 7-7 7',
-  logout: 'M9 3H3v18h6m6-15 6 6-6 6M8 12h13',
-  menu: 'M4 6h16M4 12h16M4 18h16',
-  close: 'm6 6 12 12M6 18 18 6',
-  moon: 'M21 13A9 9 0 0 1 11 3a9 9 0 1 0 10 10',
-  sun: 'M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1',
-}
-export function Icon({ name }: { name: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d={paths[name] ?? paths.layers} />
-    </svg>
-  )
-}
 
 export function AdminDashboard({
   client,
@@ -277,7 +247,7 @@ export function AdminDashboard({
               disabled={busy}
               onClick={() => open(doc)}
             >
-              Edit {doc.kind === 'project' ? 'project' : 'content'} ↗
+              Edit {doc.kind === 'project' ? 'project' : 'content'} <Icon name="right" />
             </button>
           )}
         </div>
@@ -487,13 +457,13 @@ export function AdminDashboard({
                           add('project')
                         }}
                       >
-                        + New project
+                        <Icon name="plus" /> New project
                       </button>
                     ) : section === 'Media' ? (
                       <label
                         className={`ss-upload-button ${busy ? 'is-disabled' : ''}`}
                       >
-                        + Upload images
+                        <Icon name="upload" /> Upload images
                         <input
                           disabled={busy}
                           type="file"
@@ -514,7 +484,7 @@ export function AdminDashboard({
                         disabled={busy}
                         onClick={() => add(current!.kind as Kind)}
                       >
-                        + Add {current.kind}
+                        <Icon name="plus" /> Add {current.kind}
                       </button>
                     ) : null)}
                 </div>
@@ -687,7 +657,7 @@ export function AdminDashboard({
                                       }
                                     }}
                                   >
-                                    ← All images
+                                    <Icon name="left" /> All images
                                   </button>
                                   {asset.url && (
                                     <img
@@ -794,7 +764,7 @@ export function AdminDashboard({
                                         target="_blank"
                                         rel="noopener noreferrer"
                                       >
-                                        View private original ↗
+                                        View private original <Icon name="arrow" />
                                       </a>
                                     )}
                                 </section>

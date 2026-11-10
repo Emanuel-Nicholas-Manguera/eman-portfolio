@@ -1,3 +1,4 @@
+import { AdminIcon as Icon } from './AdminIcon'
 import { useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { DocumentFields } from './DocumentFields'
@@ -175,7 +176,7 @@ export function CmsEditor({
   return (
     <>
       <button className="ss-editor-back" onClick={close}>
-        ← Back to {doc.kind === 'project' ? 'projects' : doc.kind}
+        <Icon name="left" /> Back to {doc.kind === 'project' ? 'projects' : doc.kind}
       </button>
       <div className="ss-heading">
         <div>
@@ -188,7 +189,7 @@ export function CmsEditor({
           </p>
         </div>
         <button className="ss-secondary" onClick={() => setPreview(true)}>
-          Preview draft ↗
+          <Icon name="eye" /> Preview draft
         </button>
       </div>
       <form
@@ -243,14 +244,14 @@ export function CmsEditor({
             </span>
             <div>
               <button className="ss-secondary" type="submit">
-                Save draft
+                <Icon name="save" /> Save draft
               </button>
               <button
                 className="ss-primary"
                 type="button"
                 onClick={() => void act('publish')}
               >
-                Save & publish ↗
+                <Icon name="upload" /> Save & publish
               </button>
             </div>
           </div>
@@ -262,7 +263,7 @@ export function CmsEditor({
                 </button>
               )}
               <button type="button" onClick={() => void act('archive')}>
-                Archive content
+                <Icon name="archive" /> Archive content
               </button>
             </div>
           )}
@@ -285,7 +286,7 @@ export function CmsEditor({
         <div className="ss-preview-bar">
           <span>Draft preview · visible only to you</span>
           <button className="ss-secondary" onClick={() => setPreview(false)}>
-            Close preview ✕
+            Close preview <Icon name="close" />
           </button>
         </div>
         <div

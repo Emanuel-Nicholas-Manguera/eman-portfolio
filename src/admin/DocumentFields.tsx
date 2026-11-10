@@ -1,3 +1,4 @@
+import { AdminIcon as Icon } from './AdminIcon'
 import type {
   CmsDocument,
   CmsAsset,
@@ -89,7 +90,7 @@ function Repeater({
           type="button"
           onClick={() => onChange([...rows, { title: '', detail: '' }])}
         >
-          + Add
+          <Icon name="plus" /> Add
         </button>
       </div>
       {rows.map((row, i) => (
@@ -130,13 +131,13 @@ function Repeater({
               }}
               aria-label={`Move ${label} ${i + 1} up`}
             >
-              ↑ Move up
+              <Icon name="up" /> Move up
             </button>
             <button
               type="button"
               onClick={() => onChange(rows.filter((_, n) => n !== i))}
             >
-              Remove
+              <Icon name="trash" /> Remove
             </button>
           </div>
         </div>
@@ -198,7 +199,7 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
   }
   const upload = (
     <label className="ss-upload-button">
-      + Upload images
+      <Icon name="upload" /> Upload images
       <input
         type="file"
         multiple
@@ -349,7 +350,7 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
                   })
                 }
               >
-                + Add photo
+                <Icon name="plus" /> Add photo
               </button>
             </div>
             {photos.map((photo, i) => (
@@ -389,7 +390,7 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
                       onChange({ ...c, photos: next })
                     }}
                   >
-                    ↑ Move up
+                    <Icon name="up" /> Move up
                   </button>
                   <button
                     type="button"
@@ -400,7 +401,7 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
                       onChange({ ...c, photos: next })
                     }}
                   >
-                    ↓ Move down
+                    <Icon name="down" /> Move down
                   </button>
                   <button
                     type="button"
@@ -411,7 +412,7 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
                       })
                     }
                   >
-                    Remove
+                    <Icon name="trash" /> Remove
                   </button>
                 </div>
               </div>
