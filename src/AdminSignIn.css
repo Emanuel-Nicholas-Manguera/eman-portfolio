@@ -58,12 +58,25 @@
   transition: background-color 200ms ease;
 }
 .admin-sign-in__password button:hover { background: var(--control-hover); }
-.admin-sign-in__forgot { align-self: flex-end; min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--muted-text); font-size: 12px; }
 .admin-sign-in__submit {
   display: flex; align-items: center; justify-content: space-between; min-height: 50px; margin-top: 8px;
   padding: 0 18px; border: 0; border-radius: 10px; background: var(--action-background); color: var(--action-text); font-size: 14px;
   transition: background-color var(--theme-duration) ease, color var(--theme-duration) ease;
 }
+.admin-sign-in__submit { width: 100%; cursor: pointer; margin-top: 24px; }
+.admin-sign-in__submit:hover:not(:disabled) { filter: brightness(1.08); }
+.admin-sign-in button:disabled { opacity: .65; }
+.admin-sign-in__enrollment { margin-bottom: 24px; }
+.admin-sign-in__qr { display: block; width: min(100%, 240px); height: auto; margin: 0 auto 16px; border-radius: 12px; }
+.admin-sign-in__enrollment details { color: var(--muted-text); font-size: 13px; line-height: 1.6; }
+.admin-sign-in__enrollment summary { cursor: pointer; padding-block: 8px; }
+.admin-sign-in__enrollment code { display: block; overflow-wrap: anywhere; user-select: all; }
+.admin-sign-in__form select { min-height: 48px; margin-bottom: 18px; padding: 10px; font: inherit; color: var(--text); background: var(--admin-field); border: 1px solid var(--header-border); border-radius: 10px; }
+.admin-sign-in__error { font-size: 14px; color: var(--text); border-left: 3px solid var(--accent); padding-left: 12px; line-height: 1.6; }
+.admin-sign-in__identity { color: var(--muted-text); font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
+.admin-sign-in__identity strong { display: block; font-weight: 500; color: var(--text); }
+.admin-sign-in__sign-out { display: block; min-height: 44px; padding: 10px 0; margin-top: 16px; border: 0; background: transparent; font: inherit; font-size: 14px; color: var(--accent); cursor: pointer; }
+.admin-sign-in__sign-out:hover { text-decoration: underline; text-underline-offset: 4px; }
 .admin-sign-in__form button:disabled { cursor: not-allowed; }
 .admin-sign-in__notice { margin: 12px 0 0; color: var(--muted-text); font-size: 12px; line-height: 1.6; }
 .admin-sign-in__back { width: fit-content; min-height: 44px; margin: 16px auto 0; display: flex; align-items: center; gap: 9px; color: var(--muted-text); font-size: 13px; text-decoration: none; transition: color 200ms ease; }

@@ -8,9 +8,11 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:cms": "node --test supabase/tests/cms-permissions.test.mjs"
+    "test:cms": "node --test supabase/tests/cms-permissions.test.mjs",
+    "test:auth": "node --test src/admin/auth.test.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.119.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

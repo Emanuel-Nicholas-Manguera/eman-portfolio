@@ -3,8 +3,10 @@
 The database and access rules are in place. The public portfolio still uses its
 existing content. An Open canvas sign-in page is now available at `/admin/myself`,
 with responsive layout, light/dark themes, and password visibility controls.
-Sign-in and password recovery are visibly unavailable until Auth is connected.
-Sign-out, MFA enrollment, the admin landing page, and editing forms remain future steps.
+The sign-in form now uses Supabase Auth for email/password login, authenticator
+enrollment and verification, session restoration, and sign-out. A minimal signed-in
+confirmation appears only after the database confirms owner access with MFA.
+The admin dashboard, editing forms, and password-recovery UI remain separate steps.
 
 During development, open `http://localhost:5173/admin/myself` after `npm run dev`.
 The production host will need an SPA fallback to `index.html` for this direct URL.
@@ -16,11 +18,12 @@ The production host will need an SPA fallback to `index.html` for this direct UR
 - Intended owner: `emanuel.nicholas.nm@gmail.com`.
 - Applied through the project-scoped Supabase MCP connection on 2026-11-10.
 - Local migration versions match the versions returned by the hosted migration history.
-- No content, images, Auth users, passwords, or API secrets were seeded.
+- No content, images, passwords, or API secrets were seeded. The owner creates
+  their Auth account and chooses their password directly in the Supabase dashboard.
 
-The intended email is reserved in `private.cms_owner`. Its `user_id` is currently
-null, so all CMS editing and publishing remain locked. Setting an email does not
-create a login account or grant access to a matching profile/email claim.
+The intended email is reserved in `private.cms_owner`. CMS editing and publishing
+stay locked until a trusted operator binds the verified account UUID. Setting an
+email does not create a login account or grant access to a matching profile claim.
 
 ## Data model
 
@@ -66,13 +69,32 @@ deleted through the Storage API until unpublished; replacements use a new path.
 Previously downloaded files, browser caches, and previously issued signed URLs
 cannot be recalled. Avoid long-lived signed URLs in the future gallery.
 
-## Next milestone: account setup and sign-in
+## Auth configuration and owner setup
+
+The browser uses the project's **publishable** key and URL. Copy `.env.example`
+to `.env.local`, replace the publishable-key placeholder, and restart `npm run dev`.
+The working checkout has its local values configured; `.env.local` is ignored by Git.
+Production hosting must supply the same `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_PUBLISHABLE_KEY` at build time. Never use a secret or service-role key.
+
+The Auth SDK is loaded only for the admin route. Sessions are kept in tab-scoped
+`sessionStorage`: reloads in the same tab retain the session, and closing the tab
+removes that tab's stored session. Passwords, TOTP setup secrets, and one-time
+codes are never stored by the application or logged. An enrollment QR/setup key
+exists only in the current screen state and disappears on sign-out or navigation.
+
+Hosted configuration was set for the development phase: public signup OFF,
+anonymous sign-in OFF, email confirmation ON, TOTP ON, and site URL
+`http://localhost:5173/admin/myself`. Update the site/allowed redirect URLs when the
+production domain is chosen. The login uses email/password directly and does not
+consume invitation, recovery, or OAuth callback links in this milestone.
 
 1. Configure hosted Auth for owner-only use: disable public signup and anonymous
    sign-in, enable TOTP, and set the correct redirect URLs.
 2. Create the intended owner's Auth account with a password chosen by the owner,
    and verify the email. No invitation/email was sent during this database step.
-3. Build a small sign-in and TOTP enrollment flow. Before owner binding, the
+3. Sign in at `/admin/myself`, choose **Set up authenticator**, scan the QR with an
+   authenticator app, and verify its six-digit code. Before owner binding, the
    account may use Auth enrollment APIs but cannot access CMS drafts or uploads.
 4. After verified TOTP enrollment, run this using the trusted project connection:
 
@@ -83,22 +105,32 @@ cannot be recalled. Avoid long-lived signed URLs in the future gallery.
    It resolves the configured email from trusted `auth.users`, requires one active,
    verified account and a verified TOTP factor, then binds its UUID. It refuses
    an unexpected ownership transfer. It is not callable by API/browser roles.
-5. Verify real password/MFA sign-in, sign-out, and non-owner rejection before
-   building the admin landing page or editors.
+5. Click **Check access again** after trusted activation. Test reload, sign-out,
+   and a new password/MFA sign-in before building the admin dashboard or editors.
+
+`public.cms_auth_status()` is the narrow read-only RPC used by the sign-in flow.
+It calls a private helper that validates `auth.uid()` against trusted Auth records
+and the private owner registry. The helper requires an active, email-confirmed,
+non-anonymous account and a verified TOTP factor before returning `ready` for an
+AAL2 session. While the registry is unbound, only the configured verified email
+may enroll; the browser cannot activate itself. Other identities get `denied`.
+The private helper uses a fixed search path and explicit execution grants; its
+database access does not expose the owner registry or `auth.users` through the API.
 
 `setup/configure-owner.sql` is the privileged initial email configuration script;
 it refuses to overwrite an existing owner binding. To suspend CMS access without
 changing published content, a trusted operator can set `private.cms_owner.enabled`
 to false. Recovery and ownership transfers require a separate privileged review.
 
-`config.toml` describes **local development** defaults only. Its Auth settings
-have not been pushed to the hosted project. Never ship a service-role/secret key
+`config.toml` describes **local development** defaults only. Hosted Auth settings
+are managed separately in the dashboard. Never ship a service-role/secret key
 in Vite code or commit passwords, tokens, or MFA secrets.
 
 ## Verification
 
 ```sh
 npm run test:cms
+npm run test:auth
 npm run build
 ```
 
@@ -117,10 +149,27 @@ The performance advisor reports only unused indexes on the empty new tables.
 The pre-existing automatic-RLS event helper remains enabled, with its unnecessary
 browser-role execution privileges revoked.
 
+The Auth service tests cover invalid credentials, untrusted session metadata,
+network/identity failures, MFA requirements, unfinished-factor cleanup, activation
+gating, and sign-out failure. Live checks confirm signup is disabled, email Auth is
+enabled, and anonymous requests cannot call the Auth status RPC. A live browser
+check confirmed invalid-login feedback and that the password field is cleared.
+Owner password and authenticator steps are performed by the owner; test results
+for those steps are recorded after completion without saving their credentials.
+
+The owner created and confirmed the account, enrolled and verified TOTP, and the
+trusted project connection successfully bound its UUID on 2026-11-10. The live
+browser reached the owner-only confirmation, retained access after a reload,
+and returned to the sign-in form after sign-out and another reload.
+A fresh password sign-in then required the existing authenticator code and
+successfully returned to the owner-only confirmation. The end-to-end flow is
+verified; no password, TOTP key, code, or session token was saved as test evidence.
+
 The portfolio production build passes. Repository-wide lint still reports the
 pre-existing unused `next` assignment in `src/Experience.tsx`. Dependency
 audit still reports 10 moderate findings in the existing development linter chain;
-this milestone adds no production dependency or existing dependency upgrade.
+the Auth milestone pins the added `@supabase/supabase-js` dependency and commits
+its lockfile. No existing dependency version was upgraded.
 
 References: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security),
 [MFA](https://supabase.com/docs/guides/auth/auth-mfa), and

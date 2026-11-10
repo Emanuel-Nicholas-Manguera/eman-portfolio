@@ -84,14 +84,35 @@ test('CMS database authorization and publishing workflow', async (t) => {
   await t.test('owner binding rejects missing or unverified accounts and requires verified TOTP', async () => {
     await assert.rejects(() => db.query('select private.bind_cms_owner()'), /verified, active owner/)
     await db.query('insert into auth.users (id, email) values ($1, $2)', [ownerId, ownerEmail])
+    await owner(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'denied'))
     await assert.rejects(() => db.query('select private.bind_cms_owner()'), /verified, active owner/)
     await db.query('update auth.users set email_confirmed_at = now() where id = $1', [ownerId])
+    await owner(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'enroll'), 'aal1')
     await assert.rejects(() => db.query('select private.bind_cms_owner()'), /TOTP/)
     await db.query("insert into auth.mfa_factors (user_id, factor_type, status) values ($1, 'totp', 'unverified')", [ownerId])
     await assert.rejects(() => db.query('select private.bind_cms_owner()'), /TOTP/)
     await db.query("update auth.mfa_factors set status = 'verified' where user_id = $1", [ownerId])
+    await owner(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'verify'), 'aal1')
+    await owner(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'pending'))
     assert.equal((await rows('select private.bind_cms_owner() as id'))[0].id, ownerId)
     assert.equal((await rows('select private.bind_cms_owner() as id'))[0].id, ownerId)
+  })
+
+  await t.test('sign-in status trusts the owner registry and verified Auth identity, never profile claims', async () => {
+    await visitor(async () => { await denied(() => db.query('select public.cms_auth_status()')) })
+    await db.query('insert into auth.users (id, email, email_confirmed_at) values ($1, $2, now())', [strangerId, 'stranger@example.test'])
+    await stranger(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'denied'))
+    await owner(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'verify'), 'aal1')
+    await owner(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'ready'))
+    for (const patch of ["banned_until = now() + interval '1 day'", 'deleted_at = now()', 'is_anonymous = true', 'email_confirmed_at = null']) {
+      await db.exec(`update auth.users set ${patch} where id = '${ownerId}'`)
+      await owner(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'denied'))
+      await db.query('update auth.users set banned_until = null, deleted_at = null, is_anonymous = false, email_confirmed_at = now() where id = $1', [ownerId])
+    }
+    // Once bound, changing the configured email cannot authorize a different UID.
+    await db.exec("update private.cms_owner set expected_email = 'stranger@example.test'")
+    await stranger(async () => assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'denied'))
+    await db.query('update private.cms_owner set expected_email = $1', [ownerEmail])
   })
 
   await t.test('browser clients cannot promote themselves or call owner setup functions', async () => {
@@ -245,6 +266,7 @@ test('CMS database authorization and publishing workflow', async (t) => {
   await t.test('disabling or removing the owner binding immediately blocks even AAL2 sessions', async () => {
     await db.exec('update private.cms_owner set enabled = false')
     await owner(async () => {
+      assert.equal((await rows('select public.cms_auth_status() as status'))[0].status, 'denied')
       assert.deepEqual(await rows('select * from public.cms_documents'), [])
       await denied(() => db.query('select public.publish_cms_document($1)', [docId]))
     })
