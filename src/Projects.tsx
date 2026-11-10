@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { projects, type ProjectPhoto } from './projectData'
+import { type Project, type ProjectPhoto } from './projectData'
 import './Projects.css'
 
 function Arrow({ previous = false }: { previous?: boolean }) {
@@ -7,7 +7,7 @@ function Arrow({ previous = false }: { previous?: boolean }) {
 }
 
 function Photo({ photo }: { photo: ProjectPhoto }) {
-  if (photo.src) return <img src={photo.src} alt={photo.label} draggable="false" />
+  if (photo.src) return <img src={photo.src} alt={photo.alt || photo.label} draggable="false" />
   // These are explicitly labeled illustrations until real screenshots are supplied.
   return <div className={`project-illustration project-illustration--${photo.illustration}`} aria-hidden="true">
     {photo.illustration === 'golf' ? <div className="project-phone">
@@ -24,7 +24,7 @@ function Photo({ photo }: { photo: ProjectPhoto }) {
 
 const wrap = (index: number, length: number) => (index + length) % length
 
-export function Projects() {
+export function Projects({ projects }: { projects: Project[] }) {
   const [selected, setSelected] = useState(0)
   const [photoIndexes, setPhotoIndexes] = useState(() => projects.map(() => 0))
   const [viewerOpen, setViewerOpen] = useState(false)
@@ -32,7 +32,7 @@ export function Projects() {
   const swipeStart = useRef<{ x: number; y: number } | null>(null)
   const suppressClick = useRef(false)
   const project = projects[selected]
-  const photoIndex = photoIndexes[selected]
+  const photoIndex = Math.min(photoIndexes[selected] ?? 0, project.photos.length - 1)
   const photo = project.photos[photoIndex]
 
   function changePhoto(index: number) {
@@ -79,7 +79,7 @@ export function Projects() {
           if (index === selected) setViewerOpen(true)
           else setSelected(index)
         }}>
-          <span className="project-image-frame">{item.photos.map((itemPhoto, imageIndex) => <span className="project-photo-layer" data-active={photoIndexes[index] === imageIndex} aria-hidden={photoIndexes[index] !== imageIndex} key={itemPhoto.label}><Photo photo={itemPhoto} /></span>)}<span className="project-enlarge" aria-hidden="true">View ↗</span></span>
+          <span className="project-image-frame">{item.photos.map((itemPhoto, imageIndex) => <span className="project-photo-layer" data-active={Math.min(photoIndexes[index] ?? 0, item.photos.length - 1) === imageIndex} aria-hidden={photoIndexes[index] !== imageIndex} key={itemPhoto.label}><Photo photo={itemPhoto} /></span>)}<span className="project-enlarge" aria-hidden="true">View ↗</span></span>
         </button>
       })}
     </div>

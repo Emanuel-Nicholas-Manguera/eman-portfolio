@@ -2,7 +2,7 @@ import introduction from './assets/projects/portfolio-introduction.png'
 import experience from './assets/projects/portfolio-experience.png'
 import dark from './assets/projects/portfolio-dark.png'
 
-export type ProjectPhoto = { label: string; src?: string; illustration?: 'golf' | 'dost'; note: string }
+export type ProjectPhoto = { label: string; alt?: string; src?: string; illustration?: 'golf' | 'dost'; note: string }
 export type Project = {
   id: string
   name: string

@@ -1,65 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import './Experience.css'
+import type { ExperienceContent } from './cms/content'
 
-const experiences = [
-  {
-    id: 'impulse',
-    name: 'Impulse 101',
-    company: 'Impulse 101 IT Solutions OPC',
-    role: 'Junior Developer (Full Stack)',
-    location: 'Manila City',
-    dates: { start: '2026-02', end: '2026-10', label: 'Feb 2026 — Oct 2026' },
-    kind: 'Professional experience',
-    projects: [],
-    summary: 'Developed and maintained software solutions as part of the company’s development team.',
-    contributions: [
-      { title: 'Team collaboration', detail: 'Collaborated with technical leads and operations stakeholders to deliver reliable software solutions.' },
-      { title: 'Project development', detail: 'Participated in project development activities involving source code, technical documentation, and internal systems.' },
-      { title: 'Troubleshooting & support', detail: 'Assisted in troubleshooting system issues and providing technical support during system downtime when needed.' },
-    ],
-    languages: ['TypeScript', 'JavaScript', 'SQL', 'Git'],
-  },
-  {
-    id: 'amex',
-    name: 'American Express',
-    company: 'American Express International Inc.',
-    department: 'Country Manager Office',
-    role: 'Global Services – Data Analytics Intern',
-    location: 'Taguig City',
-    dates: { start: '2025-09', end: '2025-12', label: 'Sep 2025 — Dec 2025' },
-    kind: 'Internship',
-    projects: [],
-    summary: 'Developed the backend and data architecture for a mobile performance reporting app used by Global Servicing directors and vice presidents.',
-    contributions: [
-      { title: '12 key business metrics', detail: 'Built Power BI data models, Power Query (M) ETL workflows, and DAX measures to support performance reporting.' },
-      { title: 'Data quality & testing', detail: 'Worked with business analysts to validate data, test and optimize the backend, and align reporting with business requirements.' },
-      { title: 'Leadership presentation', detail: 'Presented the solution to senior leadership and received a vice president’s endorsement to present it globally.' },
-    ],
-    languages: ['Power Query M', 'DAX'],
-  },
-  {
-    id: 'dost',
-    name: 'DOST',
-    company: 'Department of Science and Technology',
-    department: 'Central Office · Policy and Evaluation Service',
-    role: 'Developer (Full Stack) Intern',
-    location: 'Manila City',
-    // Omit the dates until the duplicate range in the résumé is confirmed.
-    dates: null,
-    kind: 'Internship',
-    projects: [],
-    summary: 'Contributed to DOST INSPIRE, developing web modules and dashboards for executive insights and data analytics.',
-    contributions: [
-      { title: 'Web modules & interfaces', detail: 'Enhanced modules from system specifications using PHP and JavaScript, and built reusable interface templates.' },
-      { title: 'Authentication & accounts', detail: 'Implemented authentication, user management, and account modules for the system.' },
-      { title: 'Team integration', detail: 'Used Git to collaborate with the development team, keeping changes integrated and the code maintainable.' },
-    ],
-    languages: ['PHP', 'JavaScript', 'CSS', 'Laravel', 'Vue.js', 'Git'],
-  },
-]
 
-export function Experience() {
+
+export function Experience({ experiences }: { experiences: ExperienceContent[] }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [panelHeight, setPanelHeight] = useState<number>()
@@ -99,10 +45,10 @@ export function Experience() {
     observer.observe(panel)
     observer.observe(list)
     return () => observer.disconnect()
-  }, [activeIndex])
+  }, [activeIndex, experiences])
 
   function handleTabKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
-    let next = index
+    let next: number
     if (event.key === 'ArrowDown') next = (index + 1) % experiences.length
     else if (event.key === 'ArrowUp') next = (index - 1 + experiences.length) % experiences.length
     else if (event.key === 'Home') next = 0

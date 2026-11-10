@@ -344,3 +344,4 @@
 
   .navigation-underline { transition: none; }
 }
+.portfolio-loading { padding: 180px 24px; color: var(--muted-text); }

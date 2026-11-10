@@ -263,6 +263,46 @@ test('CMS database authorization and publishing workflow', async (t) => {
     })
   })
 
+  await t.test('atomic draft editing rejects stale tabs and protects album updates', async () => {
+    const newId = '77777777-7777-4777-8777-777777777777'
+    const save = (timestamp, ids = [assetId], title = 'New draft') => db.query(
+      "select * from public.save_cms_document($1, 'project', 'new-draft', $2, '{\"description\":\"Private\"}', 2, $3, $4)",
+      [newId, title, timestamp, ids])
+    await visitor(async () => { await denied(() => save(null)) })
+    await stranger(async () => { await denied(() => save(null)) })
+    await owner(async () => { await denied(() => save(null)) }, 'aal1')
+    await owner(async () => {
+      const first = (await save(null)).rows[0]
+      first.updated_at = (await rows('select updated_at::text as stamp from public.cms_documents where id=$1', [newId]))[0].stamp
+      assert.equal(first.title, 'New draft')
+      assert.equal((await rows('select * from public.cms_document_assets where document_id=$1', [newId])).length, 1)
+      await assert.rejects(() => save(first.updated_at, [originalId]), /approved images/)
+      assert.equal((await rows('select * from public.cms_document_assets where document_id=$1', [newId])).length, 1)
+      const second = (await save(first.updated_at, [], 'Saved revision')).rows[0]
+      await assert.rejects(() => save(first.updated_at), (e) => e.code === '40001')
+      assert.equal((await rows('select title from public.cms_documents where id=$1', [newId]))[0].title, 'Saved revision')
+      assert.deepEqual(await rows('select * from public.cms_document_assets where document_id=$1', [newId]), [])
+      await db.query('select public.publish_cms_document($1)', [newId])
+      await db.query('select public.archive_cms_document($1)', [newId])
+      assert.deepEqual(await rows('select * from public.cms_publications where document_id=$1', [newId]), [])
+      await assert.rejects(() => db.query('select public.publish_cms_document($1)', [newId]), /not found/)
+      await db.query('select public.archive_cms_document($1,true)', [newId])
+      assert.equal((await rows('select deleted_at from public.cms_documents where id=$1', [newId]))[0].deleted_at, null)
+      assert.deepEqual(await rows('select * from public.cms_publications where document_id=$1', [newId]), [])
+      assert.ok(second.updated_at)
+    })
+  })
+
+  await t.test('media archiving refuses images still attached to content', async () => {
+    await owner(async () => {
+      await assert.rejects(() => db.query('select public.archive_cms_asset($1)', [assetId]), /Remove this image/)
+      await db.query('select public.archive_cms_asset($1)', [missingId])
+      assert.ok((await rows('select archived_at from public.cms_assets where id=$1', [missingId]))[0].archived_at)
+      await db.query('select public.archive_cms_asset($1,true)', [missingId])
+      assert.equal((await rows('select archived_at from public.cms_assets where id=$1', [missingId]))[0].archived_at, null)
+    })
+  })
+
   await t.test('disabling or removing the owner binding immediately blocks even AAL2 sessions', async () => {
     await db.exec('update private.cms_owner set enabled = false')
     await owner(async () => {

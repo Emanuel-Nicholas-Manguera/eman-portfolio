@@ -144,7 +144,7 @@ database permission tests, not a real browser password/TOTP login test.
 Hosted verification on 2026-11-10 also confirmed private bucket configuration,
 RLS and grants, the pending owner binding, and seven read-only HTTP checks:
 published endpoints readable, draft/asset endpoints denied, private owner schema
-not exposed, and bucket listings hidden. The security advisor reports no findings.
+not exposed, and bucket listings hidden. The foundation security advisor reported no findings at that checkpoint.
 The performance advisor reports only unused indexes on the empty new tables.
 The pre-existing automatic-RLS event helper remains enabled, with its unnecessary
 browser-role execution privileges revoked.
@@ -165,8 +165,8 @@ A fresh password sign-in then required the existing authenticator code and
 successfully returned to the owner-only confirmation. The end-to-end flow is
 verified; no password, TOTP key, code, or session token was saved as test evidence.
 
-The portfolio production build passes. Repository-wide lint still reports the
-pre-existing unused `next` assignment in `src/Experience.tsx`. Dependency
+The portfolio production build and repository-wide lint pass. The unused
+`next` assignment in `src/Experience.tsx` was resolved while connecting CMS data. Dependency
 audit still reports 10 moderate findings in the existing development linter chain;
 the Auth milestone pins the added `@supabase/supabase-js` dependency and commits
 its lockfile. No existing dependency version was upgraded.
@@ -174,3 +174,54 @@ its lockfile. No existing dependency version was upgraded.
 References: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security),
 [MFA](https://supabase.com/docs/guides/auth/auth-mfa), and
 [Storage access](https://supabase.com/docs/guides/storage/security/access-control).
+
+
+## Content management and public portfolio
+
+The owner dashboard at `/admin/myself` now manages introduction, experience,
+projects, About (education, recognitions, certificates), contact details, and
+images. On the overview, **Import existing portfolio** copies the original
+React content and five images into Supabase. The importer is idempotent by
+kind/slug and original image filename; it fills missing entries without replacing
+CMS edits. The existing education details are imported as an About draft for review.
+
+- **Save draft** keeps work private, including incomplete work with a CMS title.
+- **Preview draft** renders it with the public portfolio components in a private
+  dialog; no draft is stored in browser persistence or sent to the public reader.
+- **Save & publish** validates the entry, saves the draft, and snapshots it publicly.
+- **Unpublish** keeps the draft but removes its public snapshot and asset links.
+- **Archive content** unpublishes and hides an entry; **Show archived → Restore**
+  brings it back as a draft. It does not automatically republish.
+- Display order controls entry ordering; album controls order photos. Image labels,
+  captions, and alt text are editable. Changes to image alt text reach the public
+  snapshot when the associated content is republished.
+
+Uploads accept JPEG, PNG, WebP, and AVIF up to 20 MB. The original is private in
+`portfolio-originals`; the browser makes a metadata-free, maximum-2000px WebP copy
+in `portfolio-media`. Selecting and publishing a copy authorizes public reading.
+This processing does not redact sensitive content: review the actual photo or slide
+before publishing. Image archiving is recoverable and refuses images still linked
+to draft or published content. Originals remain recoverable alongside their copies.
+
+`save_cms_document` updates draft content and album links atomically and checks the
+editor's original `updated_at`, rejecting stale-tab overwrites. A partial unique
+index protects the single introduction/About/contact entry. Archive RPCs preserve
+rows and files; publishing refuses archived entries. Owner AAL2 checks and RLS apply
+to every mutation. No service-role key is used in the browser.
+
+The public site uses a separate, nonpersistent anonymous Supabase client and reads
+only `cms_publications` and `cms_publication_assets`. It obtains short-lived image
+URLs only for those approved publication paths. Updates refresh on focus, every
+minute while visible, and immediately across local tabs after publication. A
+configured CMS outage keeps the currently rendered snapshot or shows an unavailable
+message; it never resurrects removed content from bundled defaults. Bundled content
+is used only without Supabase configuration and by the initial importer.
+
+Additional checks: `npm run test:content` tests public link filtering, publication
+ordering, asset scoping, and input validation. The permission suite also covers
+atomic editing, stale saves, archiving/restoring, and used-image protection.
+
+Current hosted security review flags only disabled leaked-password protection
+(an Auth configuration notice), with no database/RLS findings. See
+[Supabase password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+Production hosting/domain configuration is separate from this local portfolio CMS.

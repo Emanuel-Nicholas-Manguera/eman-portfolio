@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Introduction } from './Introduction'
-import { Projects } from './Projects'
-import { Experience } from './Experience'
-import { Contact } from './Contact'
+import { PortfolioBody } from './PortfolioBody'
+import { usePortfolio } from './cms/usePortfolio'
 import { HeaderNavigation } from './HeaderNavigation'
 import './App.css'
 import type { SocialId } from './socialData'
@@ -10,6 +8,8 @@ import type { SocialId } from './socialData'
 type Theme = 'light' | 'dark'
 
 function App() {
+  const {data,failed} = usePortfolio()
+  const navigation = [ ...(data?.experiences.length ? ['Experience'] : []), ...(data?.projects.length ? ['Projects'] : []), ...(data?.about ? ['About'] : []), ...(data?.contact ? ['Contact'] : []) ]
   const [theme, setTheme] = useState<Theme>('light')
   const [social, setSocial] = useState<SocialId | null>(null)
   const [isFloating, setIsFloating] = useState(() => window.scrollY >= 80)
@@ -23,13 +23,13 @@ function App() {
     const updateHeader = () => {
       const threshold = Math.max(120, window.innerHeight * .3)
       let current: string | null = null
-      for (const id of ['experience', 'projects', 'contact']) {
+      for (const id of ['experience', 'projects', 'about', 'contact']) {
         const section = document.getElementById(id)
         if (section && section.getBoundingClientRect().top <= threshold) current = id
       }
       // The final section may be too short to reach the normal threshold.
       if (window.scrollY > 0 && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
-        current = 'contact'
+        current = document.getElementById('contact') ? 'contact' : current
       }
       setActiveSection(current)
       if (window.scrollY >= 80) {
@@ -101,7 +101,7 @@ function App() {
           </a>
 
           <nav className="site-nav" aria-label="Main navigation">
-            <HeaderNavigation activeSection={activeSection} />
+            <HeaderNavigation items={navigation} activeSection={activeSection} />
           </nav>
 
           <div className="header-actions">
@@ -179,15 +179,12 @@ function App() {
           aria-label="Main navigation"
           hidden={!isMenuOpen}
         >
-          <HeaderNavigation activeSection={activeSection} onNavigate={() => setIsMenuOpen(false)} />
+          <HeaderNavigation items={navigation} activeSection={activeSection} onNavigate={() => setIsMenuOpen(false)} />
         </nav>
       </header>
 
       <main className="main-content">
-        <Introduction social={social} onSocialSelect={setSocial} />
-        <Experience />
-        <Projects />
-        <Contact />
+        {data ? <PortfolioBody data={data} social={social} onSocialSelect={setSocial} /> : <p className="portfolio-loading" role="status">{failed ? 'The portfolio is temporarily unavailable. Please refresh to try again.' : 'Loading portfolio…'}</p>}
       </main>
     </div>
   )

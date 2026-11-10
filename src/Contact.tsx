@@ -1,13 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { socials } from './socialData'
+import { profileSocials } from './socialData'
+import type { ContactContent } from './cms/content'
 import './Contact.css'
-
-const email = 'emanuel.nicholas.nm@gmail.com'
-const gmail = socials.find((social) => social.id === 'gmail')!
-const contactLinks = [
-  ...socials.filter((social) => social.id === 'linkedin' || social.id === 'github').reverse(),
-  { label: 'Facebook', href: 'https://web.facebook.com/profile.php?id=61592447112540' },
-]
 
 function ContactArrow() {
   return (
@@ -17,7 +11,12 @@ function ContactArrow() {
   )
 }
 
-export function Contact() {
+export function Contact({ content }: { content: ContactContent }) {
+  const words = content.heading.split(' ')
+  const email = content.email
+  const socials = profileSocials(content)
+  const gmail = socials.find(s => s.id === 'gmail')!
+  const contactLinks = [...socials.filter(s=>s.id==='linkedin'||s.id==='github').reverse(), ...(content.facebook ? [{label:'Facebook',href:content.facebook}] : [])]
   const sectionRef = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
 
@@ -39,8 +38,8 @@ export function Contact() {
       <section ref={sectionRef} className="contact-section" id="contact" aria-labelledby="contact-title" data-visible={visible}>
         <div className="contact-invitation">
           <p className="section-eyebrow">Contact</p>
-          <h2 id="contact-title">Let’s build<br />something <span>meaningful.</span></h2>
-          <p className="contact-description">Have an opportunity or a project in mind?<br />I’d love to hear about it.</p>
+          <h2 id="contact-title">{words.slice(0,2).join(' ')}{words.length>2&&<><br />{words.slice(2,-1).join(' ')} <span>{words.at(-1)}</span></>}</h2>
+          <p className="contact-description">{content.description}</p>
           <a className="contact-email" href={gmail.href} target="_blank" rel="noopener noreferrer" aria-label={`Email ${email} in Gmail (opens in a new tab)`}>
             <span>{email}</span>
             <ContactArrow />
@@ -55,8 +54,8 @@ export function Contact() {
         </div>
       </section>
       <footer className="site-footer">
-        <span>Emanuel Nicholas</span>
-        <span>Paranaque, Philippines</span>
+        <span>{content.name}</span>
+        <span>{content.location}</span>
       </footer>
     </>
   )

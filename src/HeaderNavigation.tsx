@@ -1,17 +1,18 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
 type Props = {
+  items: string[]
   activeSection: string | null
   onNavigate?: () => void
 }
 
-const items = ['Experience', 'Projects', 'Contact']
 
-export function HeaderNavigation({ activeSection, onNavigate }: Props) {
+export function HeaderNavigation({ activeSection, onNavigate, items }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState<string | null>(null)
   const [focused, setFocused] = useState<string | null>(null)
   const [line, setLine] = useState({ x: 0, y: 0, width: 0, visible: false })
+  const itemsKey = items.join('|')
   const target = hovered ?? focused ?? activeSection
 
   useLayoutEffect(() => {
@@ -38,7 +39,7 @@ export function HeaderNavigation({ activeSection, onNavigate }: Props) {
     observer.observe(container)
     container.querySelectorAll('a').forEach((link) => observer.observe(link))
     return () => observer.disconnect()
-  }, [target])
+  }, [target, itemsKey])
 
   return (
     <div

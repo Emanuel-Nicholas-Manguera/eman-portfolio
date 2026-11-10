@@ -124,3 +124,4 @@
   .contact-section a svg { transition: none; }
   .contact-section[data-visible='false'] .contact-invitation { opacity: 1; transform: none; }
 }
+.contact-description { white-space: pre-line; }

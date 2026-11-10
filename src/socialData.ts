@@ -33,3 +33,7 @@ export const socials: {
     caption: 'Have something in mind? Let’s talk.',
   },
 ]
+
+export function profileSocials(contact: import('./cms/content').ContactContent): typeof socials {
+  return socials.map(s => ({...s, href: s.id === 'gmail' ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}` : contact[s.id], caption: contact[`${s.id}Caption`]})).filter(s => !!s.href)
+}

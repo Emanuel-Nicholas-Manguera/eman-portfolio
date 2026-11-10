@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
-import { socials, type SocialId } from './socialData'
+import { type socials, type SocialId } from './socialData'
 import './SocialLinks.css'
 
 type Props = {
+  items: typeof socials
   selected: SocialId | null
   onSelect: (social: SocialId) => void
 }
 
-export function SocialLinks({ selected, onSelect }: Props) {
+export function SocialLinks({ selected, onSelect, items: socials }: Props) {
   const portalRef = useRef<HTMLDivElement>(null)
   const watermarkRef = useRef<HTMLSpanElement>(null)
   const captionRef = useRef<HTMLParagraphElement>(null)

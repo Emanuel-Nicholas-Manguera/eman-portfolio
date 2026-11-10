@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import suitPortrait from './assets/portraits/emanuel-suit.png'
-import graduationPortrait from './assets/portraits/emanuel-graduation.png'
+import type { IntroductionContent, ContactContent } from './cms/content'
+import { profileSocials } from './socialData'
 import './Introduction.css'
 import { SocialLinks } from './SocialLinks'
 import type { SocialId } from './socialData'
@@ -131,7 +131,9 @@ function ArrowIcon({ direction = 'diagonal' }: { direction?: 'diagonal' | 'down'
   )
 }
 
-function Portrait({ isPinned, isRevealed, onHoverChange, onToggle, onReset, onGraduationReady }: {
+function Portrait({ suitSrc, graduationSrc, isPinned, isRevealed, onHoverChange, onToggle, onReset, onGraduationReady }: {
+  suitSrc?: string
+  graduationSrc?: string
   isPinned: boolean
   isRevealed: boolean
   onHoverChange: (hovered: boolean) => void
@@ -171,7 +173,7 @@ function Portrait({ isPinned, isRevealed, onHoverChange, onToggle, onReset, onGr
           <span className="portrait-edges">
             <span className="portrait-layer portrait-layer--suit">
               <img
-                src={suitPortrait}
+                src={suitSrc}
                 width="833"
                 height="1000"
                 alt=""
@@ -180,10 +182,10 @@ function Portrait({ isPinned, isRevealed, onHoverChange, onToggle, onReset, onGr
                 draggable="false"
               />
             </span>
-            <span className="portrait-layer portrait-layer--graduation">
+            {graduationSrc && <span className="portrait-layer portrait-layer--graduation">
               <img
                 ref={graduationRef}
-                src={graduationPortrait}
+                src={graduationSrc}
                 width="1000"
                 height="979"
                 alt=""
@@ -191,7 +193,7 @@ function Portrait({ isPinned, isRevealed, onHoverChange, onToggle, onReset, onGr
                 onLoad={onGraduationReady}
                 draggable="false"
               />
-            </span>
+            </span>}
           </span>
         </span>
       </button>
@@ -199,23 +201,32 @@ function Portrait({ isPinned, isRevealed, onHoverChange, onToggle, onReset, onGr
   )
 }
 
-const nameFrames = (() => {
+function makeNameFrames(name: string) {
+  const [first, ...rest] = name.split(' ')
+  const second = rest.join(' ')
   const frames = [{ at: 0, first: '', second: '' }]
   let at = 0
   const add = (first: string, second: string, delay = 80) => {
     at += delay
     frames.push({ at, first, second })
   }
-  for (let length = 1; length <= 8; length++) add('Emmanuel'.slice(0, length), '')
-  at += 500
-  for (let length = 7; length >= 2; length--) add('Emmanuel'.slice(0, length), '', 65)
-  at += 160
-  for (let length = 3; length <= 7; length++) add('Emanuel'.slice(0, length), '')
-  for (let length = 1; length <= 8; length++) add('Emanuel', 'Nicholas'.slice(0, length))
+  if (name === 'Emanuel Nicholas') {
+    for (let length = 1; length <= 8; length++) add('Emmanuel'.slice(0, length), '')
+    at += 500
+    for (let length = 7; length >= 2; length--) add('Emmanuel'.slice(0, length), '', 65)
+    at += 160
+    for (let length = 3; length <= 7; length++) add(first.slice(0, length), '')
+  } else {
+    for (let length = 1; length <= first.length; length++) add(first.slice(0, length), '')
+  }
+  for (let length = 1; length <= second.length; length++) add(first, second.slice(0, length))
   return frames
-})()
+}
 
-function TypingName() {
+function TypingName({ name }: { name: string }) {
+  const [first, ...rest] = name.split(' ')
+  const second = rest.join(' ')
+  const [nameFrames] = useState(() => makeNameFrames(name))
   const [frame, setFrame] = useState(nameFrames[0])
 
   useEffect(() => {
@@ -253,30 +264,32 @@ function TypingName() {
       motion.removeEventListener('change', finish)
       document.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [])
+  }, [nameFrames])
 
   return (
-    <h1 id="intro-title" aria-label="Emanuel Nicholas">
+    <h1 id="intro-title" aria-label={name}>
       <span className="intro-name-word" aria-hidden="true">
-        <span className="intro-name-reserve">Emanuel</span>
+        <span className="intro-name-reserve">{first}</span>
         <span className="intro-name-typed" data-cursor={!frame.second}>{frame.first}</span>
       </span>{' '}
       <span className="intro-name-word" aria-hidden="true">
-        <span className="intro-name-reserve">Nicholas</span>
+        <span className="intro-name-reserve">{second}</span>
         <span className="intro-name-typed" data-cursor={!!frame.second}>{frame.second}</span>
       </span>
     </h1>
   )
 }
 
-export function Introduction({ social, onSocialSelect }: {
+export function Introduction({ content, contact, social, onSocialSelect }: {
+  content: IntroductionContent & { suitSrc?: string; graduationSrc?: string }
+  contact: ContactContent | null
   social: SocialId | null
   onSocialSelect: (social: SocialId) => void
 }) {
   const [isHovered, setIsHovered] = useState(false)
   const [isPinned, setIsPinned] = useState(false)
   const [isGraduationLoaded, setIsGraduationLoaded] = useState(false)
-  const isRevealed = isGraduationLoaded && (isHovered || isPinned)
+  const isRevealed = !!content.graduationSrc && isGraduationLoaded && (isHovered || isPinned)
   const graduationReady = useCallback(() => setIsGraduationLoaded(true), [])
   const bioRef = useRef<HTMLDivElement>(null)
 
@@ -319,33 +332,31 @@ export function Introduction({ social, onSocialSelect }: {
             <path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z" />
             <circle cx="12" cy="10" r="2.5" />
           </svg>
-          Paranaque, Philippines
+          {content.location}
         </p>
-        <TypingName />
+        <TypingName key={content.name} name={content.name} />
         <div ref={bioRef} className="intro-bio">
           <div className="intro-bio-panel" aria-hidden={isRevealed}>
-            <p className="intro-role">Software Developer</p>
+            <p className="intro-role">{content.role}</p>
             <p className="intro-description">
-              I build websites and mobile applications, with experience in full-stack
-              development, improving existing systems, and troubleshooting.
-              I enjoy working with teams to create practical, reliable software.
+              {content.description}
             </p>
           </div>
           <div className="intro-bio-panel" aria-hidden={!isRevealed}>
-            <p className="intro-role">BS Computer Science Graduate</p>
+            <p className="intro-role">{content.graduateRole}</p>
             <p className="intro-description">
-              I earned my degree from Lyceum of the Philippines University–Manila,
-              graduating Magna Cum Laude in 2026. I was a DOST
-              scholar and a Dean’s List awardee for eight consecutive semesters.
+              {content.graduateDescription}
             </p>
           </div>
         </div>
         <a className="intro-action" href="#projects">
-          View projects <ArrowIcon />
+          {content.actionLabel} <ArrowIcon />
         </a>
-        <SocialLinks selected={social} onSelect={onSocialSelect} />
+        {contact && <SocialLinks items={profileSocials(contact)} selected={social} onSelect={onSocialSelect} />}
       </div>
-      <Portrait
+      {content.suitSrc && <Portrait
+        suitSrc={content.suitSrc}
+        graduationSrc={content.graduationSrc}
         isPinned={isPinned}
         isRevealed={isRevealed}
         onHoverChange={setIsHovered}
@@ -358,9 +369,9 @@ export function Introduction({ social, onSocialSelect }: {
           setIsPinned(false)
           setIsHovered(false)
         }}
-      />
+      />}
       <a className="intro-scroll" href="#experience">
-        <span>A little about me. Then, where I’ve contributed.</span>
+        <span>{content.scrollLabel}</span>
         <ArrowIcon direction="down" />
       </a>
     </section>
