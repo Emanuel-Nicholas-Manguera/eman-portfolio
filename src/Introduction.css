@@ -30,6 +30,12 @@
 .intro-copy {
   padding-block: 20px;
 }
+.intro-copy::after {
+  content: '';
+  display: block;
+  height: var(--intro-bio-space, 0px);
+  transition: height var(--intro-reveal-duration) ease-in-out;
+}
 
 /* Start at the top-left and fade down into the existing blue glow. */
 .introduction::before,
@@ -105,15 +111,67 @@
   letter-spacing: -.05em;
 }
 
-.intro-bio { display: grid; }
+.intro-name-word {
+  white-space: nowrap;
+}
+
+/* Every letter occupies its final space throughout the one-time reveal. */
+.intro-name-letter {
+  position: relative;
+  opacity: 0;
+  animation: intro-name-type 1ms step-end forwards;
+  animation-delay: calc(80ms + var(--letter-index) * 80ms);
+}
+
+.intro-name-letter::after {
+  content: '';
+  position: absolute;
+  top: .12em;
+  right: -.06em;
+  width: 2px;
+  height: .8em;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  animation: intro-name-cursor 80ms step-end;
+  animation-delay: calc(80ms + var(--letter-index) * 80ms);
+}
+
+.intro-copy h1 > span:last-child .intro-name-letter:last-child::after {
+  animation-name: intro-name-cursor-fade;
+  animation-duration: 400ms;
+  animation-timing-function: ease-out;
+}
+
+@keyframes intro-name-type {
+  to { opacity: 1; }
+}
+
+@keyframes intro-name-cursor {
+  0%, 99% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes intro-name-cursor-fade {
+  0%, 35% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.intro-bio {
+  position: relative;
+  overflow: hidden;
+  transition: height var(--intro-reveal-duration) ease-in-out;
+}
 .intro-bio-panel {
-  grid-area: 1 / 1;
-  align-self: start;
+  width: 100%;
   opacity: 1;
   visibility: visible;
   transition: opacity var(--intro-reveal-duration) ease-in-out, visibility 0s;
 }
 .intro-bio-panel[aria-hidden='true'] {
+  position: absolute;
+  top: 0;
+  left: 0;
   opacity: 0;
   visibility: hidden;
   transition: opacity var(--intro-reveal-duration) ease-in-out, visibility 0s var(--intro-reveal-duration);
@@ -371,6 +429,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .intro-name-letter { animation: none; opacity: 1; }
+  .intro-name-letter::after { display: none; animation: none; }
+  .intro-copy::after,
+  .intro-bio,
   .intro-bio-panel,
   .intro-bio-panel[aria-hidden='true'] { transition: none; }
   .intro-dot-hover { transition: none; }

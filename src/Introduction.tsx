@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import suitPortrait from './assets/portraits/emanuel-suit.png'
 import graduationPortrait from './assets/portraits/emanuel-graduation.png'
@@ -208,6 +208,26 @@ export function Introduction({ social, onSocialSelect }: {
   const [isGraduationLoaded, setIsGraduationLoaded] = useState(false)
   const isRevealed = isGraduationLoaded && (isHovered || isPinned)
   const graduationReady = useCallback(() => setIsGraduationLoaded(true), [])
+  const bioRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    const bio = bioRef.current
+    if (!bio) return
+    const resizeToContent = () => {
+      const active = bio.querySelector<HTMLElement>('.intro-bio-panel[aria-hidden="false"]')
+      if (!active) return
+      const activeHeight = active.getBoundingClientRect().height
+      const maximumHeight = Math.max(...Array.from(bio.querySelectorAll('.intro-bio-panel'),
+        (panel) => panel.getBoundingClientRect().height))
+      bio.style.height = `${activeHeight}px`
+      // Balance the space below the socials, keeping the name and portrait anchored.
+      bio.parentElement?.style.setProperty('--intro-bio-space', `${maximumHeight - activeHeight}px`)
+    }
+    resizeToContent()
+    const observer = new ResizeObserver(resizeToContent)
+    bio.querySelectorAll('.intro-bio-panel').forEach((panel) => observer.observe(panel))
+    return () => observer.disconnect()
+  }, [isRevealed])
 
   return (
     <section className="introduction" aria-labelledby="intro-title">
@@ -231,20 +251,37 @@ export function Introduction({ social, onSocialSelect }: {
           </svg>
           Paranaque, Philippines
         </p>
-        <h1 id="intro-title">Emanuel Nicholas</h1>
-        <div className="intro-bio">
+        <h1 id="intro-title" aria-label="Emanuel Nicholas">
+          {['Emanuel', 'Nicholas'].map((word, wordIndex) => (
+            <span key={word} aria-hidden="true">
+              {wordIndex > 0 && ' '}
+              <span className="intro-name-word">
+                {Array.from(word).map((letter, index) => (
+                  <span
+                    key={index}
+                    className="intro-name-letter"
+                    style={{ '--letter-index': index + (wordIndex === 0 ? 0 : 7) } as CSSProperties}
+                  >{letter}</span>
+                ))}
+              </span>
+            </span>
+          ))}
+        </h1>
+        <div ref={bioRef} className="intro-bio">
           <div className="intro-bio-panel" aria-hidden={isRevealed}>
             <p className="intro-role">Software Developer</p>
             <p className="intro-description">
-              I develop web applications and improve existing systems, with experience
-              in full-stack development, team collaboration, and troubleshooting.
+              I build websites and mobile applications, with experience in full-stack
+              development, improving existing systems, and troubleshooting.
+              I enjoy working with teams to create practical, reliable software.
             </p>
           </div>
           <div className="intro-bio-panel" aria-hidden={!isRevealed}>
             <p className="intro-role">BS Computer Science Graduate</p>
             <p className="intro-description">
-              My Computer Science studies built my foundation in programming and
-              problem-solving, which I applied through academic projects and internships.
+              I earned my degree from Lyceum of the Philippines University–Manila,
+              graduating Magna Cum Laude in 2026. I was a DOST
+              scholar and a Dean’s List awardee for eight consecutive semesters.
             </p>
           </div>
         </div>
