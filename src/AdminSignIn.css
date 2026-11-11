@@ -3,11 +3,15 @@
   flex-direction: column;
   --admin-field: #f3f8fc;
   --admin-dot: #3778aa;
+  --admin-error-text: #8b1728;
+  --admin-error-background: #fff1f2;
 }
 
 .admin-sign-in[data-theme='dark'] {
   --admin-field: #0d263b;
   --admin-dot: #9ccfff;
+  --admin-error-text: #ffb3bb;
+  --admin-error-background: #421e29;
 }
 
 .admin-sign-in__dots {
@@ -113,7 +117,16 @@
 .admin-sign-in__enrollment summary { cursor: pointer; padding-block: 8px; }
 .admin-sign-in__enrollment code { display: block; overflow-wrap: anywhere; user-select: all; }
 .admin-sign-in__form select { min-height: 48px; margin-bottom: 18px; padding: 10px; font: inherit; color: var(--text); background: var(--admin-field); border: 1px solid var(--header-border); border-radius: 10px; }
-.admin-sign-in__error { margin: 12px 0 0; font-size: 14px; color: var(--text); border-left: 3px solid var(--accent); padding-left: 12px; line-height: 1.6; }
+.admin-sign-in__error {
+  margin: 12px 0 0;
+  padding: 9px 12px;
+  border-left: 3px solid currentColor;
+  border-radius: 6px;
+  background: var(--admin-error-background);
+  color: var(--admin-error-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
 .admin-sign-in__error + .admin-sign-in__submit { margin-top: 14px; }
 .admin-sign-in__identity { color: var(--muted-text); font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
 .admin-sign-in__identity strong { display: block; font-weight: 500; color: var(--text); }
