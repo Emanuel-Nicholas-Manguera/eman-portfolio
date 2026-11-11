@@ -191,6 +191,7 @@ function Portrait({ suitSrc, graduationSrc, isPinned, isRevealed, onHoverChange,
                 height="979"
                 alt=""
                 aria-hidden="true"
+                fetchPriority="low"
                 onLoad={onGraduationReady}
                 draggable="false"
               />

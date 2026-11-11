@@ -6,8 +6,8 @@ function Arrow({ previous = false }: { previous?: boolean }) {
   return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d={previous ? 'M20 12H4m7-7-7 7 7 7' : 'M4 12h16m-7-7 7 7-7 7'} /></svg>
 }
 
-function Photo({ photo }: { photo: ProjectPhoto }) {
-  if (photo.src) return <img src={photo.src} alt={photo.alt || photo.label} draggable="false" />
+function Photo({ photo, eager = false }: { photo: ProjectPhoto; eager?: boolean }) {
+  if (photo.src) return <img src={photo.src} alt={photo.alt || photo.label} loading={eager ? 'eager' : 'lazy'} draggable="false" />
   // These are explicitly labeled illustrations until real screenshots are supplied.
   return <div className={`project-illustration project-illustration--${photo.illustration}`} aria-hidden="true">
     {photo.illustration === 'golf' ? <div className="project-phone">
@@ -106,7 +106,7 @@ export function Projects({ projects }: { projects: Project[] }) {
         <button autoFocus type="button" className="project-arrow" aria-label="Close image viewer" onClick={() => setViewerOpen(false)}>✕</button>
       </div>
       <div className="project-viewer-image">
-        {project.photos.map((itemPhoto, index) => <div className="project-photo-layer" data-active={index === photoIndex} aria-hidden={index !== photoIndex} key={`${project.id}-${itemPhoto.label}`}><Photo photo={itemPhoto} /></div>)}
+        {project.photos.map((itemPhoto, index) => <div className="project-photo-layer" data-active={index === photoIndex} aria-hidden={index !== photoIndex} key={`${project.id}-${itemPhoto.label}`}><Photo photo={itemPhoto} eager={index === photoIndex} /></div>)}
       </div>
       <div className="project-viewer-dock" role="group" aria-label="Browse project photos">
         <button type="button" className="project-arrow project-viewer-previous" aria-label="Previous photo" onClick={() => changePhoto(photoIndex - 1)}><Arrow previous /></button>

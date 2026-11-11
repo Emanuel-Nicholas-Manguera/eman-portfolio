@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import { publicSupabase } from './client'
 import { resolvePortfolio } from './portfolio'
 import type { PortfolioData } from './portfolio'
-import type { Publication, PublicAsset } from './content'
+import {
+  portfolioSnapshotId,
+  publishedImageUrl,
+  readPublishedPortfolio,
+} from './published'
+import type { PublishedPortfolio } from './published'
 import {
   introduction,
   contact,
@@ -18,32 +23,52 @@ const fallback: PortfolioData = {
   projects,
   about: null,
 }
+
+function readInitialSnapshot() {
+  const snapshot = document.getElementById(portfolioSnapshotId)?.textContent
+  if (!snapshot) return null
+  try {
+    const data = JSON.parse(snapshot) as PublishedPortfolio
+    return Array.isArray(data.publications) && Array.isArray(data.assets) ? data : null
+  } catch {
+    return null
+  }
+}
+
+function resolveWithPublishedImages({ publications, assets }: PublishedPortfolio) {
+  return resolvePortfolio(
+    publications,
+    assets.map((asset) => ({ ...asset, url: publishedImageUrl(asset.object_path) })),
+  )
+}
+
 export function usePortfolio() {
+  const [initialSnapshot] = useState(readInitialSnapshot)
   const [failed, setFailed] = useState(false)
   const [data, setData] = useState<PortfolioData | null>(
-    publicSupabase ? null : fallback,
+    () => initialSnapshot
+      ? resolveWithPublishedImages(initialSnapshot)
+      : publicSupabase ? null : fallback,
   )
   useEffect(() => {
     const client = publicSupabase
     if (!client) return
-    let alive = true,
-      running = false
+    const reader = client
+    let alive = true
+    let running = false
+    let refreshQueued = false
+
     async function refresh() {
-      if (running) return
+      if (!alive || running) return
       running = true
       try {
-        const [docs, images] = await Promise.all([
-          client!.from('cms_publications').select('*').order('sort_order'),
-          client!
-            .from('cms_publication_assets')
-            .select('*')
-            .order('sort_order'),
-        ])
-        if (docs.error || images.error) throw new Error('Unavailable')
-        const assets = images.data as PublicAsset[]
-        if (assets.length) {
+        const snapshot = await readPublishedPortfolio(reader)
+        const { publications, assets } = snapshot
+
+        // Static builds without a portfolio server still use the original signed links.
+        if (!initialSnapshot && assets.length) {
           const paths = [...new Set(assets.map((a) => a.object_path))]
-          const { data: urls, error } = await client!.storage
+          const { data: urls, error } = await reader.storage
             .from('portfolio-media')
             .createSignedUrls(paths, 3600)
           if (error) throw error
@@ -54,13 +79,21 @@ export function usePortfolio() {
           })
         }
         if (alive) {
-          setData(resolvePortfolio(docs.data as Publication[], assets))
+          setData(
+            initialSnapshot
+              ? resolveWithPublishedImages(snapshot)
+              : resolvePortfolio(publications, assets),
+          )
           setFailed(false)
         }
       } catch {
         if (alive) setFailed(true)
       } finally {
         running = false
+        if (refreshQueued) {
+          refreshQueued = false
+          void refresh()
+        }
       }
     }
     void refresh()
@@ -73,7 +106,11 @@ export function usePortfolio() {
     window.addEventListener('focus', focus)
     document.addEventListener('visibilitychange', focus)
     const channel = new BroadcastChannel('portfolio-publications')
-    channel.onmessage = () => void refresh()
+    channel.onmessage = () => {
+      // A publish can finish while an older request is still in flight.
+      if (running) refreshQueued = true
+      else void refresh()
+    }
     return () => {
       alive = false
       clearInterval(timer)
@@ -81,6 +118,6 @@ export function usePortfolio() {
       window.removeEventListener('focus', focus)
       document.removeEventListener('visibilitychange', focus)
     }
-  }, [])
+  }, [initialSnapshot])
   return { data, failed }
 }

@@ -1,9 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
+  "functions": {
+    "api/portfolio.ts": {
+      "includeFiles": "dist-ssr/index.html"
+    }
+  },
+  "routes": [
     {
-      "source": "/admin/myself",
-      "destination": "/index.html"
+      "src": "^/$",
+      "dest": "/api/portfolio"
+    },
+    {
+      "src": "^/admin/myself/?$",
+      "dest": "/index.html"
+    },
+    {
+      "handle": "filesystem"
     }
   ]
 }
