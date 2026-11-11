@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { publicSupabase } from './cms/client'
+import { isOwnerActivityExcluded } from './ownerActivity'
 
 export function usePortfolioActivity(ready: boolean) {
   const counted = useRef(false)
@@ -11,6 +12,8 @@ export function usePortfolioActivity(ready: boolean) {
     if (import.meta.env.VITE_VERCEL_ENV === 'preview') return
 
     const record = (activityKey: string) => {
+      // Read on every event so existing portfolio tabs respect a new admin sign-in.
+      if (isOwnerActivityExcluded()) return
       // A failed analytics request should never interfere with navigation.
       void client.rpc('record_portfolio_activity', { activity_key: activityKey }).then(() => {}, () => {})
     }

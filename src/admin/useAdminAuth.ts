@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { excludeOwnerActivity } from '../ownerActivity'
 import { adminSupabase } from './client'
 import { inspectAdminSession, signOutAdmin } from './auth'
 import type { AuthView } from './auth'
@@ -43,7 +44,9 @@ export function useAdminAuth() {
         return next
       },
       onView: (next) => {
-        if (next.stage !== 'ready') {
+        if (next.stage === 'ready') {
+          excludeOwnerActivity()
+        } else {
           if (next.stage !== 'checking') idle.stop()
           setIdleWarning(null)
         }
