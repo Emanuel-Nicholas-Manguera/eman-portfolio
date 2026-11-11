@@ -10,7 +10,17 @@
 .admin-dashboard .ss-activity-heading h2 { font-size: 20px; }
 .admin-dashboard .ss-activity-heading p { color: var(--ss-muted); font-size: 12px; margin-top: 4px; }
 .admin-dashboard .ss-activity-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.admin-dashboard .ss-activity-refresh { min-width: 112px; justify-content: center; }
+.admin-dashboard .ss-activity-refresh {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--ss-edge);
+  border-radius: 12px;
+  background: var(--ss-panel);
+}
+.admin-dashboard .ss-activity-refresh:active { transform: none; }
+.admin-dashboard .ss-activity-refresh svg { width: 18px; height: 18px; }
 .admin-dashboard .ss-activity-range {
   display: flex;
   padding: 3px;

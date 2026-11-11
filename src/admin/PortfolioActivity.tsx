@@ -78,12 +78,14 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
           </div>
           <button
             type="button"
-            className="ss-secondary ss-activity-refresh"
+            className="ss-activity-refresh"
             aria-label="Refresh portfolio activity"
+            title="Refresh portfolio activity"
+            aria-busy={refreshing}
             disabled={refreshing}
             onClick={() => setDays(recentDays())}
           >
-            <AdminIcon name="refresh" /> {refreshing ? 'Refreshing…' : 'Refresh'}
+            <AdminIcon name="refresh" />
           </button>
         </div>
       </div>
