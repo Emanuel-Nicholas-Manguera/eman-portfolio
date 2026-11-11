@@ -2,25 +2,38 @@ import githubLogo from './assets/socials/github.svg'
 import linkedinLogo from './assets/socials/linkedin.svg'
 import gmailLogo from './assets/socials/gmail.svg'
 import facebookLogo from './assets/socials/facebook.svg'
-import type { ContactContent } from './cms/content'
+import xLogo from './assets/socials/x.svg'
+import instagramLogo from './assets/socials/instagram.svg'
+import { socialPlatforms, type SocialId, type SocialProfile } from './cms/content'
 
-export const socialProfiles = [
-  { id: 'github', label: 'GitHub', logo: githubLogo },
-  { id: 'linkedin', label: 'LinkedIn', logo: linkedinLogo },
-  { id: 'gmail', label: 'Gmail', logo: gmailLogo },
-  { id: 'facebook', label: 'Facebook', logo: facebookLogo },
-] as const
+export type { SocialId } from './cms/content'
+export type SocialLink = { id: SocialId; label: string; logo: string; href: string; caption: string }
 
-export type SocialId = (typeof socialProfiles)[number]['id']
-export type SocialLink = (typeof socialProfiles)[number] & { href: string; caption: string }
+const logos: Record<SocialId, string> = {
+  github: githubLogo,
+  linkedin: linkedinLogo,
+  gmail: gmailLogo,
+  facebook: facebookLogo,
+  x: xLogo,
+  instagram: instagramLogo,
+}
 
-export function profileSocials(contact: ContactContent): SocialLink[] {
-  return socialProfiles.map((profile) => {
-    const { id } = profile
-    const href = id === 'gmail'
-      ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}`
-      : contact[id]
-    const caption = id === 'facebook' ? 'Connect with me on Facebook.' : contact[`${id}Caption`]
-    return { ...profile, href, caption }
-  }).filter((profile) => !!profile.href)
+export const socialProfiles = (Object.keys(socialPlatforms) as SocialId[]).map((id) => ({
+  id,
+  label: socialPlatforms[id],
+  logo: logos[id],
+}))
+
+export function gmailComposeUrl(email: string) {
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`
+}
+
+export function profileSocials(links: SocialProfile[]): SocialLink[] {
+  return links.map(({ platform, destination, caption }) => ({
+    id: platform,
+    label: socialPlatforms[platform],
+    logo: logos[platform],
+    href: platform === 'gmail' ? gmailComposeUrl(destination) : destination,
+    caption,
+  }))
 }

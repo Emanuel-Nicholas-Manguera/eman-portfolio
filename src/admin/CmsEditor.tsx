@@ -6,6 +6,7 @@ import { PortfolioBody } from '../PortfolioBody'
 import { resolvePortfolio } from '../cms/portfolio'
 import type {
   CmsDocument,
+  ContactContent,
   CmsAsset,
   Publication,
   PublicAsset,
@@ -23,7 +24,6 @@ export function CmsEditor({
   publications,
   onSaved,
   onClose,
-  onEditSocialLinks,
   onUpload,
   onDirtyChange,
   onWorkingChange,
@@ -37,7 +37,6 @@ export function CmsEditor({
   publications: Publication[]
   onSaved: (doc: CmsDocument) => Promise<void>
   onClose: () => void
-  onEditSocialLinks?: () => void
   externalBusy: boolean
   onWorkingChange: (busy: boolean) => void
   onDirtyChange: (dirty: boolean) => void
@@ -194,16 +193,9 @@ export function CmsEditor({
               : 'Only you can see this draft.'}
           </p>
         </div>
-        <div className="ss-editor-heading-actions">
-          {onEditSocialLinks && (
-            <button type="button" className="ss-quiet" disabled={busy || externalBusy} onClick={onEditSocialLinks}>
-              Edit social links <Icon name="right" />
-            </button>
-          )}
-          <button className="ss-secondary" onClick={() => setPreview(true)}>
-            <Icon name="eye" /> Preview draft
-          </button>
-        </div>
+        <button className="ss-secondary" onClick={() => setPreview(true)}>
+          <Icon name="eye" /> Preview draft
+        </button>
       </div>
       <form
         noValidate
@@ -241,6 +233,7 @@ export function CmsEditor({
           </div>}
           <DocumentFields
             value={doc}
+            publishedContact={publications.find((p) => p.kind === 'contact')?.content as ContactContent | undefined}
             assets={assets}
             onChange={(content) => setDoc({ ...doc, content })}
             onUpload={onUpload}

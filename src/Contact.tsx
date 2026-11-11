@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { profileSocials } from './socialData'
+import { gmailComposeUrl, type SocialLink } from './socialData'
 import type { ContactContent } from './cms/content'
 import './Contact.css'
 
@@ -11,13 +11,9 @@ function ContactArrow() {
   )
 }
 
-export function Contact({ content }: { content: ContactContent }) {
+export function Contact({ content, socialLinks }: { content: ContactContent; socialLinks: SocialLink[] }) {
   const words = content.heading.split(' ')
   const email = content.email
-  const socials = profileSocials(content)
-  const gmail = socials.find(s => s.id === 'gmail')!
-  const contactLinks = ['linkedin', 'github', 'facebook']
-    .flatMap((id) => socials.filter((social) => social.id === id))
   const sectionRef = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
 
@@ -41,17 +37,17 @@ export function Contact({ content }: { content: ContactContent }) {
           <p className="section-eyebrow">Contact</p>
           <h2 id="contact-title">{words.slice(0,2).join(' ')}{words.length>2&&<><br />{words.slice(2,-1).join(' ')} <span>{words.at(-1)}</span></>}</h2>
           <p className="contact-description">{content.description}</p>
-          <a className="contact-email" href={gmail.href} target="_blank" rel="noopener noreferrer" aria-label={`Email ${email} in Gmail (opens in a new tab)`}>
+          <a className="contact-email" href={gmailComposeUrl(email)} target="_blank" rel="noopener noreferrer" aria-label={`Email ${email} in Gmail (opens in a new tab)`}>
             <span>{email}</span>
             <ContactArrow />
           </a>
-          <nav className="contact-socials" aria-label="More ways to connect">
-            {contactLinks.map((link) => (
+          {socialLinks.length > 0 && <nav className="contact-socials" aria-label="More ways to connect">
+            {socialLinks.map((link) => (
               <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={`${link.label} (opens in a new tab)`}>
                 {link.label}<ContactArrow />
               </a>
             ))}
-          </nav>
+          </nav>}
         </div>
       </section>
       <footer className="site-footer">

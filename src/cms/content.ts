@@ -10,6 +10,18 @@ export type PhotoContent = {
   assetId?: string
   illustration?: 'golf' | 'dost'
 }
+export const socialPlatforms = {
+  github: 'GitHub',
+  linkedin: 'LinkedIn',
+  gmail: 'Gmail',
+  facebook: 'Facebook',
+  x: 'X',
+  instagram: 'Instagram',
+} as const
+
+export type SocialId = keyof typeof socialPlatforms
+export type SocialProfile = { platform: SocialId; destination: string; caption: string }
+
 export type IntroductionContent = {
   name: string
   location: string
@@ -21,6 +33,7 @@ export type IntroductionContent = {
   graduationAssetId?: string
   actionLabel: string
   scrollLabel: string
+  socialLinks?: SocialProfile[]
 }
 export type ExperienceContent = {
   id: string
@@ -129,6 +142,51 @@ export function safeLink(value: string, allowMail = false) {
     return ''
   }
 }
+function validEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function isSocialProfile(value: unknown): value is SocialProfile {
+  if (!value || typeof value !== 'object') return false
+  const profile = value as Partial<SocialProfile>
+  return typeof profile.platform === 'string'
+    && Object.hasOwn(socialPlatforms, profile.platform)
+    && typeof profile.destination === 'string'
+    && typeof profile.caption === 'string'
+}
+
+function socialDestination(profile: SocialProfile) {
+  const destination = profile.destination.trim()
+  return profile.platform === 'gmail'
+    ? (validEmail(destination) ? destination : '')
+    : safeLink(destination)
+}
+
+export function resolveSocialLinks(value: unknown, contact?: ContactContent | null): SocialProfile[] {
+  // Older Introduction records inherit the published Contact links. An explicit
+  // empty list means the owner removed all profiles.
+  if (value === undefined && contact) {
+    value = [
+      { platform: 'github', destination: contact.github, caption: contact.githubCaption ?? '' },
+      { platform: 'linkedin', destination: contact.linkedin, caption: contact.linkedinCaption ?? '' },
+      { platform: 'gmail', destination: contact.email, caption: contact.gmailCaption ?? '' },
+      { platform: 'facebook', destination: contact.facebook, caption: 'Connect with me on Facebook.' },
+    ]
+  }
+  if (!Array.isArray(value)) return []
+
+  const seen = new Set<SocialId>()
+  const links: SocialProfile[] = []
+  for (const profile of value) {
+    if (!isSocialProfile(profile) || seen.has(profile.platform)) continue
+    const destination = socialDestination(profile)
+    if (!destination) continue
+    seen.add(profile.platform)
+    links.push({ ...profile, destination })
+  }
+  return links
+}
+
 export function assetIds(content: Content): string[] {
   const c = content as IntroductionContent & ProjectContent
   return [
@@ -165,12 +223,27 @@ export function validateContent(
   if (
     forPublication &&
     kind === 'contact' &&
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(c.email))
+    !validEmail(String(c.email))
   )
     throw new Error('Enter a valid email address.')
   for (const field of ['source', 'github', 'linkedin', 'facebook'])
     if (c[field] && !safeLink(String(c[field])))
       throw new Error(`Enter a valid https:// link for ${field}.`)
+  if (kind === 'introduction' && c.socialLinks !== undefined) {
+    if (!Array.isArray(c.socialLinks) || !c.socialLinks.every(isSocialProfile))
+      throw new Error('Choose a supported platform for each social link.')
+    const seen = new Set<SocialId>()
+    for (const profile of c.socialLinks) {
+      const label = socialPlatforms[profile.platform]
+      if (seen.has(profile.platform)) throw new Error(`Add ${label} only once.`)
+      seen.add(profile.platform)
+      if ((forPublication || profile.destination.trim()) && !socialDestination(profile)) {
+        throw new Error(profile.platform === 'gmail'
+          ? 'Enter a valid email address for Gmail.'
+          : `Enter a valid profile URL for ${label}.`)
+      }
+    }
+  }
   if (forPublication && kind === 'project') {
     const photos = (content as ProjectContent).photos
     if (!photos.length) throw new Error('Add at least one project image.')

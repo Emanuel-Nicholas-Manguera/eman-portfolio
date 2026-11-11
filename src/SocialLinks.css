@@ -6,6 +6,7 @@
 .intro-socials {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 20px;
 }
@@ -96,7 +97,7 @@
 }
 
 /* Theme changes are shared by the header and all portfolio sections. */
-.portfolio[data-theme][data-social='github'] {
+.portfolio[data-theme]:is([data-social='github'], [data-social='x']) {
   --text: #24292f;
   --muted-text: #4c5764;
   --accent: #475569;
@@ -107,7 +108,7 @@
   --action-text: #fafcff;
   --focus-color: #455e78;
 }
-.portfolio[data-theme='dark'][data-social='github'] {
+.portfolio[data-theme='dark']:is([data-social='github'], [data-social='x']) {
   --text: #f0f3f6;
   --muted-text: #b7c1cb;
   --accent: #c4d1df;
@@ -140,7 +141,7 @@
   --action-text: #10334e;
   --focus-color: #8ecbff;
 }
-.portfolio[data-theme][data-social='gmail'] {
+.portfolio[data-theme]:is([data-social='gmail'], [data-social='instagram']) {
   --text: #4b2529;
   --muted-text: #735158;
   --accent: #b83c36;
@@ -151,7 +152,7 @@
   --action-text: #fff8f7;
   --focus-color: #a92f30;
 }
-.portfolio[data-theme='dark'][data-social='gmail'] {
+.portfolio[data-theme='dark']:is([data-social='gmail'], [data-social='instagram']) {
   --text: #fff0f0;
   --muted-text: #e3bfc4;
   --accent: #ffaaa4;
@@ -180,6 +181,12 @@
 .social-wallpaper--gmail::after { background: radial-gradient(ellipse at 72% 85%, #873d45, transparent 72%), #25171c; }
 .social-wallpaper--facebook { background: radial-gradient(ellipse at 72% 85%, #78aaff, transparent 72%), #e6efff; }
 .social-wallpaper--facebook::after { background: radial-gradient(ellipse at 72% 85%, #164c9e, transparent 72%), #101d34; }
+.social-wallpaper--x { background: radial-gradient(ellipse at 72% 85%, #adb5c3, transparent 72%), #f0f1f3; }
+.social-wallpaper--x::after { background: radial-gradient(ellipse at 72% 85%, #354050, transparent 72%), #101217; }
+.social-wallpaper--instagram { background: radial-gradient(ellipse at 72% 85%, #efa396, transparent 72%), #fff0eb; }
+.social-wallpaper--instagram::after { background: radial-gradient(ellipse at 72% 85%, #863849, transparent 72%), #301a23; }
+[data-social='x'] .social-wallpaper--x,
+[data-social='instagram'] .social-wallpaper--instagram,
 [data-social='github'] .social-wallpaper--github,
 [data-social='linkedin'] .social-wallpaper--linkedin,
 [data-social='gmail'] .social-wallpaper--gmail,

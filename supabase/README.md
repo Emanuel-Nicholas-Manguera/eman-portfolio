@@ -195,9 +195,11 @@ References: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/ro
 ## Content management and public portfolio
 
 The owner dashboard at `/admin/myself` now manages introduction, experience,
-projects, contact details, social links, and images. Manage the social links in
-**Contact → Social links**. The **Edit social links** button in Introduction opens
-the same editor. On Overview, **Import existing portfolio** copies the original
+projects, contact details, social links, and images. Manage social icons in
+**Introduction → Social links**. Published Introduction records without a social
+list use the published Contact links until you publish an edited list. Contact uses
+the same profile links and has its own email field. On Overview, **Import existing
+portfolio** copies the original
 React content and five images into Supabase. The importer is idempotent by
 kind/slug and original image filename and fills missing entries while preserving
 CMS edits.

@@ -32,7 +32,7 @@ const sections: {
   {
     name: 'Introduction',
     kind: 'introduction',
-    detail: 'Profile and portraits',
+    detail: 'Profile, portraits, and social links',
     icon: 'user',
   },
   {
@@ -50,7 +50,7 @@ const sections: {
   {
     name: 'Contact',
     kind: 'contact',
-    detail: 'Email and social links',
+    detail: 'Contact details and email',
     icon: 'mail',
   },
 ]
@@ -413,7 +413,6 @@ export function AdminDashboard({
                 key={editor.id}
                 initial={editor}
                 sectionTitle={section === 'Introduction' ? 'Introduction' : undefined}
-                onEditSocialLinks={section === 'Introduction' ? () => go('Contact') : undefined}
                 assets={contents.assets}
                 publications={contents.publications}
                 client={client}

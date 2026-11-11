@@ -1,4 +1,6 @@
 import { AdminIcon as Icon } from './AdminIcon'
+import { socialProfiles } from '../socialData'
+import { resolveSocialLinks, socialPlatforms, type SocialProfile } from '../cms/content'
 import type {
   CmsDocument,
   CmsAsset,
@@ -12,6 +14,7 @@ import type {
 
 type Props = {
   value: CmsDocument
+  publishedContact?: ContactContent
   assets: CmsAsset[]
   onChange: (content: Content) => void
   onUpload: (files: FileList) => void
@@ -163,7 +166,66 @@ function ImageChoice({
     </div>
   )
 }
-export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
+function SocialFields({ links, onChange }: {
+  links: SocialProfile[]
+  onChange: (links: SocialProfile[]) => void
+}) {
+  const available = socialProfiles.filter(({ id }) => !links.some((link) => link.platform === id))
+  function move(index: number, offset: -1 | 1) {
+    const next = [...links]
+    const [link] = next.splice(index, 1)
+    next.splice(index + offset, 0, link)
+    onChange(next)
+  }
+  function update(platform: SocialProfile['platform'], patch: Partial<Pick<SocialProfile, 'destination' | 'caption'>>) {
+    onChange(links.map((link) => link.platform === platform ? { ...link, ...patch } : link))
+  }
+  return (
+    <details className="ss-editor-disclosure ss-social-fields">
+      <summary>Social links</summary>
+      <label className="ss-field ss-social-add">
+        Add social link
+        <select value="" disabled={!available.length} onChange={(event) => {
+          const platform = available.find(({ id }) => id === event.target.value)
+          if (platform) onChange([...links, { platform: platform.id, destination: '', caption: '' }])
+        }}>
+          <option value="">{available.length ? 'Choose a platform' : 'All platforms added'}</option>
+          {available.map(({ id, label }) => <option key={id} value={id}>{label}</option>)}
+        </select>
+      </label>
+      {links.map(({ platform, destination, caption }, index) => {
+        const label = socialPlatforms[platform]
+        return (
+          <fieldset key={platform} className="ss-social-profile">
+            <legend>{label}</legend>
+            <div className="ss-social-profile-fields">
+              <Field
+                label={platform === 'gmail' ? 'Gmail email address' : `${label} profile URL`}
+                type={platform === 'gmail' ? 'email' : 'url'}
+                value={destination}
+                onChange={(destination) => update(platform, { destination })}
+              />
+              <Field label="Click caption (optional)" value={caption} onChange={(caption) => update(platform, { caption })} />
+            </div>
+            <div className="ss-row-actions">
+              <button type="button" disabled={index === 0} onClick={() => move(index, -1)} aria-label={`Move ${label} up`}>
+                <Icon name="up" /> Move up
+              </button>
+              <button type="button" disabled={index === links.length - 1} onClick={() => move(index, 1)} aria-label={`Move ${label} down`}>
+                <Icon name="down" /> Move down
+              </button>
+              <button type="button" onClick={() => onChange(links.filter((link) => link.platform !== platform))} aria-label={`Remove ${label}`}>
+                <Icon name="trash" /> Remove
+              </button>
+            </div>
+          </fieldset>
+        )
+      })}
+    </details>
+  )
+}
+
+export function DocumentFields({ value, publishedContact, assets, onChange, onUpload }: Props) {
   function text<T extends Content>(
     c: T,
     key: keyof T,
@@ -202,49 +264,55 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
     case 'introduction': {
       const c = value.content as IntroductionContent
       return (
-        <div className="ss-editor-grid">
-          <div className="ss-editor-fields">
-            {text(c, 'name', 'Name', false, 'text', true)}
-            {text(c, 'location', 'Location')}
-            {text(c, 'role', 'Developer role', false, 'text', true)}
-            {text(
-              c,
-              'description',
-              'Developer introduction',
-              true,
-              'text',
-              true,
-            )}
-            <details className="ss-editor-disclosure">
-              <summary>Graduation introduction</summary>
-              {text(c, 'graduateRole', 'Graduate role')}
-              {text(c, 'graduateDescription', 'Education introduction', true)}
-            </details>
-            <details className="ss-editor-disclosure">
-              <summary>Button labels</summary>
-              {text(c, 'actionLabel', 'Projects button label')}
-              {text(c, 'scrollLabel', 'Scroll invitation')}
-            </details>
+        <>
+          <SocialFields
+            links={c.socialLinks ?? resolveSocialLinks(undefined, publishedContact)}
+            onChange={(socialLinks) => onChange({ ...c, socialLinks })}
+          />
+          <div className="ss-editor-grid">
+            <div className="ss-editor-fields">
+              {text(c, 'name', 'Name', false, 'text', true)}
+              {text(c, 'location', 'Location')}
+              {text(c, 'role', 'Developer role', false, 'text', true)}
+              {text(
+                c,
+                'description',
+                'Developer introduction',
+                true,
+                'text',
+                true,
+              )}
+              <details className="ss-editor-disclosure">
+                <summary>Graduation introduction</summary>
+                {text(c, 'graduateRole', 'Graduate role')}
+                {text(c, 'graduateDescription', 'Education introduction', true)}
+              </details>
+              <details className="ss-editor-disclosure">
+                <summary>Button labels</summary>
+                {text(c, 'actionLabel', 'Projects button label')}
+                {text(c, 'scrollLabel', 'Scroll invitation')}
+              </details>
+            </div>
+            <section>
+              <h2>Portraits</h2>
+              <ImageChoice
+                label="Developer portrait"
+                id={c.suitAssetId}
+                assets={assets}
+                onChange={(suitAssetId) => onChange({ ...c, suitAssetId })}
+              />
+              <ImageChoice
+                label="Graduation portrait"
+                id={c.graduationAssetId}
+                assets={assets}
+                onChange={(graduationAssetId) =>
+                  onChange({ ...c, graduationAssetId })
+                }
+              />
+              {upload}
+            </section>
           </div>
-          <section>
-            <h2>Portraits</h2>
-            <ImageChoice
-              label="Developer portrait"
-              id={c.suitAssetId}
-              assets={assets}
-              onChange={(suitAssetId) => onChange({ ...c, suitAssetId })}
-            />
-            <ImageChoice
-              label="Graduation portrait"
-              id={c.graduationAssetId}
-              assets={assets}
-              onChange={(graduationAssetId) =>
-                onChange({ ...c, graduationAssetId })
-              }
-            />
-            {upload}
-          </section>
-        </div>
+        </>
       )
     }
     case 'experience': {
@@ -419,17 +487,7 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
       const c = value.content as ContactContent
       return (
         <div className="ss-editor-fields">
-          <fieldset className="ss-editor-fieldset ss-social-fields">
-            <legend>Social links</legend>
-            <p>Add profile URLs for the icons in Introduction and links in Contact. Leave a profile URL blank to hide it.</p>
-            {text(c, 'email', 'Email', false, 'email', true)}
-            {text(c, 'github', 'GitHub URL', false, 'url')}
-            {text(c, 'linkedin', 'LinkedIn URL', false, 'url')}
-            {text(c, 'facebook', 'Facebook URL', false, 'url')}
-            {text(c, 'githubCaption', 'GitHub click caption')}
-            {text(c, 'linkedinCaption', 'LinkedIn click caption')}
-            {text(c, 'gmailCaption', 'Gmail click caption')}
-          </fieldset>
+          {text(c, 'email', 'Contact email', false, 'email', true)}
           {text(c, 'name', 'Display name', false, 'text', true)}
           {text(c, 'location', 'Location')}
           {text(c, 'heading', 'Contact heading')}

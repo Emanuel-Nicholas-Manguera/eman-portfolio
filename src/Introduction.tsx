@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import type { IntroductionContent, ContactContent, AboutContent } from './cms/content'
-import { profileSocials } from './socialData'
+import type { IntroductionContent, AboutContent } from './cms/content'
 import './Introduction.css'
 import { IntroductionDetails } from './IntroductionDetails'
 import { SocialLinks } from './SocialLinks'
-import type { SocialId } from './socialData'
+import type { SocialId, SocialLink } from './socialData'
 
 function InteractiveDots() {
   const fieldRef = useRef<HTMLDivElement>(null)
@@ -283,11 +282,11 @@ function TypingName({ name, ready }: { name: string; ready: boolean }) {
   )
 }
 
-export function Introduction({ content, background, contact, social, onSocialSelect, ready = true }: {
+export function Introduction({ content, background, socialLinks, social, onSocialSelect, ready = true }: {
   ready?: boolean
   content: IntroductionContent & { suitSrc?: string; graduationSrc?: string }
   background?: AboutContent | null
-  contact: ContactContent | null
+  socialLinks: SocialLink[]
   social: SocialId | null
   onSocialSelect: (social: SocialId) => void
 }) {
@@ -357,7 +356,7 @@ export function Introduction({ content, background, contact, social, onSocialSel
         <a className="intro-action" href="#projects">
           {content.actionLabel} <ArrowIcon />
         </a>
-        {contact && <SocialLinks items={profileSocials(contact)} selected={social} onSelect={onSocialSelect} />}
+        {socialLinks.length > 0 && <SocialLinks items={socialLinks} selected={social} onSelect={onSocialSelect} />}
       </div>
       {content.suitSrc && <Portrait
         suitSrc={content.suitSrc}
