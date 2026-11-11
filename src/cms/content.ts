@@ -11,16 +11,47 @@ export type PhotoContent = {
   illustration?: 'golf' | 'dost'
 }
 export const socialPlatforms = {
-  github: 'GitHub',
-  linkedin: 'LinkedIn',
-  gmail: 'Gmail',
+  behance: 'Behance',
+  bluesky: 'Bluesky',
+  codepen: 'CodePen',
+  devdotto: 'DEV Community',
+  discord: 'Discord',
+  dribbble: 'Dribbble',
   facebook: 'Facebook',
-  x: 'X',
+  github: 'GitHub',
+  gitlab: 'GitLab',
+  gmail: 'Gmail',
   instagram: 'Instagram',
+  linkedin: 'LinkedIn',
+  mastodon: 'Mastodon',
+  medium: 'Medium',
+  patreon: 'Patreon',
+  pinterest: 'Pinterest',
+  reddit: 'Reddit',
+  snapchat: 'Snapchat',
+  spotify: 'Spotify',
+  stackoverflow: 'Stack Overflow',
+  telegram: 'Telegram',
+  threads: 'Threads',
+  tiktok: 'TikTok',
+  twitch: 'Twitch',
+  vimeo: 'Vimeo',
+  whatsapp: 'WhatsApp',
+  x: 'X',
+  youtube: 'YouTube',
+  website: 'Other website',
 } as const
 
-export type SocialId = keyof typeof socialPlatforms
-export type SocialProfile = { platform: SocialId; destination: string; caption: string }
+export type SocialPlatform = keyof typeof socialPlatforms
+export type SocialProfile = {
+  id?: string
+  platform: SocialPlatform
+  destination: string
+  caption: string
+  label?: string
+}
+export type SocialProfileEntry = SocialProfile & { id: string }
+export const socialLabelLimit = 80
 
 export type IntroductionContent = {
   name: string
@@ -153,6 +184,8 @@ function isSocialProfile(value: unknown): value is SocialProfile {
     && Object.hasOwn(socialPlatforms, profile.platform)
     && typeof profile.destination === 'string'
     && typeof profile.caption === 'string'
+    && (profile.id === undefined || typeof profile.id === 'string')
+    && (profile.label === undefined || typeof profile.label === 'string')
 }
 
 function socialDestination(profile: SocialProfile) {
@@ -162,7 +195,20 @@ function socialDestination(profile: SocialProfile) {
     : safeLink(destination)
 }
 
-export function resolveSocialLinks(value: unknown, contact?: ContactContent | null): SocialProfile[] {
+export function identifySocialLinks(value: unknown): SocialProfileEntry[] {
+  if (!Array.isArray(value)) return []
+
+  const used = new Set<string>()
+  return value.flatMap((profile, index) => {
+    if (!isSocialProfile(profile)) return []
+    let id = profile.id || `legacy-${profile.platform}-${index}`
+    while (used.has(id)) id += '-copy'
+    used.add(id)
+    return [{ ...profile, id }]
+  })
+}
+
+export function resolveSocialLinks(value: unknown, contact?: ContactContent | null): SocialProfileEntry[] {
   // Older Introduction records inherit the published Contact links. An explicit
   // empty list means the owner removed all profiles.
   if (value === undefined && contact) {
@@ -173,18 +219,11 @@ export function resolveSocialLinks(value: unknown, contact?: ContactContent | nu
       { platform: 'facebook', destination: contact.facebook, caption: 'Connect with me on Facebook.' },
     ]
   }
-  if (!Array.isArray(value)) return []
-
-  const seen = new Set<SocialId>()
-  const links: SocialProfile[] = []
-  for (const profile of value) {
-    if (!isSocialProfile(profile) || seen.has(profile.platform)) continue
+  return identifySocialLinks(value).flatMap((profile) => {
     const destination = socialDestination(profile)
-    if (!destination) continue
-    seen.add(profile.platform)
-    links.push({ ...profile, destination })
-  }
-  return links
+    if (!destination) return []
+    return [{ ...profile, destination, label: profile.label?.trim().slice(0, socialLabelLimit) }]
+  })
 }
 
 export function assetIds(content: Content): string[] {
@@ -232,11 +271,10 @@ export function validateContent(
   if (kind === 'introduction' && c.socialLinks !== undefined) {
     if (!Array.isArray(c.socialLinks) || !c.socialLinks.every(isSocialProfile))
       throw new Error('Choose a supported platform for each social link.')
-    const seen = new Set<SocialId>()
     for (const profile of c.socialLinks) {
       const label = socialPlatforms[profile.platform]
-      if (seen.has(profile.platform)) throw new Error(`Add ${label} only once.`)
-      seen.add(profile.platform)
+      if ((profile.label?.trim().length ?? 0) > socialLabelLimit)
+        throw new Error(`Use ${socialLabelLimit} characters or fewer for a link name.`)
       if ((forPublication || profile.destination.trim()) && !socialDestination(profile)) {
         throw new Error(profile.platform === 'gmail'
           ? 'Enter a valid email address for Gmail.'

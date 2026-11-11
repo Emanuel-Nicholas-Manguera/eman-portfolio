@@ -58,12 +58,26 @@ test('social publishing validates destinations and keeps the chosen order', () =
   const instagram = { platform: 'instagram', destination: 'https://instagram.com/example', caption: '' }
   const x = { platform: 'x', destination: 'https://x.com/example', caption: '' }
   assert.doesNotThrow(() => validateContent('introduction', 'Intro', { ...intro, socialLinks: [instagram, x] }))
-  assert.deepEqual(resolveSocialLinks([instagram, x]), [instagram, x])
-  assert.throws(() => validateContent('introduction', 'Intro', { ...intro, socialLinks: [x, x] }), /only once/)
+  assert.deepEqual(resolveSocialLinks([instagram, x]).map(({ platform }) => platform), ['instagram', 'x'])
+  const work = { platform: 'github', destination: 'https://github.com/work', caption: '', label: 'Work GitHub' }
+  const personal = { platform: 'github', destination: 'https://github.com/personal', caption: '', label: 'Personal GitHub' }
+  const discord = { platform: 'discord', destination: 'https://discord.gg/example', caption: '' }
+  const website = { platform: 'website', destination: 'https://example.com/me', caption: '', label: 'Other profile' }
+  const profiles = [work, personal, discord, website]
+  assert.doesNotThrow(() => validateContent('introduction', 'Intro', { ...intro, socialLinks: profiles }))
+  const resolved = resolveSocialLinks(profiles)
+  assert.deepEqual(resolved.map(({ destination, label }) => ({ destination, label })),
+    profiles.map(({ destination, label }) => ({ destination, label })))
+  assert.equal(new Set(resolved.map(({ id }) => id)).size, profiles.length)
+  assert.deepEqual(resolveSocialLinks(resolved.toReversed()).map(({ id }) => id),
+    resolved.toReversed().map(({ id }) => id))
   assert.throws(() => validateContent('introduction', 'Intro', {
     ...intro, socialLinks: [{ ...x, destination: 'javascript:alert(1)' }],
   }), /valid profile URL/)
   assert.doesNotThrow(() => validateContent('introduction', 'Intro', {
     ...intro, socialLinks: [{ ...x, destination: '' }],
   }, false))
+  assert.throws(() => validateContent('introduction', 'Intro', {
+    ...intro, socialLinks: [{ ...website, destination: 'javascript:alert(1)' }],
+  }), /valid profile URL/)
 })

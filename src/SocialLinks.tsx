@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
-import type { SocialLink, SocialId } from './socialData'
+import type { SocialLink, SocialSelection } from './socialData'
 import './SocialLinks.css'
 
 type Props = {
   items: SocialLink[]
-  selected: SocialId | null
-  onSelect: (social: SocialId) => void
+  selected: SocialSelection | null
+  onSelect: (social: SocialSelection) => void
 }
 
 export function SocialLinks({ selected, onSelect, items: socials }: Props) {
@@ -17,8 +17,8 @@ export function SocialLinks({ selected, onSelect, items: socials }: Props) {
   const navigationTimer = useRef<number | undefined>(undefined)
   const [blockedHref, setBlockedHref] = useState<string | null>(null)
   // Keep the mask mounted during reset so opacity can fade to zero.
-  const [watermarkSocial, setWatermarkSocial] = useState<SocialId | null>(selected)
-  const active = socials.find((social) => social.id === selected)
+  const [watermarkSocial, setWatermarkSocial] = useState<string | null>(selected?.id ?? null)
+  const active = socials.find((social) => social.id === selected?.id)
   const watermarkSocialData = socials.find((social) => social.id === watermarkSocial)
 
   useEffect(() => () => {
@@ -32,7 +32,7 @@ export function SocialLinks({ selected, onSelect, items: socials }: Props) {
     }
   }, [selected])
 
-  function activate(event: MouseEvent<HTMLAnchorElement>, id: SocialId) {
+  function activate(event: MouseEvent<HTMLAnchorElement>, social: SocialLink) {
     // Modified clicks retain the browser's normal link behavior.
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
     event.preventDefault()
@@ -56,8 +56,8 @@ export function SocialLinks({ selected, onSelect, items: socials }: Props) {
     animations.current.forEach((animation) => animation.cancel())
     animations.current = []
     flushSync(() => {
-      setWatermarkSocial(id)
-      onSelect(id)
+      setWatermarkSocial(social.id)
+      onSelect({ id: social.id, platform: social.platform })
     })
 
     const portal = portalRef.current
@@ -100,7 +100,7 @@ export function SocialLinks({ selected, onSelect, items: socials }: Props) {
         ref={watermarkRef}
         className="social-watermark"
         hidden={!watermarkSocialData}
-        data-visible={selected !== null}
+        data-visible={!!active}
         aria-hidden="true"
         style={{ '--social-logo': watermarkSocialData ? `url("${watermarkSocialData.logo}")` : 'none' } as CSSProperties}
       />
@@ -109,13 +109,13 @@ export function SocialLinks({ selected, onSelect, items: socials }: Props) {
           <a
             key={social.id}
             className="social-link"
-            data-social={social.id}
-            data-selected={selected === social.id}
+            data-social={social.platform}
+            data-selected={selected?.id === social.id}
             href={social.href}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${social.label} (opens in a new tab)`}
-            onClick={(event) => activate(event, social.id)}
+            onClick={(event) => activate(event, social)}
           >
             <span className="social-logo" aria-hidden="true" style={{ '--social-logo': `url("${social.logo}")` } as CSSProperties} />
             <span className="social-tooltip" aria-hidden="true">{social.label}</span>

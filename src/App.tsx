@@ -7,7 +7,7 @@ import { usePortfolioActivity } from './usePortfolioActivity'
 import { usePortfolioStartup } from './usePortfolioStartup'
 import { HeaderNavigation } from './HeaderNavigation'
 import './App.css'
-import { socialProfiles, type SocialId } from './socialData'
+import { socialWallpaperPlatforms, type SocialSelection } from './socialData'
 
 type Theme = 'light' | 'dark'
 const introductionPath = '/introduction'
@@ -18,7 +18,7 @@ function App() {
   const startup = usePortfolioStartup(hasData, failed, data?.introduction?.suitSrc)
   const navigation = [ ...(data?.experiences.length ? ['Experience'] : []), ...(data?.projects.length ? ['Projects'] : []), ...(data?.contact ? ['Contact'] : []) ]
   const [theme, setTheme] = useState<Theme>('light')
-  const [social, setSocial] = useState<SocialId | null>(null)
+  const [social, setSocial] = useState<SocialSelection | null>(null)
   const [isFloating, setIsFloating] = useState(() => window.scrollY >= 80)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
@@ -126,9 +126,9 @@ function App() {
   }, [isMenuOpen])
 
   return (
-    <div className="portfolio" data-theme={theme} data-social={social ?? undefined} id="introduction" tabIndex={-1}>
+    <div className="portfolio" data-theme={theme} data-social={social?.platform} id="introduction" tabIndex={-1}>
       <div className="wallpaper" aria-hidden="true">
-        {socialProfiles.map(({ id }) => (
+        {socialWallpaperPlatforms.map((id) => (
           <div key={id} className={`social-wallpaper social-wallpaper--${id}`} />
         ))}
       </div>

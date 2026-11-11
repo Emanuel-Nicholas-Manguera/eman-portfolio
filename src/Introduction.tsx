@@ -4,7 +4,7 @@ import type { IntroductionContent, AboutContent } from './cms/content'
 import './Introduction.css'
 import { IntroductionDetails } from './IntroductionDetails'
 import { SocialLinks } from './SocialLinks'
-import type { SocialId, SocialLink } from './socialData'
+import type { SocialSelection, SocialLink } from './socialData'
 
 function InteractiveDots() {
   const fieldRef = useRef<HTMLDivElement>(null)
@@ -287,8 +287,8 @@ export function Introduction({ content, background, socialLinks, social, onSocia
   content: IntroductionContent & { suitSrc?: string; graduationSrc?: string }
   background?: AboutContent | null
   socialLinks: SocialLink[]
-  social: SocialId | null
-  onSocialSelect: (social: SocialId) => void
+  social: SocialSelection | null
+  onSocialSelect: (social: SocialSelection) => void
 }) {
   const [isHovered, setIsHovered] = useState(false)
   const [isPinned, setIsPinned] = useState(false)

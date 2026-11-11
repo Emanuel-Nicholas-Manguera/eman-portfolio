@@ -43,7 +43,7 @@ export function Contact({ content, socialLinks }: { content: ContactContent; soc
           </a>
           {socialLinks.length > 0 && <nav className="contact-socials" aria-label="More ways to connect">
             {socialLinks.map((link) => (
-              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={`${link.label} (opens in a new tab)`}>
+              <a key={link.id} href={link.href} target="_blank" rel="noopener noreferrer" aria-label={`${link.label} (opens in a new tab)`}>
                 {link.label}<ContactArrow />
               </a>
             ))}

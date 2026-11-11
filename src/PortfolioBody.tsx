@@ -4,7 +4,7 @@ import { Projects } from './Projects'
 import { Contact } from './Contact'
 import type { PortfolioData } from './cms/portfolio'
 import { resolveSocialLinks } from './cms/content'
-import { profileSocials, type SocialId } from './socialData'
+import { profileSocials, type SocialSelection } from './socialData'
 export function PortfolioBody({
   data,
   introductionReady = true,
@@ -13,13 +13,13 @@ export function PortfolioBody({
 }: {
   introductionReady?: boolean
   data: PortfolioData
-  social: SocialId | null
-  onSocialSelect: (id: SocialId) => void
+  social: SocialSelection | null
+  onSocialSelect: (id: SocialSelection) => void
 }) {
   const socialLinks = profileSocials(resolveSocialLinks(data.introduction?.socialLinks, data.contact))
   const contactLinks = data.introduction?.socialLinks === undefined
-    ? ['linkedin', 'github', 'facebook'].flatMap((id) => socialLinks.filter((link) => link.id === id))
-    : socialLinks.filter((link) => link.id !== 'gmail')
+    ? ['linkedin', 'github', 'facebook'].flatMap((id) => socialLinks.filter((link) => link.platform === id))
+    : socialLinks.filter((link) => link.platform !== 'gmail')
   return (
     <>
       {data.introduction && (

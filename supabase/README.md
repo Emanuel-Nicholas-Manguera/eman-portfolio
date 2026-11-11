@@ -196,7 +196,9 @@ References: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/ro
 
 The owner dashboard at `/admin/myself` now manages introduction, experience,
 projects, contact details, social links, and images. Manage social icons in
-**Introduction → Social links**. Published Introduction records without a social
+**Introduction → Social links**. The platform picker supports multiple accounts
+per platform. Use **Other website** for any additional profile URL and set a display
+name to distinguish accounts. Published Introduction records without a social
 list use the published Contact links until you publish an edited list. Contact uses
 the same profile links and has its own email field. On Overview, **Import existing
 portfolio** copies the original

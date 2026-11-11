@@ -13,7 +13,7 @@ import type {
   ExperienceContent,
   ProjectContent,
 } from '../cms/content'
-import type { SocialId } from '../socialData'
+import type { SocialSelection } from '../socialData'
 import { assetIds, validateContent } from '../cms/content'
 import { saveDocument, publishDocument, archiveDocument } from './cms'
 
@@ -50,7 +50,7 @@ export function CmsEditor({
     [message, setMessage] = useState(''),
     [failure, setFailure] = useState(false)
   const [preview, setPreview] = useState(false),
-    [social, setSocial] = useState<SocialId | null>(null)
+    [social, setSocial] = useState<SocialSelection | null>(null)
   const dialog = useRef<HTMLDialogElement>(null)
   const dirty = JSON.stringify(doc) !== JSON.stringify(baseline)
   useEffect(() => {
@@ -298,7 +298,7 @@ export function CmsEditor({
         <div
           className="portfolio ss-preview-site"
           data-theme={theme}
-          data-social={social ?? undefined}
+          data-social={social?.platform}
         >
           <main className="main-content">
             <PortfolioBody

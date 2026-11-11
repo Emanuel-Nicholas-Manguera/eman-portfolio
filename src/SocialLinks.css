@@ -50,6 +50,10 @@
   border-radius: 7px;
   background: var(--header-background);
   color: var(--text);
+  width: max-content;
+  max-width: 120px;
+  overflow-wrap: anywhere;
+  text-align: center;
   font-size: 11px;
   line-height: 1.4;
   opacity: 0;
@@ -119,7 +123,7 @@
   --action-text: #19222b;
   --focus-color: #c4d1df;
 }
-.portfolio[data-theme]:is([data-social='linkedin'], [data-social='facebook']) {
+.portfolio[data-theme]:is([data-social='linkedin'], [data-social='facebook'], [data-social='discord']) {
   --text: #103451;
   --muted-text: #345977;
   --accent: #0866b0;
@@ -130,7 +134,7 @@
   --action-text: #fff;
   --focus-color: #0a66c2;
 }
-.portfolio[data-theme='dark']:is([data-social='linkedin'], [data-social='facebook']) {
+.portfolio[data-theme='dark']:is([data-social='linkedin'], [data-social='facebook'], [data-social='discord']) {
   --text: #ecf6ff;
   --muted-text: #b6d2e9;
   --accent: #8ecbff;
@@ -185,6 +189,9 @@
 .social-wallpaper--x::after { background: radial-gradient(ellipse at 72% 85%, #354050, transparent 72%), #101217; }
 .social-wallpaper--instagram { background: radial-gradient(ellipse at 72% 85%, #efa396, transparent 72%), #fff0eb; }
 .social-wallpaper--instagram::after { background: radial-gradient(ellipse at 72% 85%, #863849, transparent 72%), #301a23; }
+.social-wallpaper--discord { background: radial-gradient(ellipse at 72% 85%, #a4b8ef, transparent 72%), #e9eefc; }
+.social-wallpaper--discord::after { background: radial-gradient(ellipse at 72% 85%, #374d9a, transparent 72%), #111a36; }
+[data-social='discord'] .social-wallpaper--discord,
 [data-social='x'] .social-wallpaper--x,
 [data-social='instagram'] .social-wallpaper--instagram,
 [data-social='github'] .social-wallpaper--github,

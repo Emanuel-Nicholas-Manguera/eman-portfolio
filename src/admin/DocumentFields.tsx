@@ -1,6 +1,5 @@
 import { AdminIcon as Icon } from './AdminIcon'
-import { socialProfiles } from '../socialData'
-import { resolveSocialLinks, socialPlatforms, type SocialProfile } from '../cms/content'
+import { identifySocialLinks, resolveSocialLinks, socialLabelLimit, socialPlatforms, type SocialPlatform, type SocialProfileEntry } from '../cms/content'
 import type {
   CmsDocument,
   CmsAsset,
@@ -26,6 +25,7 @@ function Field({
   multiline = false,
   type = 'text',
   required = false,
+  maxLength,
 }: {
   label: string
   value: string
@@ -33,6 +33,7 @@ function Field({
   multiline?: boolean
   type?: string
   required?: boolean
+  maxLength?: number
 }) {
   return (
     <label className="ss-field">
@@ -43,6 +44,7 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           rows={4}
           required={required}
+          maxLength={maxLength}
         />
       ) : (
         <input
@@ -50,6 +52,7 @@ function Field({
           type={type}
           onChange={(e) => onChange(e.target.value)}
           required={required}
+          maxLength={maxLength}
         />
       )}
     </label>
@@ -166,55 +169,62 @@ function ImageChoice({
     </div>
   )
 }
+const platformOptions = Object.keys(socialPlatforms) as SocialPlatform[]
+
 function SocialFields({ links, onChange }: {
-  links: SocialProfile[]
-  onChange: (links: SocialProfile[]) => void
+  links: SocialProfileEntry[]
+  onChange: (links: SocialProfileEntry[]) => void
 }) {
-  const available = socialProfiles.filter(({ id }) => !links.some((link) => link.platform === id))
   function move(index: number, offset: -1 | 1) {
     const next = [...links]
     const [link] = next.splice(index, 1)
     next.splice(index + offset, 0, link)
     onChange(next)
   }
-  function update(platform: SocialProfile['platform'], patch: Partial<Pick<SocialProfile, 'destination' | 'caption'>>) {
-    onChange(links.map((link) => link.platform === platform ? { ...link, ...patch } : link))
+  function update(id: string, patch: Partial<Pick<SocialProfileEntry, 'destination' | 'caption' | 'label'>>) {
+    onChange(links.map((link) => link.id === id ? { ...link, ...patch } : link))
   }
   return (
     <details className="ss-editor-disclosure ss-social-fields">
       <summary>Social links</summary>
       <label className="ss-field ss-social-add">
         Add social link
-        <select value="" disabled={!available.length} onChange={(event) => {
-          const platform = available.find(({ id }) => id === event.target.value)
-          if (platform) onChange([...links, { platform: platform.id, destination: '', caption: '' }])
+        <select value="" onChange={(event) => {
+          const platform = platformOptions.find((id) => id === event.target.value)
+          if (platform) onChange([...links, { id: crypto.randomUUID(), platform, destination: '', caption: '' }])
         }}>
-          <option value="">{available.length ? 'Choose a platform' : 'All platforms added'}</option>
-          {available.map(({ id, label }) => <option key={id} value={id}>{label}</option>)}
+          <option value="">Choose a platform</option>
+          {platformOptions.map((platform) => <option key={platform} value={platform}>{socialPlatforms[platform]}</option>)}
         </select>
       </label>
-      {links.map(({ platform, destination, caption }, index) => {
-        const label = socialPlatforms[platform]
+      {links.map(({ id, platform, destination, caption, label }, index) => {
+        const platformLabel = socialPlatforms[platform]
+        const heading = label?.trim() || platformLabel
+        const destinationLabel = platform === 'gmail' ? 'Gmail email address'
+          : platform === 'discord' ? 'Discord invite or profile URL'
+          : platform === 'website' ? 'Website URL'
+          : `${platformLabel} profile URL`
         return (
-          <fieldset key={platform} className="ss-social-profile">
-            <legend>{label}</legend>
+          <fieldset key={id} className="ss-social-profile">
+            <legend>{heading}</legend>
             <div className="ss-social-profile-fields">
               <Field
-                label={platform === 'gmail' ? 'Gmail email address' : `${label} profile URL`}
+                label={destinationLabel}
                 type={platform === 'gmail' ? 'email' : 'url'}
                 value={destination}
-                onChange={(destination) => update(platform, { destination })}
+                onChange={(destination) => update(id, { destination })}
               />
-              <Field label="Click caption (optional)" value={caption} onChange={(caption) => update(platform, { caption })} />
+              <Field label="Display name (optional)" maxLength={socialLabelLimit} value={label ?? ''} onChange={(label) => update(id, { label })} />
+              <Field label="Click caption (optional)" value={caption} onChange={(caption) => update(id, { caption })} />
             </div>
             <div className="ss-row-actions">
-              <button type="button" disabled={index === 0} onClick={() => move(index, -1)} aria-label={`Move ${label} up`}>
+              <button type="button" disabled={index === 0} onClick={() => move(index, -1)} aria-label={`Move ${heading} up`}>
                 <Icon name="up" /> Move up
               </button>
-              <button type="button" disabled={index === links.length - 1} onClick={() => move(index, 1)} aria-label={`Move ${label} down`}>
+              <button type="button" disabled={index === links.length - 1} onClick={() => move(index, 1)} aria-label={`Move ${heading} down`}>
                 <Icon name="down" /> Move down
               </button>
-              <button type="button" onClick={() => onChange(links.filter((link) => link.platform !== platform))} aria-label={`Remove ${label}`}>
+              <button type="button" onClick={() => onChange(links.filter((link) => link.id !== id))} aria-label={`Remove ${heading}`}>
                 <Icon name="trash" /> Remove
               </button>
             </div>
@@ -266,7 +276,7 @@ export function DocumentFields({ value, publishedContact, assets, onChange, onUp
       return (
         <>
           <SocialFields
-            links={c.socialLinks ?? resolveSocialLinks(undefined, publishedContact)}
+            links={c.socialLinks === undefined ? resolveSocialLinks(undefined, publishedContact) : identifySocialLinks(c.socialLinks)}
             onChange={(socialLinks) => onChange({ ...c, socialLinks })}
           />
           <div className="ss-editor-grid">
