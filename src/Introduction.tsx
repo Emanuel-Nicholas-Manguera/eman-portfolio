@@ -208,7 +208,7 @@ function makeNameFrames(name: string) {
   const second = rest.join(' ')
   const frames = [{ at: 0, first: '', second: '' }]
   let at = 0
-  const add = (first: string, second: string, delay = 80) => {
+  const add = (first: string, second: string, delay = 100) => {
     at += delay
     frames.push({ at, first, second })
   }
@@ -225,13 +225,14 @@ function makeNameFrames(name: string) {
   return frames
 }
 
-function TypingName({ name }: { name: string }) {
+function TypingName({ name, ready }: { name: string; ready: boolean }) {
   const [first, ...rest] = name.split(' ')
   const second = rest.join(' ')
   const [nameFrames] = useState(() => makeNameFrames(name))
   const [frame, setFrame] = useState(nameFrames[0])
 
   useEffect(() => {
+    if (!ready) return
     const startedAt = performance.now()
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const finalFrame = nameFrames[nameFrames.length - 1]
@@ -266,7 +267,7 @@ function TypingName({ name }: { name: string }) {
       motion.removeEventListener('change', finish)
       document.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [nameFrames])
+  }, [nameFrames, ready])
 
   return (
     <h1 id="intro-title" aria-label={name}>
@@ -282,7 +283,8 @@ function TypingName({ name }: { name: string }) {
   )
 }
 
-export function Introduction({ content, background, contact, social, onSocialSelect }: {
+export function Introduction({ content, background, contact, social, onSocialSelect, ready = true }: {
+  ready?: boolean
   content: IntroductionContent & { suitSrc?: string; graduationSrc?: string }
   background?: AboutContent | null
   contact: ContactContent | null
@@ -337,7 +339,7 @@ export function Introduction({ content, background, contact, social, onSocialSel
           </svg>
           {content.location}
         </p>
-        <TypingName key={content.name} name={content.name} />
+        <TypingName key={content.name} name={content.name} ready={ready} />
         <div ref={bioRef} className="intro-bio">
           <div className="intro-bio-panel" aria-hidden={isRevealed}>
             <p className="intro-role">{content.role}</p>

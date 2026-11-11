@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { PortfolioBody } from './PortfolioBody'
 import { usePortfolio } from './cms/usePortfolio'
+import { PortfolioLoading } from './PortfolioLoading'
+import { usePortfolioStartup } from './usePortfolioStartup'
 import { HeaderNavigation } from './HeaderNavigation'
 import './App.css'
 import type { SocialId } from './socialData'
@@ -9,6 +11,7 @@ type Theme = 'light' | 'dark'
 
 function App() {
   const {data,failed} = usePortfolio()
+  const startup = usePortfolioStartup(!!data, failed, data?.introduction?.suitSrc)
   const navigation = [ ...(data?.experiences.length ? ['Experience'] : []), ...(data?.projects.length ? ['Projects'] : []), ...(data?.contact ? ['Contact'] : []) ]
   const [theme, setTheme] = useState<Theme>('light')
   const [social, setSocial] = useState<SocialId | null>(null)
@@ -89,6 +92,8 @@ function App() {
         ))}
       </div>
 
+      <PortfolioLoading phase={startup.phase} />
+      <div className="portfolio-content" data-ready={startup.revealed} data-revealing={startup.phase === 'revealing'} inert={!startup.revealed} aria-hidden={!startup.revealed}>
       <header ref={headerRef} className="site-header" data-floating={isFloating}>
         <div className="header-content">
           <a
@@ -184,8 +189,9 @@ function App() {
       </header>
 
       <main className="main-content">
-        {data ? <PortfolioBody data={data} social={social} onSocialSelect={setSocial} /> : <p className="portfolio-loading" role="status">{failed ? 'The portfolio is temporarily unavailable. Please refresh to try again.' : 'Loading portfolio…'}</p>}
+        {data ? <PortfolioBody introductionReady={startup.revealed} data={data} social={social} onSocialSelect={setSocial} /> : <p className="portfolio-loading" role="status">{failed || startup.timedOut ? 'The portfolio is temporarily unavailable. Please refresh to try again.' : ''}</p>}
       </main>
+      </div>
     </div>
   )
 }

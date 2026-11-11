@@ -6,9 +6,11 @@ import type { PortfolioData } from './cms/portfolio'
 import type { SocialId } from './socialData'
 export function PortfolioBody({
   data,
+  introductionReady = true,
   social,
   onSocialSelect,
 }: {
+  introductionReady?: boolean
   data: PortfolioData
   social: SocialId | null
   onSocialSelect: (id: SocialId) => void
@@ -17,6 +19,7 @@ export function PortfolioBody({
     <>
       {data.introduction && (
         <Introduction
+          ready={introductionReady}
           content={data.introduction}
           background={data.about}
           contact={data.contact}
