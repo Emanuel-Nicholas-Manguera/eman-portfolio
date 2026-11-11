@@ -118,7 +118,7 @@
   --action-text: #19222b;
   --focus-color: #c4d1df;
 }
-.portfolio[data-theme][data-social='linkedin'] {
+.portfolio[data-theme]:is([data-social='linkedin'], [data-social='facebook']) {
   --text: #103451;
   --muted-text: #345977;
   --accent: #0866b0;
@@ -129,7 +129,7 @@
   --action-text: #fff;
   --focus-color: #0a66c2;
 }
-.portfolio[data-theme='dark'][data-social='linkedin'] {
+.portfolio[data-theme='dark']:is([data-social='linkedin'], [data-social='facebook']) {
   --text: #ecf6ff;
   --muted-text: #b6d2e9;
   --accent: #8ecbff;
@@ -178,9 +178,12 @@
 .social-wallpaper--linkedin::after { background: radial-gradient(ellipse at 72% 85%, #085e9d, transparent 72%), #071c30; }
 .social-wallpaper--gmail { background: radial-gradient(ellipse at 72% 85%, #e4a5a1, transparent 72%), #f9e9e8; }
 .social-wallpaper--gmail::after { background: radial-gradient(ellipse at 72% 85%, #873d45, transparent 72%), #25171c; }
+.social-wallpaper--facebook { background: radial-gradient(ellipse at 72% 85%, #78aaff, transparent 72%), #e6efff; }
+.social-wallpaper--facebook::after { background: radial-gradient(ellipse at 72% 85%, #164c9e, transparent 72%), #101d34; }
 [data-social='github'] .social-wallpaper--github,
 [data-social='linkedin'] .social-wallpaper--linkedin,
 [data-social='gmail'] .social-wallpaper--gmail,
+[data-social='facebook'] .social-wallpaper--facebook,
 [data-theme='dark'] .social-wallpaper::after { opacity: 1; }
 
 .portfolio[data-social] .experience {

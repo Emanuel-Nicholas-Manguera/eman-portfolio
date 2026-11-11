@@ -1,39 +1,26 @@
 import githubLogo from './assets/socials/github.svg'
 import linkedinLogo from './assets/socials/linkedin.svg'
 import gmailLogo from './assets/socials/gmail.svg'
+import facebookLogo from './assets/socials/facebook.svg'
+import type { ContactContent } from './cms/content'
 
-export type SocialId = 'github' | 'linkedin' | 'gmail'
+export const socialProfiles = [
+  { id: 'github', label: 'GitHub', logo: githubLogo },
+  { id: 'linkedin', label: 'LinkedIn', logo: linkedinLogo },
+  { id: 'gmail', label: 'Gmail', logo: gmailLogo },
+  { id: 'facebook', label: 'Facebook', logo: facebookLogo },
+] as const
 
-export const socials: {
-  id: SocialId
-  label: string
-  logo: string
-  href: string
-  caption: string
-}[] = [
-  {
-    id: 'github',
-    label: 'GitHub',
-    logo: githubLogo,
-    href: 'https://github.com/Emanuel-Nicholas-Manguera',
-    caption: 'Explore what I’m building.',
-  },
-  {
-    id: 'linkedin',
-    label: 'LinkedIn',
-    logo: linkedinLogo,
-    href: 'https://www.linkedin.com/in/emanuel-nicholas-manguera-556327351/',
-    caption: 'Let’s connect professionally.',
-  },
-  {
-    id: 'gmail',
-    label: 'Gmail',
-    logo: gmailLogo,
-    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=emanuel.nicholas.nm%40gmail.com',
-    caption: 'Have something in mind? Let’s talk.',
-  },
-]
+export type SocialId = (typeof socialProfiles)[number]['id']
+export type SocialLink = (typeof socialProfiles)[number] & { href: string; caption: string }
 
-export function profileSocials(contact: import('./cms/content').ContactContent): typeof socials {
-  return socials.map(s => ({...s, href: s.id === 'gmail' ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}` : contact[s.id], caption: contact[`${s.id}Caption`]})).filter(s => !!s.href)
+export function profileSocials(contact: ContactContent): SocialLink[] {
+  return socialProfiles.map((profile) => {
+    const { id } = profile
+    const href = id === 'gmail'
+      ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contact.email)}`
+      : contact[id]
+    const caption = id === 'facebook' ? 'Connect with me on Facebook.' : contact[`${id}Caption`]
+    return { ...profile, href, caption }
+  }).filter((profile) => !!profile.href)
 }

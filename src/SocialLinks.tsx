@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
-import { type socials, type SocialId } from './socialData'
+import type { SocialLink, SocialId } from './socialData'
 import './SocialLinks.css'
 
 type Props = {
-  items: typeof socials
+  items: SocialLink[]
   selected: SocialId | null
   onSelect: (social: SocialId) => void
 }

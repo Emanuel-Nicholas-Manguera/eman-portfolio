@@ -7,7 +7,7 @@ import { usePortfolioActivity } from './usePortfolioActivity'
 import { usePortfolioStartup } from './usePortfolioStartup'
 import { HeaderNavigation } from './HeaderNavigation'
 import './App.css'
-import type { SocialId } from './socialData'
+import { socialProfiles, type SocialId } from './socialData'
 
 type Theme = 'light' | 'dark'
 const introductionPath = '/introduction'
@@ -128,7 +128,7 @@ function App() {
   return (
     <div className="portfolio" data-theme={theme} data-social={social ?? undefined} id="introduction" tabIndex={-1}>
       <div className="wallpaper" aria-hidden="true">
-        {(['github', 'linkedin', 'gmail'] as const).map((id) => (
+        {socialProfiles.map(({ id }) => (
           <div key={id} className={`social-wallpaper social-wallpaper--${id}`} />
         ))}
       </div>

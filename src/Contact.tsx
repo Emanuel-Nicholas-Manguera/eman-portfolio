@@ -16,7 +16,8 @@ export function Contact({ content }: { content: ContactContent }) {
   const email = content.email
   const socials = profileSocials(content)
   const gmail = socials.find(s => s.id === 'gmail')!
-  const contactLinks = [...socials.filter(s=>s.id==='linkedin'||s.id==='github').reverse(), ...(content.facebook ? [{label:'Facebook',href:content.facebook}] : [])]
+  const contactLinks = ['linkedin', 'github', 'facebook']
+    .flatMap((id) => socials.filter((social) => social.id === id))
   const sectionRef = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
 
