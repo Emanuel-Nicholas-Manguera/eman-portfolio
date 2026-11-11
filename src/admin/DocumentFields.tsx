@@ -432,10 +432,6 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
       const c = value.content as AboutContent
       return (
         <>
-          <div className="ss-editor-fields">
-            {text(c, 'heading', 'Expand button label', false, 'text', true)}
-            {text(c, 'description', 'Background summary (optional)', true)}
-          </div>
           <details className="ss-editor-disclosure">
             <summary>Education <span>{c.education.length}</span></summary>
           <Repeater
@@ -472,13 +468,17 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
           {text(c, 'location', 'Location')}
           {text(c, 'heading', 'Contact heading')}
           {text(c, 'description', 'Invitation', true)}
-          {text(c, 'email', 'Email', false, 'email', true)}
-          {text(c, 'github', 'GitHub URL', false, 'url')}
-          {text(c, 'linkedin', 'LinkedIn URL', false, 'url')}
-          {text(c, 'facebook', 'Facebook URL', false, 'url')}
-          {text(c, 'githubCaption', 'GitHub click caption')}
-          {text(c, 'linkedinCaption', 'LinkedIn click caption')}
-          {text(c, 'gmailCaption', 'Gmail click caption')}
+          <fieldset className="ss-editor-fieldset ss-social-fields">
+            <legend>Social buttons</legend>
+            <p>These links also appear as icons in the Introduction. Leave a profile URL blank to hide its icon.</p>
+            {text(c, 'email', 'Email', false, 'email', true)}
+            {text(c, 'github', 'GitHub URL', false, 'url')}
+            {text(c, 'linkedin', 'LinkedIn URL', false, 'url')}
+            {text(c, 'facebook', 'Facebook URL', false, 'url')}
+            {text(c, 'githubCaption', 'GitHub click caption')}
+            {text(c, 'linkedinCaption', 'LinkedIn click caption')}
+            {text(c, 'gmailCaption', 'Gmail click caption')}
+          </fieldset>
         </div>
       )
     }

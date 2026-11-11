@@ -650,6 +650,17 @@
   margin: 0;
   min-width: 0;
 }
+.admin-dashboard .ss-social-fields legend {
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.admin-dashboard .ss-social-fields > p {
+  margin: 6px 0 18px;
+  color: var(--ss-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
 .admin-dashboard .ss-document-meta {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 140px;
