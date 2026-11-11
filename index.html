@@ -6,6 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Emanuel Nicholas Manguera's software development portfolio." />
     <title>Emanuel Nicholas Manguera | Software Developer</title>
+    <script>
+      (() => {
+        if (location.pathname !== '/' && location.pathname !== '/index.html') return
+        if (performance.getEntriesByType('navigation')[0]?.type !== 'reload') return
+
+        // Run before the portfolio mounts so the browser can't restore a section on reload.
+        const previousRestoration = history.scrollRestoration
+        history.scrollRestoration = 'manual'
+        if (location.hash) {
+          history.replaceState(history.state, '', location.pathname + location.search)
+        }
+
+        // Let subsequent back/forward navigation restore positions as usual.
+        window.addEventListener('pageshow', () => {
+          window.setTimeout(() => { history.scrollRestoration = previousRestoration }, 0)
+        }, { once: true })
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

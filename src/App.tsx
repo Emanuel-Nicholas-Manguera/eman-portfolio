@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { PortfolioBody } from './PortfolioBody'
 import { usePortfolio } from './cms/usePortfolio'
 import { PortfolioLoading } from './PortfolioLoading'
@@ -20,7 +20,21 @@ function App() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const headerRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const initialSection = useRef(window.location.hash)
   const themeAction = `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`
+
+  useLayoutEffect(() => {
+    if (!data || !initialSection.current) return
+    const hash = initialSection.current
+    initialSection.current = ''
+    if (hash !== window.location.hash) return
+    if (performance.getEntriesByType('navigation').some(
+      (entry) => (entry as PerformanceNavigationTiming).type === 'back_forward',
+    )) return
+
+    // The browser may have looked for the linked section before React mounted it.
+    document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'instant' })
+  }, [data])
 
   useEffect(() => {
     const updateHeader = () => {
