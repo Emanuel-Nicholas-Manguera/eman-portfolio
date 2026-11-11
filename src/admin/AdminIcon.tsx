@@ -1,4 +1,5 @@
 const paths: Record<string, string> = {
+  refresh: 'M20 7v5h-5M20 12a8 8 0 1 0-2.3 5.7',
   overview: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
   user: 'M20 21v-2a8 8 0 0 0-16 0v2M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
   work: 'M8 6V3h8v3M3 6h18v14H3zM3 11l9 4 9-4',

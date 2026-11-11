@@ -1,3 +1,4 @@
+import { AdminIcon } from './AdminIcon'
 import { useEffect, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import './PortfolioActivity.css'
@@ -27,8 +28,8 @@ function dayLabel(day: string) {
 
 export function PortfolioActivity({ client }: { client: SupabaseClient }) {
   const [range, setRange] = useState<7 | 30>(7)
-  const [days] = useState(recentDays)
-  const [result, setResult] = useState<{ rows: ActivityRow[]; failed: boolean } | null>(null)
+  const [days, setDays] = useState(recentDays)
+  const [result, setResult] = useState<{ days: string[]; rows: ActivityRow[]; failed: boolean } | null>(null)
 
   useEffect(() => {
     const request = new AbortController()
@@ -41,15 +42,16 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
           .lte('activity_day', days[days.length - 1])
           .abortSignal(request.signal)
         if (error) throw error
-        if (!request.signal.aborted) setResult({ rows: data, failed: false })
+        if (!request.signal.aborted) setResult({ days, rows: data, failed: false })
       } catch {
-        if (!request.signal.aborted) setResult({ rows: [], failed: true })
+        if (!request.signal.aborted) setResult({ days, rows: [], failed: true })
       }
     })()
     return () => request.abort()
   }, [client, days])
 
-  const selectedDays = days.slice(-range)
+  const refreshing = result?.days !== days
+  const selectedDays = (result?.days ?? days).slice(-range)
   const lastDay = selectedDays[selectedDays.length - 1]
   const rows = result?.rows.filter((row) => row.activity_day >= selectedDays[0]) ?? []
   const viewsByDay = new Map(rows.filter((row) => row.event_key === 'page_view').map((row) => [row.activity_day, row.total]))
@@ -69,14 +71,25 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
           <h2 id="portfolio-activity-heading">Portfolio activity</h2>
           <p>{dayLabel(selectedDays[0])} – {dayLabel(lastDay)} · Philippine time</p>
         </div>
-        <div className="ss-activity-range" role="group" aria-label="Activity date range">
-          <button type="button" aria-pressed={range === 7} onClick={() => setRange(7)}>7 days</button>
-          <button type="button" aria-pressed={range === 30} onClick={() => setRange(30)}>30 days</button>
+        <div className="ss-activity-controls">
+          <div className="ss-activity-range" role="group" aria-label="Activity date range">
+            <button type="button" aria-pressed={range === 7} onClick={() => setRange(7)}>7 days</button>
+            <button type="button" aria-pressed={range === 30} onClick={() => setRange(30)}>30 days</button>
+          </div>
+          <button
+            type="button"
+            className="ss-secondary ss-activity-refresh"
+            aria-label="Refresh portfolio activity"
+            disabled={refreshing}
+            onClick={() => setDays(recentDays())}
+          >
+            <AdminIcon name="refresh" /> {refreshing ? 'Refreshing…' : 'Refresh'}
+          </button>
         </div>
       </div>
       {!result || result.failed ? (
         <p className="ss-activity-status" role="status">
-          {result?.failed ? 'Portfolio activity is unavailable right now.' : 'Loading portfolio activity…'}
+          {refreshing ? 'Loading portfolio activity…' : 'Portfolio activity is unavailable right now.'}
         </p>
       ) : (
         <div className="ss-activity-grid">
