@@ -19,7 +19,7 @@
   overflow: clip;
   color: var(--text);
   color-scheme: light;
-  background: #b7cee2;
+  background: #dce9f7;
   transition:
     color var(--theme-duration) var(--theme-easing),
     background-color var(--theme-duration) var(--theme-easing);
@@ -34,12 +34,12 @@
   background:
     radial-gradient(
       ellipse at 72% 85%,
-      #2d70b0 0,
-      #6497c4 24%,
+      #4f97da 0,
+      #8ebbe6 24%,
       transparent 62%
     ),
-    radial-gradient(ellipse at 14% 14%, #cfdfed 0, transparent 68%),
-    linear-gradient(140deg, #b7cee2, #7da7ca);
+    radial-gradient(ellipse at 14% 14%, #f1f8fc 0, transparent 68%),
+    linear-gradient(140deg, #dce9f7, #a7cbe7);
 }
 
 .portfolio[data-theme='dark'] {
@@ -66,7 +66,7 @@
   background:
     radial-gradient(
       ellipse at 72% 85%,
-      #0b3b6b 0,
+      #104c84 0,
       #092541 25%,
       transparent 64%
     ),
