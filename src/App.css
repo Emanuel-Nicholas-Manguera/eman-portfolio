@@ -55,7 +55,7 @@
   --action-text: #12334f;
 
   color-scheme: dark;
-  background: #030a13;
+  background: #06111e;
 }
 
 .wallpaper::after {
@@ -66,12 +66,12 @@
   background:
     radial-gradient(
       ellipse at 72% 85%,
-      #104c84 0,
-      #092541 25%,
+      #145c9c 0,
+      #103b66 25%,
       transparent 64%
     ),
-    radial-gradient(ellipse at 12% 12%, #0b1b29 0, transparent 65%),
-    #030a13;
+    radial-gradient(ellipse at 12% 12%, #132838 0, transparent 65%),
+    #06111e;
   transition: opacity var(--theme-duration) var(--theme-easing);
 }
 
