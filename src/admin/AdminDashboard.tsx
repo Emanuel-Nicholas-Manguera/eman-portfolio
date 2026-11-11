@@ -72,6 +72,7 @@ export function AdminDashboard({
 }) {
   const [section, setSection] = useState<Section>('Overview'),
     [menuOpen, setMenuOpen] = useState(false)
+  const [ownerMenuOpen, setOwnerMenuOpen] = useState(false)
   const [contents, setContents] = useState<Contents | null>(null),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
@@ -81,6 +82,33 @@ export function AdminDashboard({
     [showArchived, setShowArchived] = useState(false)
   const [asset, setAsset] = useState<CmsAsset | null>(null)
   const workspaceRef = useRef<HTMLDivElement>(null)
+  const ownerMenuRef = useRef<HTMLDivElement>(null)
+  const ownerButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!ownerMenuOpen) return
+
+    function dismissOutside(event: Event) {
+      if (event.target instanceof Node && !ownerMenuRef.current?.contains(event.target)) {
+        setOwnerMenuOpen(false)
+      }
+    }
+    function dismissOnEscape(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return
+      setOwnerMenuOpen(false)
+      ownerButtonRef.current?.focus()
+    }
+
+    document.addEventListener('pointerdown', dismissOutside)
+    document.addEventListener('focusin', dismissOutside)
+    document.addEventListener('keydown', dismissOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', dismissOutside)
+      document.removeEventListener('focusin', dismissOutside)
+      document.removeEventListener('keydown', dismissOnEscape)
+    }
+  }, [ownerMenuOpen])
+
   useLayoutEffect(() => {
     const workspace = workspaceRef.current
     if (workspace) workspace.scrollTop = 0
@@ -137,6 +165,7 @@ export function AdminDashboard({
     setAsset(null)
     setSection(next)
     setMenuOpen(false)
+    setOwnerMenuOpen(false)
     setShowArchived(false)
     setError('')
     setMessage('')
@@ -299,7 +328,10 @@ export function AdminDashboard({
               aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
               aria-expanded={menuOpen}
               aria-controls="studio-navigation"
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={() => {
+                setMenuOpen(!menuOpen)
+                setOwnerMenuOpen(false)
+              }}
             >
               <Icon name={menuOpen ? 'close' : 'menu'} />
             </button>
@@ -336,26 +368,37 @@ export function AdminDashboard({
                 Media library
               </button>
             </nav>
-            <div className="ss-owner">
-              <div className="ss-owner-person">
+            <div className="ss-owner" ref={ownerMenuRef}>
+              <button
+                type="button"
+                className="ss-owner-person"
+                ref={ownerButtonRef}
+                aria-expanded={ownerMenuOpen}
+                aria-controls="studio-owner-actions"
+                onClick={() => setOwnerMenuOpen((open) => !open)}
+              >
                 <span className="ss-avatar">
                   <Icon name="user" />
                 </span>
-                <div>
+                <span className="ss-owner-name">
                   <strong>Emanuel Nicholas</strong>
                   <span>Owner</span>
-                </div>
-              </div>
-              <button
-                className="ss-signout"
-                disabled={busy}
-                onClick={() => {
-                  if (leave()) onSignOut()
-                }}
-              >
-                <Icon name="logout" />
-                Sign out
+                </span>
+                <span className="ss-owner-chevron"><Icon name="chevron" /></span>
               </button>
+              <div className="ss-owner-actions" id="studio-owner-actions" hidden={!ownerMenuOpen}>
+                <button
+                  type="button"
+                  className="ss-signout"
+                  disabled={busy}
+                  onClick={() => {
+                    if (leave()) onSignOut()
+                  }}
+                >
+                  <Icon name="logout" />
+                  Sign out
+                </button>
+              </div>
             </div>
           </div>
         </aside>

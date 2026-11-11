@@ -143,6 +143,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 45px;
 }
 .admin-dashboard .ss-nav {
   width: 100%;
@@ -177,15 +178,32 @@
   color: var(--ss-muted);
 }
 .admin-dashboard .ss-owner {
+  position: relative;
   margin-top: auto;
-  padding-top: 45px;
+  border-top: 1px solid var(--ss-edge);
+  padding-top: 12px;
 }
 .admin-dashboard .ss-owner-person {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 7px;
+  padding: 7px 4px;
+}
+.admin-dashboard .ss-owner-person[aria-expanded='true'] {
+  background: var(--ss-hover);
+}
+.admin-dashboard .ss-owner-chevron {
   display: flex;
-  align-items: center;
-  gap: 9px;
-  border-top: 1px solid var(--ss-edge);
-  padding: 20px 4px 7px;
+  margin-left: auto;
+  color: var(--ss-muted);
+}
+.admin-dashboard .ss-owner-chevron svg {
+  width: 12px;
+  height: 12px;
+  transform: rotate(-90deg);
+}
+.admin-dashboard .ss-owner-person[aria-expanded='true'] .ss-owner-chevron svg {
+  transform: rotate(90deg);
 }
 .admin-dashboard .ss-avatar {
   width: 32px;
@@ -201,17 +219,24 @@
   display: block;
   font-size: 11px;
 }
-.admin-dashboard .ss-owner-person div > span {
-  font-size: 10px;
-  color: var(--ss-muted);
-}
-.admin-dashboard .ss-signout {
+.admin-dashboard .ss-owner-name > span {
   font-size: 11px;
   color: var(--ss-muted);
+}
+.admin-dashboard .ss-owner-actions {
+  position: absolute;
+  z-index: 1;
+  inset: auto 0 calc(100% + 8px);
+  padding: 4px;
+  border: 1px solid var(--ss-edge);
+  border-radius: 12px;
+  background: var(--ss-panel);
+  box-shadow: 0 6px 18px var(--ss-shadow);
+}
+.admin-dashboard .ss-signout {
+  font-size: 13px;
   justify-content: flex-start;
   width: 100%;
-  padding-left: 6px;
-  min-height: 34px;
 }
 .admin-dashboard .ss-workspace {
   min-width: 0;
@@ -404,18 +429,13 @@
   .admin-dashboard .ss-navigation {
     display: none;
     margin-top: 25px;
+    gap: 15px;
   }
   .admin-dashboard[data-menu='open'] .ss-navigation {
     display: flex;
   }
   .admin-dashboard .ss-nav-label {
     margin-top: 20px;
-  }
-  .admin-dashboard .ss-owner {
-    padding-top: 15px;
-  }
-  .admin-dashboard .ss-owner-person {
-    padding-top: 15px;
   }
   .admin-dashboard .ss-toolbar {
     padding: 12px 18px;
@@ -490,8 +510,7 @@
 .admin-dashboard .ss-secondary {
   font-size: 13px;
 }
-.admin-dashboard .ss-nav-label,
-.admin-dashboard .ss-owner-person div > span { font-size: 11px; }
+.admin-dashboard .ss-nav-label { font-size: 11px; }
 .admin-dashboard .ss-owner-person strong {
   font-size: 12px;
 }
