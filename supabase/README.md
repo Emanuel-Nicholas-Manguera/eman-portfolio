@@ -195,11 +195,12 @@ References: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/ro
 ## Content management and public portfolio
 
 The owner dashboard at `/admin/myself` now manages introduction, experience,
-projects, About (education, recognitions, certificates), contact details, and
-images. On the overview, **Import existing portfolio** copies the original
+projects, contact details, social links, and images. Manage the social links in
+**Contact → Social links**. The **Edit social links** button in Introduction opens
+the same editor. On Overview, **Import existing portfolio** copies the original
 React content and five images into Supabase. The importer is idempotent by
-kind/slug and original image filename; it fills missing entries without replacing
-CMS edits. The existing education details are imported as an About draft for review.
+kind/slug and original image filename and fills missing entries while preserving
+CMS edits.
 
 - **Save draft** keeps work private, including incomplete work with a CMS title.
 - **Preview draft** renders it with the public portfolio components in a private

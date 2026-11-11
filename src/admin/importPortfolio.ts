@@ -2,7 +2,6 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   introduction,
   contact,
-  about,
   experiences,
   projects,
   suit,
@@ -47,7 +46,6 @@ export async function importPortfolio(
     title: string,
     content: Content,
     order: number,
-    publish = true,
   ) {
     if (known.has(`${kind}/${slug}`)) return
     const saved = await saveDocument(client, {
@@ -60,7 +58,7 @@ export async function importPortfolio(
       updated_at: '',
       deleted_at: null,
     } as CmsDocument)
-    if (publish) await publishDocument(client, saved.id)
+    await publishDocument(client, saved.id)
     known.add(`${kind}/${slug}`)
   }
   progress('Importing your introduction and portraits…')
@@ -107,7 +105,6 @@ export async function importPortfolio(
       })
     await add('project', project.id, project.name, { ...project, photos }, i)
   }
-  progress('Importing contact and education…')
+  progress('Importing contact and social links…')
   await add('contact', 'contact', 'Contact', contact, 0)
-  await add('about', 'about', 'About', about, 0, false)
 }

@@ -7,7 +7,6 @@ import type {
   IntroductionContent,
   ExperienceContent,
   ProjectContent,
-  AboutContent,
   ContactContent,
 } from '../cms/content'
 
@@ -75,12 +74,10 @@ function Repeater({
   label,
   rows,
   onChange,
-  links = false,
 }: {
   label: string
-  rows: { title: string; detail: string; url?: string }[]
-  onChange: (rows: { title: string; detail: string; url?: string }[]) => void
-  links?: boolean
+  rows: { title: string; detail: string }[]
+  onChange: (rows: { title: string; detail: string }[]) => void
 }) {
   return (
     <section className="ss-repeater">
@@ -110,16 +107,6 @@ function Repeater({
               onChange(rows.map((r, n) => (n === i ? { ...r, detail } : r)))
             }
           />
-          {links && (
-            <Field
-              label="Certificate link"
-              type="url"
-              value={row.url ?? ''}
-              onChange={(url) =>
-                onChange(rows.map((r, n) => (n === i ? { ...r, url } : r)))
-              }
-            />
-          )}
           <div className="ss-row-actions">
             <button
               type="button"
@@ -428,49 +415,13 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
         </div>
       )
     }
-    case 'about': {
-      const c = value.content as AboutContent
-      return (
-        <>
-          <details className="ss-editor-disclosure">
-            <summary>Education <span>{c.education.length}</span></summary>
-          <Repeater
-            label="Education"
-            rows={c.education}
-            onChange={(education) => onChange({ ...c, education })}
-          />
-          </details>
-          <details className="ss-editor-disclosure">
-            <summary>Recognitions <span>{c.recognitions.length}</span></summary>
-          <Repeater
-            label="Recognitions"
-            rows={c.recognitions}
-            onChange={(recognitions) => onChange({ ...c, recognitions })}
-          />
-          </details>
-          <details className="ss-editor-disclosure">
-            <summary>Certificates <span>{c.certificates.length}</span></summary>
-          <Repeater
-            label="Certificates"
-            rows={c.certificates}
-            links
-            onChange={(certificates) => onChange({ ...c, certificates })}
-          />
-          </details>
-        </>
-      )
-    }
     case 'contact': {
       const c = value.content as ContactContent
       return (
-        <div className="ss-editor-fields ss-section-editor">
-          {text(c, 'name', 'Display name', false, 'text', true)}
-          {text(c, 'location', 'Location')}
-          {text(c, 'heading', 'Contact heading')}
-          {text(c, 'description', 'Invitation', true)}
+        <div className="ss-editor-fields">
           <fieldset className="ss-editor-fieldset ss-social-fields">
-            <legend>Social buttons</legend>
-            <p>These links also appear as icons in the Introduction. Leave a profile URL blank to hide its icon.</p>
+            <legend>Social links</legend>
+            <p>Add profile URLs for the icons in Introduction and links in Contact. Leave a profile URL blank to hide it.</p>
             {text(c, 'email', 'Email', false, 'email', true)}
             {text(c, 'github', 'GitHub URL', false, 'url')}
             {text(c, 'linkedin', 'LinkedIn URL', false, 'url')}
@@ -479,6 +430,10 @@ export function DocumentFields({ value, assets, onChange, onUpload }: Props) {
             {text(c, 'linkedinCaption', 'LinkedIn click caption')}
             {text(c, 'gmailCaption', 'Gmail click caption')}
           </fieldset>
+          {text(c, 'name', 'Display name', false, 'text', true)}
+          {text(c, 'location', 'Location')}
+          {text(c, 'heading', 'Contact heading')}
+          {text(c, 'description', 'Invitation', true)}
         </div>
       )
     }

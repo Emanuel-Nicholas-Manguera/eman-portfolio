@@ -32,7 +32,7 @@ const sections: {
   {
     name: 'Introduction',
     kind: 'introduction',
-    detail: 'Profile, education, and recognition',
+    detail: 'Profile and portraits',
     icon: 'user',
   },
   {
@@ -50,7 +50,7 @@ const sections: {
   {
     name: 'Contact',
     kind: 'contact',
-    detail: 'Ways to reach you',
+    detail: 'Email and social links',
     icon: 'mail',
   },
 ]
@@ -141,27 +141,20 @@ export function AdminDashboard({
     setError('')
     setMessage('')
   }
-  function singleton(kind: 'introduction' | 'about' | 'contact') {
+  function singleton(kind: 'introduction' | 'contact') {
     if (!contents) return null
     const existing = contents.documents.find((d) => d.kind === kind && !d.deleted_at)
     if (existing) return existing
     const created = newDocument(kind, 0)
     created.content = blankContent(kind)
-    created.title = kind === 'about' ? 'Background' : kind === 'contact' ? 'Contact' : 'Introduction'
+    created.title = kind === 'contact' ? 'Contact' : 'Introduction'
     return created
-  }
-  function switchIntroduction(kind: 'introduction' | 'about') {
-    if (busy || !leave()) return
-    setDirty(false)
-    setEditor(singleton(kind))
-    setError('')
-    setMessage('')
   }
   function open(doc: CmsDocument) {
     if (!leave()) return
     setDirty(false)
     setEditor(doc)
-    setSection(doc.kind === 'about' ? 'Introduction' : sections.find((s) => s.kind === doc.kind)!.name)
+    setSection(sections.find((s) => s.kind === doc.kind)!.name)
     setError('')
     setMessage('')
   }
@@ -416,17 +409,11 @@ export function AdminDashboard({
               </p>
             )}
             {editor && contents ? (
-              <>
-              {section === 'Introduction' && (
-                <nav className="ss-editor-tabs" aria-label="Introduction editor">
-                  <button aria-current={editor.kind === 'introduction' ? 'page' : undefined} disabled={busy} onClick={() => switchIntroduction('introduction')}>Profile & portraits</button>
-                  <button aria-current={editor.kind === 'about' ? 'page' : undefined} disabled={busy} onClick={() => switchIntroduction('about')}>Education & recognition</button>
-                </nav>
-              )}
               <CmsEditor
                 key={editor.id}
                 initial={editor}
                 sectionTitle={section === 'Introduction' ? 'Introduction' : undefined}
+                onEditSocialLinks={section === 'Introduction' ? () => go('Contact') : undefined}
                 assets={contents.assets}
                 publications={contents.publications}
                 client={client}
@@ -444,7 +431,6 @@ export function AdminDashboard({
                 }}
                 onUpload={(files) => void upload(files)}
               />
-              </>
             ) : (
               <>
                 <div className="ss-heading">
@@ -538,7 +524,7 @@ export function AdminDashboard({
                           {!!contents.documents.length && (
                             <section className="ss-overview" aria-label="Portfolio sections">
                               {sections.map((s) => {
-                                const entries = activeDocs.filter((d) => d.kind === s.kind || (s.kind === 'introduction' && d.kind === 'about'))
+                                const entries = activeDocs.filter((d) => d.kind === s.kind)
                                 const pending = entries.filter((d) => {
                                   const live = contents.publications.find((p) => p.document_id === d.id)
                                   return !live || live.title !== d.title || live.sort_order !== d.sort_order || JSON.stringify(live.content) !== JSON.stringify(d.content)

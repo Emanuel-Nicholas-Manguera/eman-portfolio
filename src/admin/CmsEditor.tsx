@@ -23,6 +23,7 @@ export function CmsEditor({
   publications,
   onSaved,
   onClose,
+  onEditSocialLinks,
   onUpload,
   onDirtyChange,
   onWorkingChange,
@@ -36,6 +37,7 @@ export function CmsEditor({
   publications: Publication[]
   onSaved: (doc: CmsDocument) => Promise<void>
   onClose: () => void
+  onEditSocialLinks?: () => void
   externalBusy: boolean
   onWorkingChange: (busy: boolean) => void
   onDirtyChange: (dirty: boolean) => void
@@ -177,12 +179,14 @@ export function CmsEditor({
   )
   return (
     <>
-      <button className="ss-editor-back" onClick={close}>
-        <Icon name="left" /> Back to {['introduction', 'about', 'contact'].includes(doc.kind) ? 'overview' : doc.kind === 'project' ? 'projects' : 'experience'}
-      </button>
+      {(doc.kind === 'project' || doc.kind === 'experience') && (
+        <button className="ss-editor-back" onClick={close}>
+          <Icon name="left" /> Back to {doc.kind === 'project' ? 'projects' : 'experience'}
+        </button>
+      )}
       <div className="ss-heading">
         <div>
-          <div className="ss-eyebrow">{doc.kind === 'about' ? 'EDUCATION & RECOGNITION' : doc.kind.toUpperCase() + ' EDITOR'}</div>
+          <div className="ss-eyebrow">{doc.kind.toUpperCase()} EDITOR</div>
           <h1>{sectionTitle || doc.title || 'Untitled content'}</h1>
           <p className="ss-lead">
             {published
@@ -190,9 +194,16 @@ export function CmsEditor({
               : 'Only you can see this draft.'}
           </p>
         </div>
-        <button className="ss-secondary" onClick={() => setPreview(true)}>
-          <Icon name="eye" /> Preview draft
-        </button>
+        <div className="ss-editor-heading-actions">
+          {onEditSocialLinks && (
+            <button type="button" className="ss-quiet" disabled={busy || externalBusy} onClick={onEditSocialLinks}>
+              Edit social links <Icon name="right" />
+            </button>
+          )}
+          <button className="ss-secondary" onClick={() => setPreview(true)}>
+            <Icon name="eye" /> Preview draft
+          </button>
+        </div>
       </div>
       <form
         noValidate
