@@ -6,6 +6,7 @@ import { blankContent, assetIds } from '../cms/content'
 import { loadWorkspace, uploadImage, archiveDocument, newDocument } from './cms'
 import { importPortfolio } from './importPortfolio'
 import { CmsEditor } from './CmsEditor'
+import { PortfolioActivity } from './PortfolioActivity'
 import './AdminDashboard.css'
 import './AdminIdle.css'
 import './AdminButtons.css'
@@ -501,6 +502,7 @@ export function AdminDashboard({
                     <>
                       {section === 'Overview' ? (
                         <>
+                          <PortfolioActivity client={client} />
                           {!contents.documents.length && (
                             <div className="ss-import">
                               <h2>Bring your portfolio into the studio.</h2>

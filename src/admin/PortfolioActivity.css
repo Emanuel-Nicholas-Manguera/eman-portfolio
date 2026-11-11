@@ -1,0 +1,56 @@
+.admin-dashboard .ss-activity { margin-bottom: 32px; }
+.admin-dashboard .ss-activity-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.admin-dashboard .ss-activity-heading h2 { font-size: 20px; }
+.admin-dashboard .ss-activity-heading p { color: var(--ss-muted); font-size: 12px; margin-top: 4px; }
+.admin-dashboard .ss-activity-range {
+  display: flex;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--ss-edge);
+  border-radius: 10px;
+  background: var(--ss-rail);
+}
+.admin-dashboard .ss-activity-range button { min-height: 36px; color: var(--ss-muted); font-size: 12px; }
+.admin-dashboard .ss-activity-range button[aria-pressed='true'] { background: var(--ss-active); color: var(--ss-ink); }
+.admin-dashboard .ss-activity-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 16px; }
+.admin-dashboard .ss-activity-card,
+.admin-dashboard .ss-activity-status {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--ss-edge);
+  border-radius: var(--ss-radius);
+  background: var(--ss-panel);
+}
+.admin-dashboard .ss-activity-card h3 { color: var(--ss-muted); font-size: 13px; }
+.admin-dashboard .ss-activity-total { font-size: 34px; line-height: 1.15; letter-spacing: -.03em; margin: 6px 0 18px; font-variant-numeric: tabular-nums; }
+.admin-dashboard :is(.ss-activity-chart, .ss-activity-ranking) { list-style: none; margin: 0; padding: 0; }
+.admin-dashboard .ss-activity-chart {
+  display: flex;
+  gap: clamp(2px, .6vw, 8px);
+  height: 100px;
+  border-bottom: 1px solid var(--ss-edge);
+  background: repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), var(--ss-faint) calc(25% - 1px) 25%);
+}
+.admin-dashboard .ss-activity-chart li { display: flex; align-items: flex-end; justify-content: center; flex: 1; }
+.admin-dashboard .ss-activity-chart span { width: 100%; max-width: 38px; background: var(--ss-accent); border-radius: 3px 3px 0 0; opacity: .8; }
+.admin-dashboard .ss-activity-chart span:hover { opacity: 1; }
+.admin-dashboard .ss-activity-axis,
+.admin-dashboard .ss-activity-ranking li > div:first-child { display: flex; justify-content: space-between; gap: 12px; }
+.admin-dashboard .ss-activity-axis { margin-top: 8px; color: var(--ss-muted); font-size: 11px; }
+.admin-dashboard .ss-activity-ranking { display: grid; gap: 12px; }
+.admin-dashboard .ss-activity-ranking strong { font-variant-numeric: tabular-nums; }
+.admin-dashboard .ss-activity-track { height: 5px; border-radius: 4px; background: var(--ss-faint); margin-top: 5px; }
+.admin-dashboard .ss-activity-track span { display: block; height: 100%; border-radius: inherit; background: var(--ss-accent); }
+@media (max-width: 900px) {
+  .admin-dashboard .ss-activity-grid { grid-template-columns: 1fr; }
+}
+@media (pointer: coarse) {
+  .admin-dashboard .ss-activity-range button { min-height: 44px; }
+}

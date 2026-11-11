@@ -303,6 +303,32 @@ test('CMS database authorization and publishing workflow', async (t) => {
     })
   })
 
+  await t.test('anonymous activity increments only known daily counters, readable only by the MFA owner', async () => {
+    const record = (event) => db.query('select public.record_portfolio_activity($1)', [event])
+    const read = () => rows('select event_key, total::integer as total, activity_day = (now() at time zone \'Asia/Manila\')::date as today from public.portfolio_activity_daily order by event_key')
+    await visitor(async () => {
+      await record('page_view')
+      await record('page_view')
+      await record('projects')
+      await assert.rejects(() => record('unexpected'), (e) => e.code === '22023')
+      await assert.rejects(() => record(null), (e) => e.code === '22023')
+      await denied(read)
+      await denied(() => db.query('update public.portfolio_activity_daily set total = 999'))
+    })
+    await stranger(async () => {
+      assert.deepEqual(await read(), [])
+      await denied(() => record('contact'))
+    })
+    await owner(async () => assert.deepEqual(await read(), []), 'aal1')
+    await owner(async () => {
+      assert.deepEqual(await read(), [
+        { event_key: 'page_view', total: 2, today: true },
+        { event_key: 'projects', total: 1, today: true },
+      ])
+      await denied(() => db.query('delete from public.portfolio_activity_daily'))
+    })
+  })
+
   await t.test('disabling or removing the owner binding immediately blocks even AAL2 sessions', async () => {
     await db.exec('update private.cms_owner set enabled = false')
     await owner(async () => {

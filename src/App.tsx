@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { PortfolioBody } from './PortfolioBody'
 import { usePortfolio } from './cms/usePortfolio'
 import { PortfolioLoading } from './PortfolioLoading'
+import { usePortfolioActivity } from './usePortfolioActivity'
 import { usePortfolioStartup } from './usePortfolioStartup'
 import { HeaderNavigation } from './HeaderNavigation'
 import './App.css'
@@ -22,6 +23,7 @@ function App() {
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const initialSection = useRef(window.location.hash)
   const themeAction = `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`
+  usePortfolioActivity(startup.revealed && !!data)
 
   useLayoutEffect(() => {
     if (!data || !initialSection.current) return
