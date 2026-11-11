@@ -83,8 +83,8 @@ removes that tab's stored session. Passwords, TOTP setup secrets, and one-time
 codes are never stored by the application or logged. An enrollment QR/setup key
 exists only in the current screen state and disappears on sign-out or navigation.
 
-The admin signs out the current tab's session after **10 minutes of inactivity**.
-At nine minutes, an inline warning shows the remaining minute and a **Stay signed
+The admin signs out the current tab's session after **60 minutes of inactivity**.
+At 59 minutes, an inline warning shows the remaining minute and a **Stay signed
 in** button. Trusted clicks, typing, and scrolling reset the timer; Auth/token
 refreshes and returning to the tab do not. The activity timestamp and a non-secret
 session identifier are kept in the same tab's `sessionStorage`, so reloads retain

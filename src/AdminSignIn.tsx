@@ -4,6 +4,7 @@ import './AdminSignIn.css'
 import { AdminAuthPanel } from './admin/AdminAuthPanel'
 import { useAdminAuth } from './admin/useAdminAuth'
 import { AdminDashboard } from './admin/AdminDashboard'
+import { ADMIN_IDLE_TIMEOUT_MINUTES } from './admin/idleSession'
 
 export function AdminSignIn() {
   const auth = useAdminAuth()
@@ -54,7 +55,7 @@ export function AdminSignIn() {
         <section className={`admin-sign-in__content${auth.view.stage === 'checking' ? ' admin-sign-in__content--checking' : ''}`} aria-labelledby="sign-in-heading">
           <p className="admin-sign-in__eyebrow">{auth.view.stage === 'checking' ? 'Portfolio studio' : 'Portfolio admin'}</p>
           {auth.idleTimedOut && auth.view.stage !== 'checking' && <p className="admin-sign-in__timeout" role="status">
-            You were signed out after 10 minutes of inactivity. Sign in again to continue.
+            You were signed out after {ADMIN_IDLE_TIMEOUT_MINUTES} minutes of inactivity. Sign in again to continue.
           </p>}
           <AdminAuthPanel auth={auth} />
         </section>

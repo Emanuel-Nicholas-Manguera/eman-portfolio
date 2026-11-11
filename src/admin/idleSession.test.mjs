@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { createAuthController } from './authController.ts'
-import { ADMIN_IDLE_TIMEOUT_MS, createIdleSession, sessionIdFromToken } from './idleSession.ts'
+import { ADMIN_IDLE_TIMEOUT_MS, ADMIN_IDLE_WARNING_MS, createIdleSession, sessionIdFromToken } from './idleSession.ts'
 
+const warningAt = ADMIN_IDLE_TIMEOUT_MS - ADMIN_IDLE_WARNING_MS
 const firstSession = '00000000-0000-4000-8000-000000000001'
 const secondSession = '00000000-0000-4000-8000-000000000002'
 function fixture() {
@@ -21,11 +22,11 @@ function fixture() {
   }
 }
 
-test('warns at nine minutes and expires at exactly ten minutes', () => {
+test('warns at 59 minutes and expires at exactly 60 minutes', () => {
   const f = fixture()
-  assert.equal(ADMIN_IDLE_TIMEOUT_MS, 600_000)
+  assert.equal(ADMIN_IDLE_TIMEOUT_MS, 3_600_000)
   assert.deepEqual(f.idle.start(firstSession), { stage: 'active' })
-  f.advance(539_999)
+  f.advance(warningAt - 1)
   assert.deepEqual(f.idle.status(), { stage: 'active' })
   f.advance(1)
   assert.deepEqual(f.idle.status(), { stage: 'warning', seconds: 60 })
@@ -35,12 +36,12 @@ test('warns at nine minutes and expires at exactly ten minutes', () => {
   assert.deepEqual(f.idle.status(), { stage: 'expired' })
 })
 
-test('user activity and Stay signed in restart the full ten minutes', () => {
+test('user activity and Stay signed in restart the full 60 minutes', () => {
   const f = fixture()
   f.idle.start(firstSession)
-  f.advance(550_000)
+  f.advance(warningAt + 10_000)
   assert.equal(f.idle.touch().stage, 'active')
-  f.advance(539_999)
+  f.advance(warningAt - 1)
   assert.equal(f.idle.status().stage, 'active')
   f.advance(1)
   assert.equal(f.idle.status().stage, 'warning')
@@ -50,7 +51,7 @@ test('focus checks and auth/token refreshes never count as activity', () => {
   const f = fixture()
   f.idle.start(firstSession)
   const original = f.stored().lastActivityAt
-  for (let n = 0; n < 10; n++) {
+  for (let n = 0; n < 60; n++) {
     f.advance(60_000)
     f.idle.status()
     f.idle.start(firstSession)
@@ -62,7 +63,7 @@ test('focus checks and auth/token refreshes never count as activity', () => {
 test('reload preserves the remaining warning and sleep cannot reset an expired timer', () => {
   const f = fixture()
   f.idle.start(firstSession)
-  f.advance(570_000)
+  f.advance(ADMIN_IDLE_TIMEOUT_MS - 30_000)
   assert.deepEqual(f.reload().start(firstSession), { stage: 'warning', seconds: 30 })
   f.advance(31_000)
   assert.deepEqual(f.reload().start(firstSession), { stage: 'expired' })
@@ -72,7 +73,7 @@ test('reload preserves the remaining warning and sleep cannot reset an expired t
 test('late input cannot revive an expired login; a fresh login gets a new timer', () => {
   const f = fixture()
   f.idle.start(firstSession)
-  f.advance(600_001)
+  f.advance(ADMIN_IDLE_TIMEOUT_MS + 1)
   const original = f.stored().lastActivityAt
   assert.equal(f.idle.touch().stage, 'expired')
   assert.equal(f.stored().lastActivityAt, original)
@@ -89,7 +90,7 @@ test('storage failures keep a functioning in-memory timer without exposing error
     write: () => { throw new Error('Storage blocked') },
   })
   assert.equal(idle.start(firstSession).stage, 'active')
-  time += 600_000
+  time += ADMIN_IDLE_TIMEOUT_MS
   assert.equal(idle.status().stage, 'expired')
 })
 
@@ -114,7 +115,7 @@ test('an expired restored session is signed out before any dashboard view is emi
   const f = fixture()
   const ready = { stage: 'ready', email: 'owner@example.test', userId: 'owner', sessionId: firstSession }
   f.idle.start(firstSession)
-  f.advance(600_001)
+  f.advance(ADMIN_IDLE_TIMEOUT_MS + 1)
   const restored = f.reload()
   const views = []
   let signOuts = 0

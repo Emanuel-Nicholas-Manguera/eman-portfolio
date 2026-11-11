@@ -1,4 +1,5 @@
-export const ADMIN_IDLE_TIMEOUT_MS = 10 * 60_000
+export const ADMIN_IDLE_TIMEOUT_MINUTES = 60
+export const ADMIN_IDLE_TIMEOUT_MS = ADMIN_IDLE_TIMEOUT_MINUTES * 60_000
 export const ADMIN_IDLE_WARNING_MS = 60_000
 export const ADMIN_IDLE_STORAGE_KEY = 'portfolio-admin-idle-v1'
 
