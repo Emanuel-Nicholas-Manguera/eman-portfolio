@@ -39,10 +39,14 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
 
   if (view.stage === 'checking') return <AdminLoading />
 
+  const errorMessage = error && <p className="admin-sign-in__error" role="alert">{error}</p>
+  const isCodeForm = view.stage === 'enrolling' || view.stage === 'verify'
+
   return (
     <>
       <h1 id="sign-in-heading">{titles[view.stage]}</h1>
       <p className="admin-sign-in__intro">{descriptions[view.stage]}</p>
+      {view.stage !== 'signedOut' && !isCodeForm && errorMessage}
 
       {view.stage === 'signedOut' && (
         <form className="admin-sign-in__form" aria-busy={busy} onSubmit={(event) => {
@@ -72,6 +76,7 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
               </svg>
             </button>
           </div>
+          {errorMessage}
           <button className="admin-sign-in__submit" type="submit" disabled={busy}>
             {busy ? 'Signing in…' : 'Sign in'}<AdminIcon name="right" />
           </button>
@@ -88,7 +93,7 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
         <details><summary>Can’t scan the code?</summary><p>Enter this setup key in your authenticator:</p><code>{view.secret}</code></details>
       </div>}
 
-      {(view.stage === 'enrolling' || view.stage === 'verify') && (
+      {isCodeForm && (
         <form className="admin-sign-in__form" onSubmit={submitCode} aria-busy={busy}>
           {view.stage === 'verify' && (view.factors.length > 1 ? <>
             <label htmlFor="admin-factor">Authenticator</label>
@@ -127,6 +132,7 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
             </div>
           </div>
           <p id="code-help" className="admin-sign-in__notice">Use the current code from your authenticator app.</p>
+          {errorMessage}
           <button className="admin-sign-in__submit" type="submit" disabled={busy}>{busy ? 'Verifying…' : 'Verify code'}<AdminIcon name="right" /></button>
         </form>
       )}
@@ -135,7 +141,6 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
         disabled={busy} onClick={() => { void auth.refresh() }}>{busy ? 'Checking…' : 'Check access again'}</button>}
 
       {view.stage === 'ready' && <p className="admin-sign-in__identity">Signed in as <strong>{view.email}</strong></p>}
-      {error && <p className="admin-sign-in__error" role="alert">{error}</p>}
     </>
   )
 }
