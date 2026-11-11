@@ -35,7 +35,7 @@ export function Contact({ content }: { content: ContactContent }) {
 
   return (
     <>
-      <section ref={sectionRef} className="contact-section" id="contact" aria-labelledby="contact-title" data-visible={visible}>
+      <section ref={sectionRef} className="contact-section" id="contact" aria-labelledby="contact-title" data-visible={visible} tabIndex={-1}>
         <div className="contact-invitation">
           <p className="section-eyebrow">Contact</p>
           <h2 id="contact-title">{words.slice(0,2).join(' ')}{words.length>2&&<><br />{words.slice(2,-1).join(' ')} <span>{words.at(-1)}</span></>}</h2>

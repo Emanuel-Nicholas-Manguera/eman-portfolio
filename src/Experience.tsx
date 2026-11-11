@@ -63,6 +63,7 @@ export function Experience({ experiences }: { experiences: ExperienceContent[] }
       ref={sectionRef}
       className="experience"
       id="experience"
+      tabIndex={-1}
       aria-labelledby="experience-title"
       data-visible={isVisible}
     >

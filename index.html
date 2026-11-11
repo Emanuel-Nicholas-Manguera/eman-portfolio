@@ -8,14 +8,15 @@
     <title>Emanuel Nicholas Manguera | Software Developer</title>
     <script>
       (() => {
-        if (location.pathname !== '/' && location.pathname !== '/index.html') return
+        if (!/^\/(?:index\.html|introduction\/?)?$/.test(location.pathname)) return
         if (performance.getEntriesByType('navigation')[0]?.type !== 'reload') return
 
         // Run before the portfolio mounts so the browser can't restore a section on reload.
         const previousRestoration = history.scrollRestoration
         history.scrollRestoration = 'manual'
-        if (location.hash) {
-          history.replaceState(history.state, '', location.pathname + location.search)
+        const { portfolioSection, ...state } = history.state ?? {}
+        if (location.hash || portfolioSection) {
+          history.replaceState(state, '', location.pathname + location.search)
         }
 
         // Let subsequent back/forward navigation restore positions as usual.

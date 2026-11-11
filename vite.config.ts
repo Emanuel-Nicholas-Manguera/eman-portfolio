@@ -37,7 +37,7 @@ function localPortfolio(env: Record<string, string>) {
     },
     async transformIndexHtml(html, context) {
       const path = new URL(context.originalUrl ?? context.path, 'http://localhost').pathname
-      if (context.server && (path === '/' || path === '/index.html')) {
+      if (context.server && /^\/(?:index\.html|introduction\/?)?$/.test(path)) {
         return (await renderPage(html)).html
       }
     },

@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import type { MouseEvent } from 'react'
 import { PortfolioBody } from './PortfolioBody'
 import { usePortfolio } from './cms/usePortfolio'
 import { PortfolioLoading } from './PortfolioLoading'
@@ -9,10 +10,12 @@ import './App.css'
 import type { SocialId } from './socialData'
 
 type Theme = 'light' | 'dark'
+const introductionPath = '/introduction'
 
 function App() {
   const {data,failed} = usePortfolio()
-  const startup = usePortfolioStartup(!!data, failed, data?.introduction?.suitSrc)
+  const hasData = !!data
+  const startup = usePortfolioStartup(hasData, failed, data?.introduction?.suitSrc)
   const navigation = [ ...(data?.experiences.length ? ['Experience'] : []), ...(data?.projects.length ? ['Projects'] : []), ...(data?.contact ? ['Contact'] : []) ]
   const [theme, setTheme] = useState<Theme>('light')
   const [social, setSocial] = useState<SocialId | null>(null)
@@ -21,22 +24,44 @@ function App() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const headerRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
-  const initialSection = useRef(window.location.hash)
   const themeAction = `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`
   usePortfolioActivity(startup.revealed && !!data)
 
   useLayoutEffect(() => {
-    if (!data || !initialSection.current) return
-    const hash = initialSection.current
-    initialSection.current = ''
-    if (hash !== window.location.hash) return
-    if (performance.getEntriesByType('navigation').some(
-      (entry) => (entry as PerformanceNavigationTiming).type === 'back_forward',
-    )) return
+    if (!hasData || !startup.revealed) return
 
-    // The browser may have looked for the linked section before React mounted it.
-    document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: 'instant' })
-  }, [data])
+    const openLinkedSection = () => {
+      const hash = window.location.hash
+      const section = document.getElementById(hash === '#top' ? 'introduction' : hash.slice(1))
+      if (!section) return
+
+      // Older section links can arrive before React has rendered their target.
+      section.scrollIntoView({ behavior: 'instant' })
+      const pathname = section.id === 'introduction' ? introductionPath : location.pathname
+      history.replaceState({ ...history.state, portfolioSection: section.id }, '', pathname + location.search)
+    }
+
+    openLinkedSection()
+    window.addEventListener('hashchange', openLinkedSection)
+    return () => window.removeEventListener('hashchange', openLinkedSection)
+  }, [hasData, startup.revealed])
+
+  function navigateSection(event: MouseEvent<HTMLDivElement>) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    if (!(event.target instanceof Element)) return
+    const link = event.target.closest<HTMLAnchorElement>(`a[href^="#"], a[href="${introductionPath}"]`)
+    if (!link) return
+    event.preventDefault()
+    const section = document.getElementById(link.hash ? link.hash.slice(1) : 'introduction')
+    if (!section) return
+
+    const pathname = section.id === 'introduction' ? introductionPath : location.pathname
+    if (history.state?.portfolioSection !== section.id || pathname !== location.pathname) {
+      history.pushState({ ...history.state, portfolioSection: section.id }, '', pathname + location.search)
+    }
+    section.focus({ preventScroll: true })
+    section.scrollIntoView()
+  }
 
   useEffect(() => {
     const updateHeader = () => {
@@ -101,7 +126,7 @@ function App() {
   }, [isMenuOpen])
 
   return (
-    <div className="portfolio" data-theme={theme} data-social={social ?? undefined} id="top">
+    <div className="portfolio" data-theme={theme} data-social={social ?? undefined} id="introduction" tabIndex={-1}>
       <div className="wallpaper" aria-hidden="true">
         {(['github', 'linkedin', 'gmail'] as const).map((id) => (
           <div key={id} className={`social-wallpaper social-wallpaper--${id}`} />
@@ -109,12 +134,12 @@ function App() {
       </div>
 
       <PortfolioLoading phase={startup.phase} />
-      <div className="portfolio-content" data-ready={startup.revealed} data-revealing={startup.phase === 'revealing'} inert={!startup.revealed} aria-hidden={!startup.revealed}>
+      <div className="portfolio-content" data-ready={startup.revealed} data-revealing={startup.phase === 'revealing'} inert={!startup.revealed} aria-hidden={!startup.revealed} onClick={navigateSection}>
       <header ref={headerRef} className="site-header" data-floating={isFloating}>
         <div className="header-content">
           <a
             className="wordmark"
-            href="#top"
+            href={introductionPath}
             aria-label="Emanuel, home"
             onClick={() => setIsMenuOpen(false)}
           >

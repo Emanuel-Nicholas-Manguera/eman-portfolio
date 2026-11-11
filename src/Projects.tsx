@@ -51,7 +51,7 @@ export function Projects({ projects }: { projects: Project[] }) {
     }
   }, [viewerOpen])
 
-  return <section className="projects-section" id="projects" aria-labelledby="projects-title">
+  return <section className="projects-section" id="projects" aria-labelledby="projects-title" tabIndex={-1}>
     <div className="projects-heading">
       <div><p className="section-eyebrow">Selected work</p><h2 id="projects-title">Ideas brought to life.</h2></div>
       <div className="projects-navigation" role="group" aria-label="Browse projects">
