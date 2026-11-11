@@ -50,6 +50,37 @@
   transition: color var(--theme-duration) ease, background-color var(--theme-duration) ease, border-color var(--theme-duration) ease;
 }
 .admin-sign-in__form input::placeholder { color: var(--muted-text); opacity: .8; }
+.admin-sign-in__code { position: relative; }
+.admin-sign-in__code input {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  opacity: 0;
+  cursor: text;
+}
+.admin-sign-in__code-slots {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(6px, 2vw, 10px);
+  pointer-events: none;
+}
+.admin-sign-in__code-slots span {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  border: 1px solid var(--header-border);
+  border-radius: 10px;
+  background: var(--admin-field);
+  font-size: 22px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.admin-sign-in__code:focus-within [data-active='true'] {
+  border-color: var(--focus-color);
+  outline: 2px solid var(--focus-color);
+  outline-offset: 1px;
+}
+.admin-sign-in__code input:disabled + .admin-sign-in__code-slots { opacity: .65; }
 .admin-sign-in__password { position: relative; }
 .admin-sign-in__password input { padding-right: 54px; }
 .admin-sign-in__password button {

@@ -7,6 +7,8 @@ import { AdminLoading } from './AdminLoading'
 export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth> }) {
   const { view, busy, error, client, run } = auth
   const [showPassword, setShowPassword] = useState(false)
+  const [code, setCode] = useState('')
+  const [codePosition, setCodePosition] = useState(0)
   const titles = {
     signedOut: 'Welcome back.', checking: 'Checking sign-in…', unconfigured: 'Sign-in unavailable.',
     error: 'Connection interrupted.', denied: 'Access unavailable.', enroll: 'Secure your account.',
@@ -29,10 +31,10 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
     if (!client || busy || !['enrolling', 'verify'].includes(view.stage)) return
     const fields = new FormData(event.currentTarget)
     const factorId = view.stage === 'enrolling' ? view.factorId : String(fields.get('factor'))
-    const code = String(fields.get('code') ?? '')
-    void run(() => verifyAdminAuthenticator(client, factorId, code), 'Unable to verify that code. Please try again.')
-    const input = event.currentTarget.elements.namedItem('code') as HTMLInputElement
-    input.value = ''
+    const submittedCode = String(fields.get('code') ?? '')
+    void run(() => verifyAdminAuthenticator(client, factorId, submittedCode), 'Unable to verify that code. Please try again.')
+    setCode('')
+    setCodePosition(0)
   }
 
   if (view.stage === 'checking') return <AdminLoading />
@@ -93,8 +95,37 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
             <select id="admin-factor" name="factor" disabled={busy}>{view.factors.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}</select>
           </> : <input type="hidden" name="factor" value={view.factors[0].id} />)}
           <label htmlFor="admin-code">Authenticator code</label>
-          <input id="admin-code" name="code" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6}
-            autoComplete="one-time-code" placeholder="000000" required disabled={busy} aria-describedby="code-help" />
+          <div className="admin-sign-in__code">
+            <input id="admin-code" name="code" type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6}
+              autoComplete="one-time-code" required disabled={busy} aria-describedby="code-help" value={code}
+              onChange={(event) => {
+                const input = event.currentTarget
+                const digits = input.value.replace(/[^0-9]/g, '')
+                setCode(digits)
+                setCodePosition(Math.min(input.selectionStart ?? digits.length, digits.length))
+              }}
+              onSelect={(event) => setCodePosition(event.currentTarget.selectionStart ?? code.length)}
+              onPaste={(event) => {
+                const digits = event.clipboardData.getData('text').replace(/[^0-9]/g, '')
+                if (digits.length !== 6) return
+                event.preventDefault()
+                setCode(digits)
+                setCodePosition(6)
+              }}
+              onClick={(event) => {
+                if (event.detail !== 1) return
+                const input = event.currentTarget
+                const { left, width } = input.getBoundingClientRect()
+                const position = Math.max(0, Math.min(code.length, Math.floor((event.clientX - left) * 6 / width)))
+                input.setSelectionRange(position, position)
+                setCodePosition(position)
+              }} />
+            <div className="admin-sign-in__code-slots" aria-hidden="true">
+              {Array.from({ length: 6 }, (_, index) => (
+                <span key={index} data-active={index === Math.min(codePosition, 5)}>{code[index] || ''}</span>
+              ))}
+            </div>
+          </div>
           <p id="code-help" className="admin-sign-in__notice">Use the current code from your authenticator app.</p>
           <button className="admin-sign-in__submit" type="submit" disabled={busy}>{busy ? 'Verifying…' : 'Verify code'}<AdminIcon name="right" /></button>
         </form>
