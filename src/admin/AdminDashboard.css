@@ -609,6 +609,20 @@
     flex: 1;
   }
 }
+@media (width > 700px) {
+  .admin-dashboard .ss-app {
+    height: 100dvh;
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .admin-dashboard :is(.ss-sidebar, .ss-workspace) {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+  .admin-dashboard .ss-workspace {
+    scrollbar-gutter: stable;
+  }
+}
 .admin-dashboard .ss-field {
   display: block;
   font-size: 13px;

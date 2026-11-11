@@ -1,5 +1,5 @@
 import { AdminIcon as Icon } from './AdminIcon'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CmsDocument, CmsAsset, Publication, Kind } from '../cms/content'
 import { blankContent, assetIds } from '../cms/content'
@@ -80,6 +80,12 @@ export function AdminDashboard({
     [dirty, setDirty] = useState(false),
     [showArchived, setShowArchived] = useState(false)
   const [asset, setAsset] = useState<CmsAsset | null>(null)
+  const workspaceRef = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const workspace = workspaceRef.current
+    if (workspace) workspace.scrollTop = 0
+  }, [section, editor?.id, asset?.id])
+
   const reload = useCallback(async () => {
     const next = await loadWorkspace(client)
     setContents(next)
@@ -360,7 +366,7 @@ export function AdminDashboard({
             </div>
           </div>
         </aside>
-        <div className="ss-workspace">
+        <div className="ss-workspace" ref={workspaceRef}>
           <header className="ss-toolbar">
             <div className="ss-breadcrumb">
               <span>Workspace</span>
