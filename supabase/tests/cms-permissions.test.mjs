@@ -303,6 +303,68 @@ test('CMS database authorization and publishing workflow', async (t) => {
     })
   })
 
+  await t.test('bulk media actions protect draft and public images and resume interrupted deletion', async () => {
+    const displayId = '88888888-8888-4888-8888-888888888888'
+    const sourceId = '99999999-9999-4999-8999-999999999999'
+    const displayPath = `${ownerId}/test-bulk/display.webp`
+    const sourcePath = `${ownerId}/test-bulk/original.png`
+    const ids = [displayId, missingId]
+    const archive = (targets, restore = false) =>
+      db.query('select public.archive_cms_assets($1, $2)', [targets, restore])
+    const prepare = (targets) => rows('select * from public.prepare_cms_asset_deletion($1)', [targets])
+    const complete = (targets) => db.query('select public.complete_cms_asset_deletion($1)', [targets])
+    const states = () => rows('select id, archived_at, deletion_pending from public.cms_assets where id = any($1)', [[...ids, sourceId]])
+
+    await visitor(async () => { await denied(() => prepare(ids)) })
+    await stranger(async () => {
+      await denied(() => archive(ids))
+      await denied(() => prepare(ids))
+      await denied(() => complete(ids))
+    })
+    await owner(async () => { await denied(() => prepare(ids)) }, 'aal1')
+    await owner(async () => {
+      await db.query(`insert into storage.objects (bucket_id, name)
+        values ('portfolio-media', $1), ('portfolio-originals', $2)`, [displayPath, sourcePath])
+      await db.query(`insert into public.cms_assets
+        (id, bucket_id, object_path, original_filename, mime_type, byte_size, original_asset_id)
+        values ($1, 'portfolio-originals', $3, 'test.png', 'image/png', 10, null),
+               ($2, 'portfolio-media', $4, 'test.png', 'image/webp', 10, $1)`,
+      [sourceId, displayId, sourcePath, displayPath])
+
+      await assert.rejects(() => archive([...ids, assetId]), /Remove this image/)
+      await assert.rejects(() => prepare([...ids, assetId]), /Remove this image/)
+      assert.ok((await states()).every((asset) => !asset.archived_at && !asset.deletion_pending))
+      await db.query('select public.publish_cms_document($1)', [docId])
+      await db.query('delete from public.cms_document_assets where document_id = $1', [docId])
+      await assert.rejects(() => prepare([assetId]), /Remove this image/)
+      await db.query('select public.unpublish_cms_document($1)', [docId])
+
+      await archive(ids)
+      assert.ok((await states()).every((asset) => asset.archived_at))
+      await archive(ids, true)
+      assert.ok((await states()).every((asset) => !asset.archived_at))
+      await archive([missingId])
+
+      // In the disposable database, exercise the RLS used by Storage API removal.
+      assert.deepEqual(await rows('delete from storage.objects where name = $1 returning name', [displayPath]), [])
+      const files = await prepare(ids)
+      assert.equal(files.length, 3)
+      assert.ok(files.some((file) => file.object_path === sourcePath && file.bucket_id === 'portfolio-originals'))
+      assert.ok((await states()).every((asset) => asset.deletion_pending))
+      await assert.rejects(() => archive(ids, true), /Finish deleting/)
+      await assert.rejects(() => db.query('insert into public.cms_document_assets (document_id, asset_id) values ($1, $2)', [docId, displayId]), /active image/)
+      await db.query('delete from storage.objects where name = $1', [displayPath])
+      await assert.rejects(() => complete(ids), /still in storage/)
+      assert.equal((await states()).length, 3)
+      assert.equal((await prepare(ids)).length, 3)
+      await db.query('delete from storage.objects where name = $1', [sourcePath])
+      await complete(ids)
+      assert.deepEqual(await states(), [])
+      assert.deepEqual(await prepare(ids), [])
+      await complete(ids)
+    })
+  })
+
   await t.test('anonymous activity increments only known daily counters, readable only by the MFA owner', async () => {
     const record = (event) => db.query('select public.record_portfolio_activity($1)', [event])
     const read = () => rows('select event_key, total::integer as total, activity_day = (now() at time zone \'Asia/Manila\')::date as today from public.portfolio_activity_daily order by event_key')

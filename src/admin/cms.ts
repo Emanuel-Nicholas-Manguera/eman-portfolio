@@ -2,6 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { assetIds, validateContent } from '../cms/content'
 import type { CmsDocument, CmsAsset, Publication, Kind } from '../cms/content'
 
+const mediaBuckets = ['portfolio-media', 'portfolio-originals'] as const
+
 export async function loadWorkspace(client: SupabaseClient) {
   const [docs, assets, publications] = await Promise.all([
     client.from('cms_documents').select('*').order('sort_order').order('id'),
@@ -15,9 +17,10 @@ export async function loadWorkspace(client: SupabaseClient) {
     throw new Error('We couldn’t load your workspace. Please try again.')
   const media = assets.data as CmsAsset[]
   await Promise.all(
-    ['portfolio-media', 'portfolio-originals'].map(async (bucket) => {
+    mediaBuckets.map(async (bucket) => {
       const group = media.filter(
-        (a) => a.bucket_id === bucket && !a.archived_at,
+        (a) => a.bucket_id === bucket && !a.deletion_pending &&
+          (bucket === 'portfolio-media' || !a.archived_at),
       )
       if (!group.length) return
       const { data } = await client.storage.from(bucket).createSignedUrls(
@@ -94,6 +97,36 @@ export async function archiveDocument(
   channel.postMessage('refresh')
   channel.close()
 }
+
+export async function archiveImages(client: SupabaseClient, ids: string[], restore: boolean) {
+  const { error } = await client.rpc('archive_cms_assets', { target_ids: ids, restore })
+  if (error)
+    throw new Error(error.code === '23503'
+      ? 'Remove the images from draft and published content first.'
+      : 'Couldn’t update the selected images. Refresh the library and try again.')
+}
+
+export async function deleteImages(client: SupabaseClient, ids: string[]) {
+  const params = { target_ids: ids }
+  const { data, error } = await client.rpc('prepare_cms_asset_deletion', params)
+  if (error)
+    throw new Error(error.code === '23503'
+      ? 'Remove the images from draft and published content first.'
+      : 'Couldn’t start deletion. Refresh the library and try again.')
+
+  const files = (data ?? []) as Pick<CmsAsset, 'bucket_id' | 'object_path'>[]
+  const removed = await Promise.allSettled(mediaBuckets.map(async (bucket) => {
+    const paths = files.filter((file) => file.bucket_id === bucket).map((file) => file.object_path)
+    if (!paths.length) return
+    const { error } = await client.storage.from(bucket).remove(paths)
+    if (error) throw error
+  }))
+  const retry = 'Some images are pending deletion. Select them and press Delete again to finish.'
+  if (removed.some((result) => result.status === 'rejected')) throw new Error(retry)
+  const completed = await client.rpc('complete_cms_asset_deletion', params)
+  if (completed.error) throw new Error(retry)
+}
+
 const fileTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif']
 export async function uploadImage(
   client: SupabaseClient,

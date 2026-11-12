@@ -3,9 +3,10 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CmsDocument, CmsAsset, Publication, Kind } from '../cms/content'
 import { blankContent, assetIds } from '../cms/content'
-import { loadWorkspace, uploadImage, archiveDocument, newDocument } from './cms'
+import { loadWorkspace, uploadImage, archiveDocument, archiveImages, deleteImages, newDocument } from './cms'
 import { importPortfolio } from './importPortfolio'
 import { CmsEditor } from './CmsEditor'
+import { MediaLibraryGrid, type MediaAction } from './MediaLibraryGrid'
 import { PortfolioActivity } from './PortfolioActivity'
 import './AdminDashboard.css'
 import './AdminIdle.css'
@@ -218,6 +219,22 @@ export function AdminDashboard({
       setDirty(true)
     }
   }
+  async function manageImages(ids: string[], action: MediaAction) {
+    await run(async () => {
+      try {
+        if (action === 'delete') await deleteImages(client, ids)
+        else await archiveImages(client, ids, action === 'restore')
+      } catch (error) {
+        await reload().catch(() => {})
+        throw error
+      }
+      setAsset(null)
+      setDirty(false)
+      await reload()
+      const pastTense = action === 'delete' ? 'deleted' : action === 'restore' ? 'restored' : 'archived'
+      setMessage(`${ids.length} image${ids.length === 1 ? '' : 's'} ${pastTense}.`)
+    })
+  }
   function empty(title: string, text: string, icon = 'layers') {
     return (
       <div className="ss-empty">
@@ -302,10 +319,12 @@ export function AdminDashboard({
       (a) =>
         a.bucket_id === 'portfolio-media' && !!a.archived_at === showArchived,
     ) ?? []
+  const mediaEntries = contents && section === 'Media'
+    ? [...contents.documents, ...contents.publications]
+    : []
+  const referencedImages = new Set(mediaEntries.flatMap((entry) => assetIds(entry.content)))
   const used = asset
-    ? (contents?.documents.filter((d) =>
-        assetIds(d.content).includes(asset.id),
-      ) ?? [])
+    ? [...new Set(mediaEntries.filter((entry) => assetIds(entry.content).includes(asset.id)).map((entry) => entry.title))]
     : []
   return (
     <div
@@ -588,9 +607,12 @@ export function AdminDashboard({
                               <input
                                 type="checkbox"
                                 checked={showArchived}
+                                disabled={busy}
                                 onChange={(e) => {
+                                  if (!leave()) return
                                   setShowArchived(e.target.checked)
                                   setAsset(null)
+                                  setDirty(false)
                                 }}
                               />
                               Show archived
@@ -645,11 +667,11 @@ export function AdminDashboard({
                                       }
                                     />
                                   </label>
-                                  <p className="ss-lead">
-                                    {used.length
-                                      ? `Used in: ${used.map((d) => d.title).join(', ')}. Republish each entry to update its public image description.`
-                                      : 'Not used in any drafts.'}
-                                  </p>
+                                  {used.length > 0 && (
+                                    <p className="ss-lead">
+                                      Used in {used.join(', ')}. Republish each entry to update its public image description.
+                                    </p>
+                                  )}
                                   <div className="ss-row-actions">
                                     <button
                                       className="ss-primary"
@@ -681,26 +703,12 @@ export function AdminDashboard({
                                       className="ss-secondary"
                                       disabled={
                                         busy ||
+                                        asset.deletion_pending ||
                                         (!asset.archived_at && used.length > 0)
                                       }
-                                      onClick={() =>
-                                        void run(async () => {
-                                          const { error } = await client.rpc(
-                                            'archive_cms_asset',
-                                            {
-                                              target_id: asset.id,
-                                              restore: !!asset.archived_at,
-                                            },
-                                          )
-                                          if (error)
-                                            throw new Error(
-                                              'Remove this image from all draft and published albums before archiving.',
-                                            )
-                                          setAsset(null)
-                                          await reload()
-                                          setMessage('Image library updated.')
-                                        })
-                                      }
+                                      onClick={() => {
+                                        if (leave()) void manageImages([asset.id], asset.archived_at ? 'restore' : 'archive')
+                                      }}
                                     >
                                       {asset.archived_at
                                         ? 'Restore image'
@@ -727,24 +735,15 @@ export function AdminDashboard({
                                     )}
                                 </section>
                               ) : media.length ? (
-                                <div className="ss-media-grid">
-                                  {media.map((a) => (
-                                    <button
-                                      className="ss-media-item"
-                                      key={a.id}
-                                      onClick={() => setAsset(a)}
-                                    >
-                                      {a.url ? (
-                                        <img src={a.url} alt={a.alt_text} />
-                                      ) : (
-                                        <div className="ss-cover-placeholder">
-                                          <Icon name="media" />
-                                        </div>
-                                      )}
-                                      <span>{a.original_filename}</span>
-                                    </button>
-                                  ))}
-                                </div>
+                                <MediaLibraryGrid
+                                  key={String(showArchived)}
+                                  images={media}
+                                  referencedImages={referencedImages}
+                                  archived={showArchived}
+                                  busy={busy}
+                                  onOpen={setAsset}
+                                  onManage={(ids, action) => void manageImages(ids, action)}
+                                />
                               ) : (
                                 empty(
                                   showArchived

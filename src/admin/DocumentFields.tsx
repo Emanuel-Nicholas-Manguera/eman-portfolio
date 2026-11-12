@@ -157,7 +157,7 @@ function ImageChoice({
         <select value={id ?? ''} onChange={(e) => onChange(e.target.value)}>
           <option value="">Choose an image</option>
           {assets
-            .filter((a) => a.bucket_id === 'portfolio-media' && !a.archived_at)
+            .filter((a) => a.bucket_id === 'portfolio-media' && !a.archived_at && !a.deletion_pending)
             .map((a) => (
               <option value={a.id} key={a.id}>
                 {a.original_filename}

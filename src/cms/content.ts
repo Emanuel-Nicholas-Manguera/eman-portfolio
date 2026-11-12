@@ -133,6 +133,7 @@ export type CmsAsset = {
   mime_type: string
   byte_size: number
   archived_at: string | null
+  deletion_pending?: boolean
   original_asset_id: string | null
   url?: string
 }
