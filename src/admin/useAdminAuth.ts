@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { excludeOwnerActivity } from '../ownerActivity'
 import { adminSupabase } from './client'
-import { inspectAdminSession, signOutAdmin } from './auth'
-import type { AuthView } from './auth'
+import { inspectAdminSession, signInAdmin, signOutAdmin, type AuthView } from './auth'
 import { createAuthController } from './authController'
 import { ADMIN_IDLE_STORAGE_KEY, createIdleSession, type IdleStatus } from './idleSession'
 
@@ -98,6 +97,14 @@ export function useAdminAuth() {
   const run = useCallback((action: () => Promise<AuthView>, fallback: string, hideCurrent = false) => {
     return controller.current?.run(action, fallback, hideCurrent) ?? Promise.resolve()
   }, [])
+  const signIn = useCallback((email: string, password: string) => {
+    const client = adminSupabase
+    if (!client) return
+    return run(() => {
+      setIdleTimedOut(false)
+      return signInAdmin(client, email, password)
+    }, 'Unable to sign in. Please check your connection and try again.')
+  }, [run])
   const refresh = useCallback(() => controller.current?.refresh(), [])
   const signOut = useCallback(() => {
     const client = adminSupabase
@@ -105,5 +112,5 @@ export function useAdminAuth() {
   }, [])
   const staySignedIn = useCallback(() => continueSession.current?.(), [])
 
-  return { client: adminSupabase, view, busy, error, run, refresh, signOut, idleWarning, idleTimedOut, staySignedIn }
+  return { client: adminSupabase, view, busy, error, run, signIn, refresh, signOut, idleWarning, idleTimedOut, staySignedIn }
 }

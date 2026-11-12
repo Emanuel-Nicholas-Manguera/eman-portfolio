@@ -54,7 +54,7 @@ export function AdminSignIn() {
       <main className="admin-sign-in__main">
         <section className={`admin-sign-in__content${auth.view.stage === 'checking' ? ' admin-sign-in__content--checking' : ''}`} aria-labelledby="sign-in-heading">
           <p className="admin-sign-in__eyebrow">{auth.view.stage === 'checking' ? 'Portfolio studio' : 'Portfolio admin'}</p>
-          {auth.idleTimedOut && auth.view.stage !== 'checking' && <p className="admin-sign-in__timeout" role="status">
+          {auth.idleTimedOut && auth.view.stage === 'signedOut' && <p className="admin-sign-in__timeout" role="status">
             You were signed out after {ADMIN_IDLE_TIMEOUT_MINUTES} minutes of inactivity. Sign in again to continue.
           </p>}
           <AdminAuthPanel auth={auth} />

@@ -1,11 +1,11 @@
 import { AdminIcon } from './AdminIcon'
 import { useState } from 'react'
-import { enrollAdminAuthenticator, signInAdmin, verifyAdminAuthenticator } from './auth'
+import { enrollAdminAuthenticator, verifyAdminAuthenticator } from './auth'
 import type { useAdminAuth } from './useAdminAuth'
 import { AdminLoading } from './AdminLoading'
 
 export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth> }) {
-  const { view, busy, error, client, run } = auth
+  const { view, busy, error, client, run, signIn } = auth
   const [showPassword, setShowPassword] = useState(false)
   const [code, setCode] = useState('')
   const [codePosition, setCodePosition] = useState(0)
@@ -55,7 +55,7 @@ export function AdminAuthPanel({ auth }: { auth: ReturnType<typeof useAdminAuth>
           const fields = new FormData(event.currentTarget)
           const email = String(fields.get('email') ?? '')
           const password = String(fields.get('password') ?? '')
-          void run(() => signInAdmin(client, email, password), 'Unable to sign in. Please check your connection and try again.')
+          void signIn(email, password)
           const input = event.currentTarget.elements.namedItem('password') as HTMLInputElement
           input.value = ''
           setShowPassword(false)
