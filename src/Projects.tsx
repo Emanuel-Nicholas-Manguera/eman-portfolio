@@ -6,8 +6,22 @@ function Arrow({ previous = false }: { previous?: boolean }) {
   return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d={previous ? 'M20 12H4m7-7-7 7 7 7' : 'M4 12h16m-7-7 7 7-7 7'} /></svg>
 }
 
+function setPhotoFit(image: HTMLImageElement | null) {
+  if (image?.complete && image.naturalWidth > 0) {
+    image.dataset.fit = image.naturalHeight > image.naturalWidth ? 'contain' : 'cover'
+  }
+}
+
 function Photo({ photo, eager = false }: { photo: ProjectPhoto; eager?: boolean }) {
-  if (photo.src) return <img src={photo.src} alt={photo.alt || photo.label} loading={eager ? 'eager' : 'lazy'} draggable="false" />
+  if (photo.src) return <img
+    key={photo.src}
+    ref={setPhotoFit}
+    onLoad={event => setPhotoFit(event.currentTarget)}
+    src={photo.src}
+    alt={photo.alt || photo.label}
+    loading={eager ? 'eager' : 'lazy'}
+    draggable="false"
+  />
   // These are explicitly labeled illustrations until real screenshots are supplied.
   return <div className={`project-illustration project-illustration--${photo.illustration}`} aria-hidden="true">
     {photo.illustration === 'golf' ? <div className="project-phone">
