@@ -9,6 +9,7 @@ const sections = [
   { key: 'contact', label: 'Contact' },
 ] as const
 const dateLabel = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+const fullDateLabel = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 const numberLabel = new Intl.NumberFormat('en-US')
 type ActivityRow = { activity_day: string; event_key: string; total: number }
 
@@ -30,6 +31,7 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
   const [range, setRange] = useState<7 | 30>(7)
   const [days, setDays] = useState(recentDays)
   const [result, setResult] = useState<{ days: string[]; rows: ActivityRow[]; failed: boolean } | null>(null)
+  const [selectedDay, setSelectedDay] = useState<string | null>(null)
 
   useEffect(() => {
     const request = new AbortController()
@@ -51,18 +53,31 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
   }, [client, days])
 
   const refreshing = result?.days !== days
-  const selectedDays = (result?.days ?? days).slice(-range)
+  const availableDays = result?.days ?? days
+  const selectedDays = availableDays.slice(-range)
   const lastDay = selectedDays[selectedDays.length - 1]
   const rows = result?.rows.filter((row) => row.activity_day >= selectedDays[0]) ?? []
   const viewsByDay = new Map(rows.filter((row) => row.event_key === 'page_view').map((row) => [row.activity_day, row.total]))
   const views = selectedDays.map((day) => ({ day, total: viewsByDay.get(day) ?? 0 }))
   const viewTotal = views.reduce((sum, { total }) => sum + total, 0)
+  const dailyView = views.find(({ day }) => day === selectedDay)
   const peak = Math.max(1, ...views.map(({ total }) => total))
+  const tickStep = Math.ceil(peak / 4)
+  const tickCount = Math.ceil(peak / tickStep)
+  const chartMax = tickCount * tickStep
+  const ticks = Array.from({ length: tickCount + 1 }, (_, index) => chartMax - index * tickStep)
   const clicks = sections.map((section) => ({
     ...section,
     total: rows.reduce((sum, row) => sum + (row.event_key === section.key ? row.total : 0), 0),
   })).sort((a, b) => b.total - a.total)
   const clickTotal = clicks.reduce((sum, { total }) => sum + total, 0)
+
+  function selectRange(nextRange: 7 | 30) {
+    setRange(nextRange)
+    if (selectedDay && selectedDay < availableDays[availableDays.length - nextRange]) {
+      setSelectedDay(null)
+    }
+  }
 
   return (
     <section className="ss-activity" aria-labelledby="portfolio-activity-heading">
@@ -73,8 +88,8 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
         </div>
         <div className="ss-activity-controls">
           <div className="ss-activity-range" role="group" aria-label="Activity date range">
-            <button type="button" aria-pressed={range === 7} onClick={() => setRange(7)}>7 days</button>
-            <button type="button" aria-pressed={range === 30} onClick={() => setRange(30)}>30 days</button>
+            <button type="button" aria-pressed={range === 7} onClick={() => selectRange(7)}>7 days</button>
+            <button type="button" aria-pressed={range === 30} onClick={() => selectRange(30)}>30 days</button>
           </div>
           <button
             type="button"
@@ -96,16 +111,55 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
       ) : (
         <div className="ss-activity-grid">
           <div className="ss-activity-card">
-            <h3>Page views</h3>
-            <p className="ss-activity-total">{numberLabel.format(viewTotal)}</p>
-            <ul className="ss-activity-chart" aria-label="Page views by day">
-              {views.map(({ day, total }) => (
-                <li key={day} aria-label={`${dayLabel(day)}: ${numberLabel.format(total)} page views`}>
-                  <span title={`${dayLabel(day)}: ${numberLabel.format(total)}`} style={{ height: `${total / peak * 100}%` }} />
-                </li>
-              ))}
-            </ul>
-            <div className="ss-activity-axis" aria-hidden="true"><span>{dayLabel(selectedDays[0])}</span><span>{dayLabel(lastDay)}</span></div>
+            <div className="ss-activity-views-heading">
+              <div>
+                <h3>Page views</h3>
+                <div role="status">
+                  <p className="ss-activity-total">{numberLabel.format(dailyView?.total ?? viewTotal)}</p>
+                  <p className="ss-activity-period">{dailyView
+                    ? fullDateLabel.format(new Date(`${dailyView.day}T00:00:00Z`))
+                    : `${range}-day total`}</p>
+                </div>
+              </div>
+              {dailyView && <button type="button" className="ss-activity-show-total" onClick={() => setSelectedDay(null)}>Show total</button>}
+            </div>
+            <div className="ss-activity-plot">
+              <div className="ss-activity-scale" aria-hidden="true">
+                {ticks.map((tick) => <span key={tick}>{numberLabel.format(tick)}</span>)}
+              </div>
+              <div className="ss-activity-plot-scroll">
+                <div style={{ minWidth: range * 24 }}>
+                  <ul
+                    className="ss-activity-chart"
+                    aria-label="Page views by day"
+                    style={{ backgroundSize: `100% ${100 / tickCount}%` }}
+                  >
+                    {views.map(({ day, total }) => {
+                      const label = `${dayLabel(day)}, ${numberLabel.format(total)} ${total === 1 ? 'view' : 'views'}`
+                      const isSelected = dailyView?.day === day
+                      return (
+                        <li key={day}>
+                          <button
+                            type="button"
+                            className="ss-activity-bar"
+                            aria-label={label}
+                            aria-pressed={isSelected}
+                            title={label}
+                            onClick={() => setSelectedDay(isSelected ? null : day)}
+                          >
+                            <span aria-hidden="true" style={{ height: `${total / chartMax * 100}%` }} />
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  <div className="ss-activity-axis" aria-hidden="true">
+                    <span>{dayLabel(selectedDays[0])}</span>
+                    <span>{dayLabel(lastDay)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="ss-activity-card">
             <h3>Section clicks</h3>
