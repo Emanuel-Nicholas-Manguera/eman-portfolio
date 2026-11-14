@@ -415,7 +415,6 @@ export function AdminDashboard({
                   <strong>Emanuel Nicholas</strong>
                   <span>Owner</span>
                 </span>
-                <span className="ss-owner-chevron"><Icon name="chevron" /></span>
               </button>
               <div className="ss-owner-actions" id="studio-owner-actions" hidden={!ownerMenuOpen}>
                 <button

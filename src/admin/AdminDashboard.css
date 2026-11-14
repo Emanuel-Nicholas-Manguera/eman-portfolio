@@ -192,19 +192,6 @@
 .admin-dashboard .ss-owner-person[aria-expanded='true'] {
   background: var(--ss-hover);
 }
-.admin-dashboard .ss-owner-chevron {
-  display: flex;
-  margin-left: auto;
-  color: var(--ss-muted);
-}
-.admin-dashboard .ss-owner-chevron svg {
-  width: 12px;
-  height: 12px;
-  transform: rotate(-90deg);
-}
-.admin-dashboard .ss-owner-person[aria-expanded='true'] .ss-owner-chevron svg {
-  transform: rotate(90deg);
-}
 .admin-dashboard .ss-avatar {
   width: 32px;
   height: 32px;
