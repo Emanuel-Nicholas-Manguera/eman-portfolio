@@ -79,6 +79,10 @@
   opacity: 1;
 }
 
+.portfolio-content {
+  --portfolio-intro-width: clamp(1120px, 100vw - 200px, 1320px);
+}
+
 .site-header {
   position: fixed;
   z-index: 10;
@@ -104,7 +108,7 @@
 
 .site-header[data-floating='true'] {
   top: calc(16px + env(safe-area-inset-top, 0px));
-  width: min(calc(100% - 48px), 1120px);
+  width: min(calc(100% - 48px), var(--portfolio-intro-width));
   padding: 10px 24px;
   border-color: var(--header-border);
   border-radius: 18px;
@@ -116,7 +120,7 @@
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 24px;
-  max-width: 1120px;
+  max-width: var(--portfolio-intro-width);
   margin-inline: auto;
 }
 

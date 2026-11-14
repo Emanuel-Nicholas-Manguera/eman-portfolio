@@ -1,5 +1,5 @@
 .main-content {
-  width: min(calc(100% - 80px), 1120px);
+  width: min(calc(100% - 80px), var(--portfolio-intro-width, 1120px));
   margin-inline: auto;
 }
 
@@ -45,7 +45,7 @@
   z-index: -1;
   top: 0;
   height: min(100%, 780px);
-  left: calc(-1 * max(40px, (100vw - 1120px) / 2));
+  left: calc(-1 * max(40px, (100vw - var(--portfolio-intro-width, 1120px)) / 2));
   right: 24%;
   pointer-events: none;
   color: var(--dot-color);
