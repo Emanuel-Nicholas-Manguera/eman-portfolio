@@ -49,6 +49,7 @@
 .admin-dashboard :is(.ss-activity-chart, .ss-activity-ranking) { list-style: none; margin: 0; padding: 0; }
 .admin-dashboard .ss-activity-plot {
   --ss-plot-height: 112px;
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: 8px;
@@ -93,6 +94,29 @@
 }
 .admin-dashboard .ss-activity-bar:is(:hover, :focus-visible) span { opacity: 1; }
 .admin-dashboard .ss-activity-bar[aria-pressed='true'] span { background: var(--ss-action); opacity: 1; }
+.admin-dashboard .ss-activity-tooltip {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  gap: 1px;
+  padding: 6px 10px;
+  border: 1px solid var(--ss-edge);
+  border-radius: 8px;
+  background: var(--ss-rail);
+  color: var(--ss-muted);
+  box-shadow: 0 4px 12px var(--ss-shadow);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 8px));
+  animation: ss-activity-tooltip-in 160ms ease-out;
+}
+.admin-dashboard .ss-activity-tooltip strong { color: var(--ss-ink); font-variant-numeric: tabular-nums; }
+@keyframes ss-activity-tooltip-in {
+  from { opacity: 0; transform: translate(-50%, calc(-100% - 4px)); }
+}
 .admin-dashboard .ss-activity-axis,
 .admin-dashboard .ss-activity-ranking li > div:first-child { display: flex; justify-content: space-between; gap: 12px; }
 .admin-dashboard .ss-activity-axis { margin-top: 8px; color: var(--ss-muted); font-size: 11px; }

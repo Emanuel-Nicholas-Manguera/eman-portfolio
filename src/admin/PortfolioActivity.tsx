@@ -1,5 +1,5 @@
 import { AdminIcon } from './AdminIcon'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import './PortfolioActivity.css'
 
@@ -12,6 +12,7 @@ const dateLabel = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numer
 const fullDateLabel = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 const numberLabel = new Intl.NumberFormat('en-US')
 type ActivityRow = { activity_day: string; event_key: string; total: number }
+type BarPreview = { day: string; left: number; top: number }
 
 function recentDays() {
   const today = new Intl.DateTimeFormat('en-CA', {
@@ -32,6 +33,8 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
   const [days, setDays] = useState(recentDays)
   const [result, setResult] = useState<{ days: string[]; rows: ActivityRow[]; failed: boolean } | null>(null)
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  const [barPreview, setBarPreview] = useState<BarPreview | null>(null)
+  const plotRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const request = new AbortController()
@@ -61,6 +64,7 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
   const views = selectedDays.map((day) => ({ day, total: viewsByDay.get(day) ?? 0 }))
   const viewTotal = views.reduce((sum, { total }) => sum + total, 0)
   const dailyView = views.find(({ day }) => day === selectedDay)
+  const previewView = views.find(({ day }) => day === barPreview?.day)
   const peak = Math.max(1, ...views.map(({ total }) => total))
   const tickStep = Math.ceil(peak / 4)
   const tickCount = Math.ceil(peak / tickStep)
@@ -74,9 +78,21 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
 
   function selectRange(nextRange: 7 | 30) {
     setRange(nextRange)
+    setBarPreview(null)
     if (selectedDay && selectedDay < availableDays[availableDays.length - nextRange]) {
       setSelectedDay(null)
     }
+  }
+
+  function previewBar(day: string, button: HTMLButtonElement) {
+    const plot = plotRef.current?.getBoundingClientRect()
+    const bar = button.firstElementChild?.getBoundingClientRect()
+    if (!plot || !bar) return
+    setBarPreview({ day, left: bar.left + bar.width / 2 - plot.left, top: bar.top - plot.top })
+  }
+
+  function hideBarPreview(day: string) {
+    setBarPreview((preview) => preview?.day === day ? null : preview)
   }
 
   return (
@@ -98,7 +114,10 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
             title="Refresh portfolio activity"
             aria-busy={refreshing}
             disabled={refreshing}
-            onClick={() => setDays(recentDays())}
+            onClick={() => {
+              setBarPreview(null)
+              setDays(recentDays())
+            }}
           >
             <AdminIcon name="refresh" />
           </button>
@@ -123,11 +142,11 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
               </div>
               {dailyView && <button type="button" className="ss-activity-show-total" onClick={() => setSelectedDay(null)}>Show total</button>}
             </div>
-            <div className="ss-activity-plot">
+            <div className="ss-activity-plot" ref={plotRef}>
               <div className="ss-activity-scale" aria-hidden="true">
                 {ticks.map((tick) => <span key={tick}>{numberLabel.format(tick)}</span>)}
               </div>
-              <div className="ss-activity-plot-scroll">
+              <div className="ss-activity-plot-scroll" onScroll={() => setBarPreview(null)}>
                 <div style={{ minWidth: range * 24 }}>
                   <ul
                     className="ss-activity-chart"
@@ -135,16 +154,26 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
                     style={{ backgroundSize: `100% ${100 / tickCount}%` }}
                   >
                     {views.map(({ day, total }) => {
-                      const label = `${dayLabel(day)}, ${numberLabel.format(total)} ${total === 1 ? 'view' : 'views'}`
+                      const count = `${numberLabel.format(total)} ${total === 1 ? 'view' : 'views'}`
                       const isSelected = dailyView?.day === day
                       return (
                         <li key={day}>
                           <button
                             type="button"
                             className="ss-activity-bar"
-                            aria-label={label}
+                            aria-label={`${dayLabel(day)}, ${count}`}
                             aria-pressed={isSelected}
-                            title={label}
+                            onPointerEnter={(event) => {
+                              if (event.pointerType !== 'touch') previewBar(day, event.currentTarget)
+                            }}
+                            onPointerLeave={() => hideBarPreview(day)}
+                            onFocus={(event) => {
+                              if (event.currentTarget.matches(':focus-visible')) previewBar(day, event.currentTarget)
+                            }}
+                            onBlur={() => hideBarPreview(day)}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Escape') setBarPreview(null)
+                            }}
                             onClick={() => setSelectedDay(isSelected ? null : day)}
                           >
                             <span aria-hidden="true" style={{ height: `${total / chartMax * 100}%` }} />
@@ -159,6 +188,17 @@ export function PortfolioActivity({ client }: { client: SupabaseClient }) {
                   </div>
                 </div>
               </div>
+              {barPreview && previewView && (
+                <div
+                  key={previewView.day}
+                  className="ss-activity-tooltip"
+                  aria-hidden="true"
+                  style={{ left: `clamp(56px, ${barPreview.left}px, 100% - 56px)`, top: barPreview.top }}
+                >
+                  <span>{dayLabel(previewView.day)}</span>
+                  <strong>{numberLabel.format(previewView.total)} {previewView.total === 1 ? 'view' : 'views'}</strong>
+                </div>
+              )}
             </div>
           </div>
           <div className="ss-activity-card">
