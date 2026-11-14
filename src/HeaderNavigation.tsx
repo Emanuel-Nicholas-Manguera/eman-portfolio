@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
+import { portfolioScale } from './portfolioScale'
 
 type Props = {
   items: string[]
@@ -29,7 +30,13 @@ export function HeaderNavigation({ activeSection, onNavigate, items }: Props) {
       }
       const bounds = container.getBoundingClientRect()
       const text = label.getBoundingClientRect()
-      const next = { x: text.left - bounds.left, y: text.bottom - bounds.top + 5, width: text.width, visible: true }
+      const scale = portfolioScale(container)
+      const next = {
+        x: (text.left - bounds.left) / scale,
+        y: (text.bottom - bounds.top) / scale + 5,
+        width: text.width / scale,
+        visible: true,
+      }
       setLine((current) => current.x === next.x && current.y === next.y && current.width === next.width && current.visible
         ? current : next)
     }
@@ -38,7 +45,11 @@ export function HeaderNavigation({ activeSection, onNavigate, items }: Props) {
     const observer = new ResizeObserver(measure)
     observer.observe(container)
     container.querySelectorAll('a').forEach((link) => observer.observe(link))
-    return () => observer.disconnect()
+    window.addEventListener('resize', measure)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+    }
   }, [target, itemsKey])
 
   return (

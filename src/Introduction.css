@@ -1,10 +1,9 @@
 .main-content {
-  width: min(calc(100% - 80px), var(--portfolio-intro-width, 1120px));
+  width: min(calc(100% - 80px), 1120px);
   margin-inline: auto;
 }
 
 .introduction {
-  --intro-scale: var(--portfolio-intro-scale, 1);
   --intro-reveal-duration: 350ms;
   --intro-secondary-text: var(--muted-text);
   --dot-color: var(--accent);
@@ -15,10 +14,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
   align-items: center;
-  gap: calc(36px * var(--intro-scale)) calc(56px * var(--intro-scale));
-  min-height: 100svh;
+  gap: 36px 56px;
+  min-height: calc(100svh / var(--portfolio-scale, 1));
   padding-top: calc(132px + env(safe-area-inset-top, 0px));
-  padding-bottom: calc(32px * var(--intro-scale));
+  padding-bottom: 32px;
 }
 
 .portfolio[data-theme='light'] .introduction {
@@ -29,7 +28,7 @@
 }
 
 .intro-copy {
-  padding-block: calc(20px * var(--intro-scale));
+  padding-block: 20px;
 }
 .intro-copy::after {
   content: '';
@@ -46,7 +45,7 @@
   z-index: -1;
   top: 0;
   height: min(100%, 780px);
-  left: calc(-1 * max(40px, (100vw - var(--portfolio-intro-width, 1120px)) / 2));
+  left: calc(-1 * max(40px, (100vw / var(--portfolio-scale, 1) - 1120px) / 2));
   right: 24%;
   pointer-events: none;
   color: var(--dot-color);
@@ -105,8 +104,8 @@
 }
 
 .intro-copy h1 {
-  margin: calc(20px * var(--intro-scale)) 0 calc(14px * var(--intro-scale));
-  font-size: calc(clamp(42px, 4.7vw, 64px) * var(--intro-scale));
+  margin: 20px 0 14px;
+  font-size: clamp(42px, 4.7vw, 64px);
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: -.05em;
@@ -164,33 +163,33 @@
 }
 
 .intro-role {
-  margin: 0 0 calc(26px * var(--intro-scale));
+  margin: 0 0 26px;
   color: var(--accent);
-  font-size: calc(clamp(20px, 2vw, 24px) * var(--intro-scale));
+  font-size: clamp(20px, 2vw, 24px);
   font-weight: 500;
   line-height: 1.4;
   transition: color var(--theme-duration) var(--theme-easing);
 }
 
 .intro-description {
-  max-width: calc(450px * var(--intro-scale));
+  max-width: 450px;
   margin: 0;
   color: var(--intro-secondary-text);
-  font-size: calc(16px * var(--intro-scale));
+  font-size: 16px;
   line-height: 1.85;
 }
 
 .intro-action {
   display: inline-flex;
   align-items: center;
-  gap: calc(30px * var(--intro-scale));
-  min-height: calc(48px * var(--intro-scale));
-  margin-top: calc(30px * var(--intro-scale));
-  padding: calc(14px * var(--intro-scale)) calc(20px * var(--intro-scale));
-  border-radius: calc(10px * var(--intro-scale));
+  gap: 30px;
+  min-height: 48px;
+  margin-top: 30px;
+  padding: 14px 20px;
+  border-radius: 10px;
   color: var(--action-text);
   background: var(--action-background);
-  font-size: calc(14px * var(--intro-scale));
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
   text-decoration: none;
@@ -207,17 +206,17 @@
 .intro-location {
   display: flex;
   align-items: center;
-  gap: calc(7px * var(--intro-scale));
+  gap: 7px;
   margin: 0;
   color: var(--intro-secondary-text);
-  font-size: calc(12px * var(--intro-scale));
+  font-size: 12px;
   line-height: 1.5;
 }
 
 .portrait {
   container-type: inline-size;
   width: 100%;
-  max-width: calc(450px * var(--intro-scale));
+  max-width: 450px;
   margin: 0;
   justify-self: end;
   text-align: center;
@@ -317,28 +316,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: calc(20px * var(--intro-scale));
-  min-height: calc(56px * var(--intro-scale));
-  padding-top: calc(20px * var(--intro-scale));
+  gap: 20px;
+  min-height: 56px;
+  padding-top: 20px;
   border-top: 1px solid var(--header-border);
   color: var(--muted-text);
-  font-size: calc(12px * var(--intro-scale));
+  font-size: 12px;
   line-height: 1.5;
   text-decoration: none;
 }
 
 .intro-scroll svg {
   flex: 0 0 auto;
-}
-
-.intro-location svg {
-  width: calc(15px * var(--intro-scale));
-  height: calc(15px * var(--intro-scale));
-}
-
-:is(.intro-action, .intro-scroll) svg {
-  width: calc(18px * var(--intro-scale));
-  height: calc(18px * var(--intro-scale));
 }
 
 .main-content a:focus-visible,

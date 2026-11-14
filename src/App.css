@@ -104,7 +104,7 @@
 
 .site-header[data-floating='true'] {
   top: calc(16px + env(safe-area-inset-top, 0px));
-  width: min(calc(100% - 48px), var(--portfolio-intro-width, 1120px));
+  width: min(calc(100% - 48px), 1120px);
   padding: 10px 24px;
   border-color: var(--header-border);
   border-radius: 18px;
@@ -116,24 +116,25 @@
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 24px;
-  max-width: var(--portfolio-intro-width, 1120px);
+  max-width: 1120px;
   margin-inline: auto;
 }
 
 .portfolio-content {
-  --portfolio-intro-width: calc(1120px * var(--portfolio-intro-scale, 1));
+  --portfolio-scale: 1;
+  zoom: var(--portfolio-scale);
 }
 
 @media (min-width: 1900px) {
   .portfolio-content {
-    --portfolio-intro-scale: 1.1;
+    --portfolio-scale: 1.12;
   }
 }
 
-@supports (font-size: calc(16px * (100vw / 1600px))) {
+@supports (zoom: calc(100vw / 1600px)) {
   .portfolio-content {
-    /* Grow from the original size at 1600px to 110% at 1900px. */
-    --portfolio-intro-scale: clamp(1, 1 + (100vw - 1600px) / 3000px, 1.1);
+    /* Keep the original size through 1600px and reach 112% at 1900px. */
+    --portfolio-scale: clamp(1, 1 + (100vw - 1600px) / 2500px, 1.12);
   }
 }
 

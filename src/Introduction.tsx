@@ -5,6 +5,7 @@ import './Introduction.css'
 import { IntroductionDetails } from './IntroductionDetails'
 import { SocialLinks } from './SocialLinks'
 import type { SocialSelection, SocialLink } from './socialData'
+import { portfolioScale } from './portfolioScale'
 
 function InteractiveDots() {
   const fieldRef = useRef<HTMLDivElement>(null)
@@ -41,8 +42,9 @@ function InteractiveDots() {
         hide()
         return
       }
-      field.style.setProperty('--dot-x', `${x}px`)
-      field.style.setProperty('--dot-y', `${y}px`)
+      const scale = portfolioScale(field)
+      field.style.setProperty('--dot-x', `${x / scale}px`)
+      field.style.setProperty('--dot-y', `${y / scale}px`)
       field.dataset.active = 'true'
     }
     const move = (event: PointerEvent) => {
@@ -71,7 +73,8 @@ function InteractiveDots() {
       const x = event.clientX - bounds.left
       const y = event.clientY - bounds.top
       if (x < 0 || y < 0 || x > bounds.width || y > bounds.height) return
-      setRipple({ x, y, id: ++rippleId })
+      const scale = portfolioScale(field)
+      setRipple({ x: x / scale, y: y / scale, id: ++rippleId })
     }
     window.addEventListener('pointermove', move, { passive: true })
     // Observe controls without stopping their events or changing their behavior.
@@ -303,9 +306,10 @@ export function Introduction({ content, background, socialLinks, social, onSocia
     const resizeToContent = () => {
       const active = bio.querySelector<HTMLElement>('.intro-bio-panel[aria-hidden="false"]')
       if (!active) return
-      const activeHeight = active.getBoundingClientRect().height
+      const scale = portfolioScale(bio)
+      const activeHeight = active.getBoundingClientRect().height / scale
       const maximumHeight = Math.max(...Array.from(bio.querySelectorAll('.intro-bio-panel'),
-        (panel) => panel.getBoundingClientRect().height))
+        (panel) => panel.getBoundingClientRect().height / scale))
       bio.style.height = `${activeHeight}px`
       // Balance the space below the socials, keeping the name and portrait anchored.
       bio.parentElement?.style.setProperty('--intro-bio-space', `${maximumHeight - activeHeight}px`)
@@ -313,7 +317,11 @@ export function Introduction({ content, background, socialLinks, social, onSocia
     resizeToContent()
     const observer = new ResizeObserver(resizeToContent)
     bio.querySelectorAll('.intro-bio-panel').forEach((panel) => observer.observe(panel))
-    return () => observer.disconnect()
+    window.addEventListener('resize', resizeToContent)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', resizeToContent)
+    }
   }, [isRevealed])
 
   return (

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { flushSync } from 'react-dom'
 import type { SocialLink, SocialSelection } from './socialData'
+import { portfolioScale } from './portfolioScale'
 import './SocialLinks.css'
 
 type Props = {
@@ -68,9 +69,12 @@ export function SocialLinks({ selected, onSelect, items: socials }: Props) {
     const origin = event.currentTarget.getBoundingClientRect()
     const bounds = portal.getBoundingClientRect()
     const mark = watermark.getBoundingClientRect()
-    const x = origin.left + origin.width / 2 - bounds.left
-    const y = origin.top + origin.height / 2 - bounds.top
-    const radius = Math.hypot(Math.max(x, bounds.width - x), Math.max(y, bounds.height - y))
+    const scale = portfolioScale(portal)
+    const originX = origin.left + origin.width / 2
+    const originY = origin.top + origin.height / 2
+    const x = (originX - bounds.left) / scale
+    const y = (originY - bounds.top) / scale
+    const radius = Math.hypot(Math.max(x, bounds.width / scale - x), Math.max(y, bounds.height / scale - y))
     const timing = { duration: 600, easing: 'cubic-bezier(.22,.65,.3,1)' }
 
     animations.current = [
@@ -81,7 +85,7 @@ export function SocialLinks({ selected, onSelect, items: socials }: Props) {
       ], timing),
       watermark.animate([
         {
-          transform: `translate(${origin.left + origin.width / 2 - mark.left - mark.width / 2}px, ${origin.top + origin.height / 2 - mark.top - mark.height / 2}px) scale(.07) rotate(-12deg)`,
+          transform: `translate(${(originX - mark.left - mark.width / 2) / scale}px, ${(originY - mark.top - mark.height / 2) / scale}px) scale(.07) rotate(-12deg)`,
           opacity: .55,
         },
         { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: .09 },
