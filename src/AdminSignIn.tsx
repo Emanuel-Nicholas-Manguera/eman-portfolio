@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import './AdminSignIn.css'
 import { AdminAuthPanel } from './admin/AdminAuthPanel'
@@ -9,7 +9,40 @@ import { ADMIN_IDLE_TIMEOUT_MINUTES } from './admin/idleSession'
 export function AdminSignIn() {
   const auth = useAdminAuth()
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const [signOutPrompt, setSignOutPrompt] = useState<{ source: 'menu' | 'back'; sessionId: string } | null>(null)
+  const [backSignOutPending, setBackSignOutPending] = useState(false)
+  const leaveAfterSignOut = useRef(false)
+  const sessionId = auth.view.stage === 'ready' ? auth.view.sessionId : null
+  const activePrompt = signOutPrompt?.sessionId === sessionId ? signOutPrompt.source : null
   const themeAction = `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`
+
+  useEffect(() => {
+    if (!sessionId) return
+    // Keep one entry in the same document so Back can ask before leaving Studio.
+    if (!history.state?.studioBackGuard) {
+      history.pushState({ ...history.state, studioBackGuard: true }, '')
+    }
+    const onBack = (event: PopStateEvent) => {
+      if (event.state?.studioBackGuard) return
+      history.forward()
+      setSignOutPrompt({ source: 'back', sessionId })
+    }
+    window.addEventListener('popstate', onBack)
+    return () => window.removeEventListener('popstate', onBack)
+  }, [sessionId])
+
+  useEffect(() => {
+    if (backSignOutPending) return
+    const shouldLeave = leaveAfterSignOut.current
+    leaveAfterSignOut.current = false
+    if (auth.view.stage !== 'signedOut') return
+    const atGuard = history.state?.studioBackGuard === true
+    if (shouldLeave && history.length > 2) {
+      history.go(atGuard ? -2 : -1)
+    } else if (atGuard) {
+      history.back()
+    }
+  }, [auth.view.stage, backSignOutPending])
 
   useEffect(() => {
     const previousTitle = document.title
@@ -24,10 +57,26 @@ export function AdminSignIn() {
     }
   }, [auth.view.stage])
 
-  if (auth.view.stage === 'ready' && auth.client) {
+  if (sessionId && auth.client) {
     return <AdminDashboard client={auth.client} theme={theme}
       idleWarning={auth.idleWarning} onStaySignedIn={auth.staySignedIn}
-      onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')} onSignOut={auth.signOut} />
+      onToggleTheme={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+      signOutPrompt={activePrompt}
+      onRequestSignOut={() => setSignOutPrompt({ source: 'menu', sessionId })}
+      onCancelSignOut={() => setSignOutPrompt(null)}
+      onSignOut={async () => {
+        const fromBack = activePrompt === 'back'
+        setSignOutPrompt(null)
+        if (fromBack) setBackSignOutPending(true)
+        try {
+          await auth.signOut()
+        } finally {
+          if (fromBack) {
+            leaveAfterSignOut.current = true
+            setBackSignOutPending(false)
+          }
+        }
+      }} />
   }
 
   return (

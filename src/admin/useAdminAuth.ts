@@ -118,7 +118,7 @@ export function useAdminAuth() {
   const refresh = useCallback(() => controller.current?.refresh(), [])
   const signOut = useCallback(() => {
     const client = adminSupabase
-    if (client) void controller.current?.signOut(() => signOutAdmin(client))
+    if (client) return controller.current?.signOut(() => signOutAdmin(client))
   }, [])
   const staySignedIn = useCallback(() => continueSession.current?.(), [])
 

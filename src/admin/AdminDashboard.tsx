@@ -60,6 +60,9 @@ export function AdminDashboard({
   client,
   theme,
   onToggleTheme,
+  signOutPrompt,
+  onRequestSignOut,
+  onCancelSignOut,
   onSignOut,
   idleWarning,
   onStaySignedIn,
@@ -67,6 +70,9 @@ export function AdminDashboard({
   client: SupabaseClient
   theme: 'light' | 'dark'
   onToggleTheme: () => void
+  signOutPrompt: 'menu' | 'back' | null
+  onRequestSignOut: () => void
+  onCancelSignOut: () => void
   onSignOut: () => void
   idleWarning: number | null
   onStaySignedIn: () => void
@@ -86,6 +92,11 @@ export function AdminDashboard({
   const ownerMenuRef = useRef<HTMLDivElement>(null)
   const ownerButtonRef = useRef<HTMLButtonElement>(null)
   const signOutDialogRef = useRef<HTMLDialogElement>(null)
+
+  useEffect(() => {
+    const dialog = signOutDialogRef.current
+    if (signOutPrompt && !dialog?.open) dialog?.showModal()
+  }, [signOutPrompt])
 
   useEffect(() => {
     if (!ownerMenuOpen) return
@@ -413,7 +424,7 @@ export function AdminDashboard({
                   disabled={busy}
                   onClick={() => {
                     setOwnerMenuOpen(false)
-                    signOutDialogRef.current?.showModal()
+                    onRequestSignOut()
                   }}
                 >
                   <Icon name="logout" />
@@ -785,7 +796,10 @@ export function AdminDashboard({
         ref={signOutDialogRef}
         aria-labelledby="studio-signout-title"
         aria-describedby="studio-signout-message"
-        onClose={() => ownerButtonRef.current?.focus()}
+        onClose={() => {
+          if (signOutPrompt === 'menu') ownerButtonRef.current?.focus()
+          onCancelSignOut()
+        }}
       >
         <h2 id="studio-signout-title">Are you sure you want to sign out?</h2>
         <p id="studio-signout-message">
@@ -798,6 +812,7 @@ export function AdminDashboard({
           <button
             type="button"
             className="ss-primary"
+            disabled={busy}
             onClick={onSignOut}
           >
             Sign out
