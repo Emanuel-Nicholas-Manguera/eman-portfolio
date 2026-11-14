@@ -999,9 +999,26 @@
   color: var(--ss-ink);
   background: var(--ss-base);
 }
-.admin-dashboard .ss-draft-dialog::backdrop {
+.admin-dashboard :is(.ss-draft-dialog, .ss-signout-dialog)::backdrop {
   background: #051321cc;
   backdrop-filter: blur(8px);
+}
+.admin-dashboard .ss-signout-dialog {
+  width: min(420px, calc(100% - 32px));
+  padding: 24px;
+  border: 1px solid var(--ss-edge);
+  border-radius: var(--ss-radius);
+  color: var(--ss-ink);
+  background: var(--ss-panel);
+}
+.admin-dashboard .ss-signout-dialog h2 { font-size: 20px; }
+.admin-dashboard .ss-signout-dialog p { margin-top: 8px; color: var(--ss-muted); }
+.admin-dashboard .ss-signout-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
 }
 .admin-dashboard .ss-preview-bar {
   position: sticky;

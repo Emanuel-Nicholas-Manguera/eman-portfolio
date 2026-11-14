@@ -85,6 +85,7 @@ export function AdminDashboard({
   const workspaceRef = useRef<HTMLDivElement>(null)
   const ownerMenuRef = useRef<HTMLDivElement>(null)
   const ownerButtonRef = useRef<HTMLButtonElement>(null)
+  const signOutDialogRef = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
     if (!ownerMenuOpen) return
@@ -411,7 +412,8 @@ export function AdminDashboard({
                   className="ss-signout"
                   disabled={busy}
                   onClick={() => {
-                    if (leave()) onSignOut()
+                    setOwnerMenuOpen(false)
+                    signOutDialogRef.current?.showModal()
                   }}
                 >
                   <Icon name="logout" />
@@ -778,6 +780,30 @@ export function AdminDashboard({
 
         </div>
       </div>
+      <dialog
+        className="ss-signout-dialog"
+        ref={signOutDialogRef}
+        aria-labelledby="studio-signout-title"
+        aria-describedby="studio-signout-message"
+        onClose={() => ownerButtonRef.current?.focus()}
+      >
+        <h2 id="studio-signout-title">Are you sure you want to sign out?</h2>
+        <p id="studio-signout-message">
+          {dirty ? 'Your unsaved changes will be lost.' : 'You’ll need to sign in again to access the studio.'}
+        </p>
+        <div className="ss-signout-dialog-actions">
+          <button type="button" className="ss-secondary" autoFocus onClick={() => signOutDialogRef.current?.close()}>
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="ss-primary"
+            onClick={onSignOut}
+          >
+            Sign out
+          </button>
+        </div>
+      </dialog>
     </div>
   )
 }

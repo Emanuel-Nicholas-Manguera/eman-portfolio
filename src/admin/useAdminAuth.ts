@@ -67,11 +67,20 @@ export function useAdminAuth() {
       if (event.isTrusted && !document.hidden) staySignedIn()
     }
     const onVisible = () => { if (!document.hidden) checkIdle() }
+    const onPageHide = (event: PageTransitionEvent) => {
+      // A cached document can retain the dashboard even after its session ends.
+      if (event.persisted) document.getElementById('root')?.setAttribute('hidden', '')
+    }
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) window.location.reload()
+      else checkIdle()
+    }
     const activityEvents = ['click', 'keydown', 'input', 'wheel', 'touchmove'] as const
     // Auth refreshes and tab focus are checks, never user activity.
     for (const event of activityEvents) window.addEventListener(event, onActivity, { passive: true, capture: true })
     window.addEventListener('focus', checkIdle)
-    window.addEventListener('pageshow', checkIdle)
+    window.addEventListener('pagehide', onPageHide)
+    window.addEventListener('pageshow', onPageShow)
     document.addEventListener('visibilitychange', onVisible)
     const idleTimer = window.setInterval(checkIdle, 1000)
     continueSession.current = staySignedIn
@@ -85,7 +94,8 @@ export function useAdminAuth() {
       clearInterval(idleTimer)
       for (const event of activityEvents) window.removeEventListener(event, onActivity, true)
       window.removeEventListener('focus', checkIdle)
-      window.removeEventListener('pageshow', checkIdle)
+      window.removeEventListener('pagehide', onPageHide)
+      window.removeEventListener('pageshow', onPageShow)
       document.removeEventListener('visibilitychange', onVisible)
       idle.stop()
       current.dispose()
