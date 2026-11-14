@@ -120,10 +120,20 @@
   margin-inline: auto;
 }
 
-@media (min-width: 1440px) {
+.portfolio-content {
+  --portfolio-intro-width: calc(1120px * var(--portfolio-intro-scale, 1));
+}
+
+@media (min-width: 1900px) {
   .portfolio-content {
     --portfolio-intro-scale: 1.1;
-    --portfolio-intro-width: calc(1120px * var(--portfolio-intro-scale));
+  }
+}
+
+@supports (font-size: calc(16px * (100vw / 1600px))) {
+  .portfolio-content {
+    /* Grow from the original size at 1600px to 110% at 1900px. */
+    --portfolio-intro-scale: clamp(1, 1 + (100vw - 1600px) / 3000px, 1.1);
   }
 }
 
