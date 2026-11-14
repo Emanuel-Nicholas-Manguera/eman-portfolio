@@ -104,7 +104,7 @@
 
 .site-header[data-floating='true'] {
   top: calc(16px + env(safe-area-inset-top, 0px));
-  width: min(calc(100% - 48px), 1120px);
+  width: min(calc(100% - 48px), var(--portfolio-intro-width, 1120px));
   padding: 10px 24px;
   border-color: var(--header-border);
   border-radius: 18px;
@@ -116,8 +116,15 @@
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 24px;
-  max-width: 1120px;
+  max-width: var(--portfolio-intro-width, 1120px);
   margin-inline: auto;
+}
+
+@media (min-width: 1440px) {
+  .portfolio-content {
+    --portfolio-intro-scale: 1.1;
+    --portfolio-intro-width: calc(1120px * var(--portfolio-intro-scale));
+  }
 }
 
 .header-actions {
